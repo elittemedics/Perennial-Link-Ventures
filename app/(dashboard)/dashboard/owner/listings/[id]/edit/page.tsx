@@ -1,21 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import ImageUpload from '@/components/common/ImageUpload';
-import { Building2, Save, ArrowLeft, MessageCircle, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Building2, Save, ArrowLeft, Loader2, Facebook, Instagram, Linkedin } from 'lucide-react';
 import Link from 'next/link';
 import { readApiResponse } from '@/lib/api-client';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@/lib/countries-data';
 
-export default function CreateListingPage() {
+export default function EditListingPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [phoneDialCode, setPhoneDialCode] = useState(DEFAULT_COUNTRY.phoneCode);
@@ -40,29 +44,64 @@ export default function CreateListingPage() {
   });
 
   useEffect(() => {
-    fetch('/api/v1/categories')
-      .then((res) => readApiResponse<{ categories?: { id: string; name: string }[] }>(res))
-      .then((data) => {
-        if (data.categories) setCategories(data.categories);
-      })
-      .catch(() => null);
-  }, []);
+    Promise.all([
+      fetch('/api/v1/categories').then((res) => res.json()),
+      fetch(`/api/v1/businesses/${id}`).then((res) => res.json())
+    ]).then(([catsData, busData]) => {
+      if (catsData.categories) setCategories(catsData.categories);
+      
+      if (busData.success && busData.business) {
+        const b = busData.business;
+        setFormData({
+          name: b.name || '',
+          tagline: b.tagline || '',
+          description: b.description || '',
+          categoryId: b.categoryId || '',
+          phone: b.phone || '',
+          whatsapp: b.whatsapp || '',
+          email: b.email || '',
+          website: b.website || '',
+          socialLinks: b.socialLinks || { facebook: '', instagram: '', linkedin: '' },
+          address: b.address || '',
+          cityName: b.cityName || 'Accra',
+          stateName: b.stateName || 'Greater Accra',
+          countryName: b.countryName || 'Ghana',
+          logo: b.logo || null,
+          coverImage: b.coverImage || null,
+        });
+
+        const countryMatch = COUNTRIES.find(c => c.name === (b.countryName || 'Ghana'));
+        if (countryMatch) {
+          setPhoneDialCode(countryMatch.phoneCode);
+          setWhatsappDialCode(countryMatch.phoneCode);
+        }
+      } else {
+        setError('Failed to load business details.');
+      }
+    }).catch(() => {
+      setError('An error occurred while fetching data.');
+    }).finally(() => {
+      setIsFetching(false);
+    });
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const formattedPhone = formData.phone
-      ? (formData.phone.startsWith('+') ? formData.phone : `${phoneDialCode}${formData.phone.replace(/^0+/, '')}`)
-      : '';
-    const formattedWhatsapp = formData.whatsapp
-      ? (formData.whatsapp.startsWith('+') ? formData.whatsapp : `${whatsappDialCode}${formData.whatsapp.replace(/^0+/, '')}`)
-      : '';
+    const formatNumber = (num: string, code: string) => {
+      if (!num) return '';
+      if (num.startsWith('+')) return num;
+      return `${code}${num.replace(/^0+/, '')}`;
+    };
+
+    const formattedPhone = formatNumber(formData.phone, phoneDialCode);
+    const formattedWhatsapp = formatNumber(formData.whatsapp, whatsappDialCode);
 
     try {
-      const res = await fetch('/api/v1/businesses', {
-        method: 'POST',
+      const res = await fetch(`/api/v1/businesses/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
@@ -74,17 +113,25 @@ export default function CreateListingPage() {
       const data = await readApiResponse<{ success?: boolean; error?: string }>(res);
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to submit business listing.');
+        throw new Error(data.error || 'Failed to update business listing.');
       }
 
       router.push('/dashboard/owner');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Submission failed');
+      setError(err instanceof Error ? err.message : 'Update failed');
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isFetching) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-sea" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
@@ -97,7 +144,7 @@ export default function CreateListingPage() {
       <Card className="p-4 sm:p-8">
         <CardHeader className="border-b border-slate-100 pb-4 mb-6">
           <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-sea" /> Register New Business Listing
+            <Building2 className="w-6 h-6 text-sea" /> Edit Business Listing
           </CardTitle>
         </CardHeader>
 
@@ -140,7 +187,6 @@ export default function CreateListingPage() {
                 </select>
               </div>
 
-              {/* Telephone with country dial code */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Telephone / Contact Number</label>
                 <div className="flex gap-2">
@@ -165,7 +211,6 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* WhatsApp with country dial code */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">WhatsApp Number (optional)</label>
                 <div className="flex gap-2">
@@ -214,9 +259,9 @@ export default function CreateListingPage() {
                 <p className="text-xs text-slate-500 mt-1">All optional. Add only the places customers can contact or learn about your business.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Input label="Facebook page" type="url" leftIcon={<Facebook className="w-4 h-4" />} value={formData.socialLinks.facebook} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, facebook: e.target.value } })} placeholder="https://facebook.com/yourbusiness" />
-                <Input label="Instagram profile" type="url" leftIcon={<Instagram className="w-4 h-4" />} value={formData.socialLinks.instagram} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })} placeholder="https://instagram.com/yourbusiness" />
-                <Input label="LinkedIn page" type="url" leftIcon={<Linkedin className="w-4 h-4" />} value={formData.socialLinks.linkedin} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, linkedin: e.target.value } })} placeholder="https://linkedin.com/company/yourbusiness" />
+                <Input label="Facebook page" type="url" leftIcon={<Facebook className="w-4 h-4" />} value={formData.socialLinks?.facebook || ''} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, facebook: e.target.value } })} placeholder="https://facebook.com/yourbusiness" />
+                <Input label="Instagram profile" type="url" leftIcon={<Instagram className="w-4 h-4" />} value={formData.socialLinks?.instagram || ''} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })} placeholder="https://instagram.com/yourbusiness" />
+                <Input label="LinkedIn page" type="url" leftIcon={<Linkedin className="w-4 h-4" />} value={formData.socialLinks?.linkedin || ''} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, linkedin: e.target.value } })} placeholder="https://linkedin.com/company/yourbusiness" />
               </div>
             </div>
 
@@ -242,7 +287,6 @@ export default function CreateListingPage() {
                 placeholder="Greater Accra"
               />
               
-              {/* Country Dropdown Selector */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Country</label>
                 <select
@@ -276,7 +320,6 @@ export default function CreateListingPage() {
               placeholder="Describe your services, products, history, and special offers in detail..."
             />
 
-            {/* Sharp WebP Image Upload Inputs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
               <ImageUpload
                 label="Company Logo (Sharp Auto-WebP)"
@@ -299,7 +342,7 @@ export default function CreateListingPage() {
                 </Button>
               </Link>
               <Button type="submit" variant="primary" isLoading={isLoading} className="gap-2 px-8">
-                <Save className="w-4 h-4" /> Submit Business Listing
+                <Save className="w-4 h-4" /> Save Changes
               </Button>
             </div>
           </form>

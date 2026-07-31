@@ -15,17 +15,41 @@ module.exports = {
           200: '#BAE6FD',
           300: '#7DD3FC',
           400: '#38BDF8',
-          500: '#0284C7', // Sea Blue primary
-          600: '#006699', // Rich Sea Blue
+          500: '#0284C7',
+          600: '#006699',
           700: '#0369A1',
           800: '#075985',
           900: '#0C4A6E',
           950: '#082F49',
         },
         sea: {
-          DEFAULT: '#006699',
-          light: '#0284C7',
-          dark: '#0A4B70',
+          DEFAULT: '#1a2d44',
+          light: '#243d5e',
+          dark: '#0f1e2e',
+        },
+        // PLV Gold — extracted from the logo's gold lettering
+        gold: {
+          DEFAULT: '#B8963E',
+          light: '#D4AF5A',
+          muted: '#C9A84C',
+          50:  '#FDF9EE',
+          100: '#F8EDCA',
+          200: '#F0D88A',
+          300: '#E8C055',
+          400: '#D4AF5A',
+          500: '#B8963E',
+          600: '#9C7D2E',
+          700: '#7A6020',
+          800: '#584516',
+          900: '#362A0C',
+        },
+        navy: {
+          DEFAULT: '#1a2d44',
+          light: '#243d5e',
+          dark: '#0f1e2e',
+          50: '#eef2f7',
+          100: '#d5dfe8',
+          900: '#0f1e2e',
         },
         slate: {
           light: '#F8FAFC',
@@ -38,3 +62,4 @@ module.exports = {
   },
   plugins: [],
 };
+

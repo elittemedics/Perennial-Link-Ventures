@@ -35,8 +35,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create session and set HTTP-only cookie
-    await createSession(user.id, req.headers.get('user-agent') || undefined);
+    // Do not create session automatically so user must log in manually.
 
     // Dispatch welcome & verification emails
     const token = await createEmailVerificationToken(user.email);

@@ -8,11 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { UserPlus, Building2, User, Eye, EyeOff, Mail } from 'lucide-react';
+import { COUNTRIES, DEFAULT_COUNTRY } from '@/lib/countries-data';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [countryDialCode, setCountryDialCode] = useState(DEFAULT_COUNTRY.phoneCode);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'VISITOR' | 'BUSINESS_OWNER'>('BUSINESS_OWNER');
@@ -25,11 +27,13 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError(null);
 
+    const fullPhone = phone.startsWith('+') ? phone : `${countryDialCode}${phone.replace(/^0+/, '')}`;
+
     try {
       const res = await fetch('/api/v1/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, password, role }),
+        body: JSON.stringify({ name, email, phone: fullPhone, password, role }),
       });
 
       const data = await readApiResponse<{ success?: boolean; error?: string }>(res);
@@ -38,9 +42,9 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed.');
       }
 
-      // The app registration endpoint creates the secure session cookie.
-      router.push('/dashboard');
-      router.refresh();
+      // Redirect to sign in page after successful registration
+      router.push('/login?registered=true');
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -123,14 +127,36 @@ export default function RegisterPage() {
               leftIcon={<Mail className="w-4 h-4" />}
             />
 
-            <Input
-              label="Telephone Number"
-              type="tel"
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="054XXXXXXX"
-            />
+            {/* Country & International Telephone Input */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Telephone Number
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={countryDialCode}
+                  onChange={(e) => setCountryDialCode(e.target.value)}
+                  className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 focus:border-sea focus:outline-none focus:ring-2 focus:ring-sea/20 shadow-sm"
+                  aria-label="Country dial code"
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.phoneCode}>
+                      {c.flagEmoji} {c.code} ({c.phoneCode})
+                    </option>
+                  ))}
+                </select>
+                <div className="flex-1">
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="054XXXXXXX"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-sea focus:outline-none focus:ring-2 focus:ring-sea/20 shadow-sm"
+                  />
+                </div>
+              </div>
+            </div>
 
             <Input
               label="Password"

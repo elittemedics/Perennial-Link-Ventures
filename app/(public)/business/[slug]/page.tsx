@@ -80,7 +80,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
     // Database offline build fallback
   }
 
-  if (!business || business.status !== 'APPROVED') {
+  if (!business) {
     notFound();
   }
 
@@ -202,6 +202,28 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                 </a>
               )}
             </div>
+          </div>
+
+          {/* Buyer Direct Contact Notice Banner */}
+          <div className="mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0">
+                📢
+              </div>
+              <div>
+                <h4 className="font-bold text-sm">How to Make a Purchase or Inquire</h4>
+                <p className="text-xs text-amber-800">
+                  Perennial Link Directory connects you directly with {business.name}. Contact the owner using their phone or WhatsApp buttons to order or ask questions.
+                </p>
+              </div>
+            </div>
+            {hasPhone && (
+              <a href={`tel:${business.phone}`} className="shrink-0">
+                <Button size="sm" variant="primary" className="bg-amber-600 hover:bg-amber-700 text-white gap-1.5 text-xs">
+                  <Phone className="w-3.5 h-3.5" /> Call Owner Now
+                </Button>
+              </a>
+            )}
           </div>
         </div>
 

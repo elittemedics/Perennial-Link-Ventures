@@ -108,11 +108,14 @@ export const SupportTicketSchema = z.object({
 export const ProductSchema = z.object({
   businessId: z.string().min(1),
   title: z.string().min(2, 'Product title is required.'),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   price: z.number().min(0, 'Price must be non-negative.'),
   originalPrice: z.number().optional().nullable(),
-  currency: z.string().default('USD'),
+  currency: z.string().default('GHS'),
   image: z.string().optional().nullable(),
+  images: z.array(z.string()).optional().default([]),
+  quantity: z.number().optional().nullable(),
+  location: z.string().optional().nullable(),
   whatsappPhone: z.string().optional().nullable(),
   productCategory: z.string().default('Other categories'),
 });

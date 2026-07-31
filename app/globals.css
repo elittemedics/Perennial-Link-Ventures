@@ -6,12 +6,13 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-    --primary: 199 98% 39%;
-    --primary-dark: 200 100% 30%;
+    --primary: 215 45% 18%;
+    --primary-dark: 215 50% 12%;
     --primary-foreground: 210 40% 98%;
+    --gold: 38 52% 48%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 199 89% 94%;
+    --accent: 38 52% 95%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --border: 214.3 31.8% 91.4%;
     --radius: 0.75rem;
@@ -30,8 +31,8 @@ body {
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+::-webkit-scrollbar-thumb { background: #B8963E; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9C7D2E; }
 
 /* Glassmorphism Panels */
 .glass-panel {
@@ -44,18 +45,26 @@ body {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(184, 150, 62, 0.2);
 }
 
-/* Hero Gradient */
+/* Hero Gradient — PLV Navy + dark slate */
 .hero-gradient {
-  background: linear-gradient(135deg, #042a40 0%, #073854 25%, #006699 55%, #0284c7 80%, #0369a1 100%);
+  background: linear-gradient(135deg, #0f1e2e 0%, #1a2d44 30%, #243d5e 60%, #1a2d44 100%);
   position: relative;
 }
 
-/* Gradient Text */
+/* Gradient Text — gold shimmer */
 .gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #7dd3fc 50%, #ffffff 100%);
+  background: linear-gradient(135deg, #D4AF5A 0%, #E8C055 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gold gradient text */
+.gold-text {
+  background: linear-gradient(135deg, #B8963E 0%, #D4AF5A 50%, #B8963E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -68,7 +77,7 @@ body {
 }
 .card-3d:hover {
   transform: perspective(1000px) rotateX(-4deg) rotateY(4deg) translateY(-6px);
-  box-shadow: 20px 25px 50px -10px rgba(2, 132, 199, 0.25);
+  box-shadow: 20px 25px 50px -10px rgba(184, 150, 62, 0.20);
 }
 
 /* Floating 3D Orb shapes in hero */
@@ -140,11 +149,17 @@ body {
   animation: shimmer 3s infinite;
 }
 
-/* Animated hero bg gradient */
+/* Animated hero bg gradient — navy + gold pulse */
 .hero-bg-animated {
-  background: linear-gradient(270deg, #042a40, #006699, #0284c7, #0c4a6e);
+  background: linear-gradient(270deg, #0f1e2e, #1a2d44, #243d5e, #1a2d44);
   background-size: 400% 400%;
   animation: gradient-shift 10s ease infinite;
+}
+
+/* Gold accent divider line */
+.gold-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #B8963E, transparent);
 }
 
 /* Active Button Press Feedback */
@@ -159,7 +174,7 @@ button:active { transform: scale(0.96) !important; }
 }
 .hover-card-elevate:hover {
   transform: translateY(-5px);
-  box-shadow: 0 24px 30px -8px rgba(2, 132, 199, 0.15), 0 10px 12px -6px rgba(2, 132, 199, 0.08);
+  box-shadow: 0 24px 30px -8px rgba(184, 150, 62, 0.15), 0 10px 12px -6px rgba(26, 45, 68, 0.10);
 }
 
 /* 3D Perspective Hero Image Float */
@@ -189,7 +204,7 @@ button:active { transform: scale(0.96) !important; }
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.5), rgba(2, 132, 199, 0.3));
+  background: linear-gradient(135deg, rgba(184, 150, 62, 0.4), rgba(26, 45, 68, 0.3));
   z-index: -1;
   filter: blur(8px);
 }

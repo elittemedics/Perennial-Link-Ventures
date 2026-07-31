@@ -493,17 +493,33 @@ model BusinessProduct {
   discountPercentage Int?     @default(0)
   currency           String   @default("USD")
   image              String?
+  quantity           Int?
+  location           String?
   whatsappPhone      String?
   productCategory    String   @default("Other categories")
   isAvailable        Boolean  @default(true)
   isFeatured         Boolean  @default(false)
   createdAt          DateTime @default(now())
 
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  images   BusinessProductImage[]
 
   @@index([businessId])
   @@index([productCategory])
 }
+
+model BusinessProductImage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String   @db.Uuid
+  url       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product BusinessProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
 
 model BusinessContact {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

@@ -189,3 +189,68 @@ sudo certbot --nginx -d perenniallink.com -d www.perenniallink.com
 - [x] Confirm Nodemailer transactional email delivery.
 
 Your **Perennial Link Ventures Business Directory Platform** is now fully operational on Hostinger Cloud Startup!
+
+---
+
+## 9. Troubleshooting
+
+### ❌ `The table 'public.User' does not exist in the current database`
+
+**Full error message:**
+```
+Invalid `prisma.user.findUnique()` invocation:
+The table `public.User` does not exist in the current database.
+```
+
+**What it means:**  
+Prisma can connect to PostgreSQL successfully, but the database schema has not been applied yet. The `User` table (and all other application tables) are missing from the `public` schema. This typically happens when:
+
+- `npx prisma db push` was skipped or failed silently during deployment.
+- The `DATABASE_URL` in `.env` points to a different database than the one where the schema was pushed.
+- The schema was pushed to a different schema namespace (e.g., a non-`public` schema).
+- The PostgreSQL user lacks the `CREATE TABLE` privilege required to apply the schema.
+
+**Fix — re-run the schema push:**
+
+SSH into your server and navigate to the project root:
+```bash
+cd /var/www/perennial-directory
+```
+
+Confirm the `DATABASE_URL` is correct:
+```bash
+grep DATABASE_URL .env
+```
+
+Re-apply the Prisma schema to create all tables:
+```bash
+npx prisma db push
+```
+
+If the push fails with a permissions error, grant the required privileges first:
+```bash
+sudo -u postgres psql
+```
+```sql
+GRANT ALL PRIVILEGES ON DATABASE perennial_directory TO perennial_user;
+GRANT ALL ON SCHEMA public TO perennial_user;
+\q
+```
+
+Then retry:
+```bash
+npx prisma db push
+```
+
+After a successful push, re-seed the database and restart the PM2 process:
+```bash
+pnpm run db:seed
+pm2 restart perennial-directory
+```
+
+Verify the tables now exist:
+```bash
+sudo -u postgres psql -d perennial_directory -c "\dt public.*"
+```
+
+You should see a list of tables including `User`, `Business`, `Category`, etc. The application should now respond correctly to authentication and data requests.

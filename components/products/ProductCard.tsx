@@ -20,6 +20,8 @@ export interface ProductItemProps {
     discountPercentage?: number | null;
     currency?: string;
     image?: string | null;
+    quantity?: number | null;
+    location?: string | null;
     whatsappPhone?: string | null;
     productCategory: string;
     business: {
@@ -83,7 +85,9 @@ export default function ProductCard({ product }: ProductItemProps) {
               <Link href={`/business/${product.business.slug}`} className="font-semibold text-sea hover:underline line-clamp-1">
                 Vendor: {product.business.name}
               </Link>
-              {product.business.cityName && <span>{product.business.cityName}</span>}
+              {(product.location || product.business.cityName) && (
+                <span className="text-slate-500">📍 {product.location || product.business.cityName}</span>
+              )}
             </div>
 
             <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-sea transition-colors">
@@ -96,8 +100,15 @@ export default function ProductCard({ product }: ProductItemProps) {
               </p>
             )}
 
+            {/* Quantity / Availability Tag */}
+            {product.quantity !== undefined && product.quantity !== null && (
+              <div className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md inline-block">
+                📦 {product.quantity > 0 ? `${product.quantity} in stock` : 'Available on request'}
+              </div>
+            )}
+
             {/* Price section */}
-            <div className="pt-2 flex items-baseline gap-2">
+            <div className="pt-1 flex items-baseline gap-2">
               <span className="text-lg font-black text-slate-900">
                 {formatGHS(product.price)}
               </span>
@@ -110,14 +121,17 @@ export default function ProductCard({ product }: ProductItemProps) {
           </CardContent>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons & Notice */}
         <div className="p-4 pt-0 space-y-2">
+          <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] text-slate-600 text-center font-medium">
+            Contact owner directly to purchase:
+          </div>
           <Button
             type="button"
             onClick={() => setIsWhatsAppOpen(true)}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 text-xs py-2.5 rounded-xl shadow-md"
           >
-            <MessageSquare className="w-4 h-4 fill-current" /> Inquiry via WhatsApp
+            <MessageSquare className="w-4 h-4 fill-current" /> Contact Owner via WhatsApp / Call
           </Button>
         </div>
       </Card>

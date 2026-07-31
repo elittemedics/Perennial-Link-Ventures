@@ -89,6 +89,7 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
           <input
             type="file"
             accept="image/png, image/jpeg, image/webp"
+            capture="environment"
             className="hidden"
             onChange={handleFileChange}
             disabled={isUploading}

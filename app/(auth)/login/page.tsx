@@ -2,17 +2,19 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, LogIn, Eye, EyeOff, Mail, KeyRound, ArrowLeft, Loader2 } from 'lucide-react';
+import { ShieldCheck, LogIn, Eye, EyeOff, Mail, KeyRound, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
 import { readApiResponse } from '@/lib/api-client';
 
 type Step = 'credentials' | 'otp';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRegistered = searchParams.get('registered') === 'true';
 
   const [step, setStep]               = useState<Step>('credentials');
   const [email, setEmail]             = useState('');
@@ -22,6 +24,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading]     = useState(false);
   const [error, setError]             = useState<string | null>(null);
   const [successMsg, setSuccessMsg]   = useState<string | null>(null);
+
 
   // ── Step 1: Verify email + password, send OTP ───────────────────────────
   const handleSendOTP = async (e: React.FormEvent) => {
@@ -91,6 +94,12 @@ export default function LoginPage() {
 
         <CardContent className="space-y-5 pt-0">
           {/* Error / Success Alerts */}
+          {isRegistered && !successMsg && !error && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-medium flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Account created successfully! Please sign in with your credentials below.</span>
+            </div>
+          )}
           {error && (
             <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium flex items-start gap-2">
               <span className="shrink-0">⚠️</span> {error}

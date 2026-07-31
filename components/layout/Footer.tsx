@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, Mail, MapPin, Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt, ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse } from 'lucide-react';
 
 const CATEGORIES = [
@@ -26,8 +27,15 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-sea text-white flex items-center justify-center font-bold text-lg shadow-md shadow-sea/30">
-                PL
+              <div className="relative w-10 h-10 shrink-0">
+                <Image
+                  src="/images/plv-logo.png"
+                  alt="Perennial Link Ventures"
+                  fill
+                  sizes="40px"
+                  className="object-contain"
+                />
+              </div>
               </div>
               <span className="font-extrabold text-white text-xl tracking-tight">
                 Perennial Link

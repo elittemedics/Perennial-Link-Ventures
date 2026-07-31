@@ -5,7 +5,8 @@ import db from '@/lib/db';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Building2, Eye, MessageSquare, PlusCircle, Star, ArrowRight } from 'lucide-react';
+import { Building2, Eye, MessageSquare, PlusCircle, Star, ArrowRight, Package } from 'lucide-react';
+import { BusinessActions } from '@/components/dashboard/BusinessActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,11 +40,18 @@ export default async function OwnerDashboardPage() {
           <p className="text-slate-500 text-xs">Manage your business listings, inquiries, and customer feedback.</p>
         </div>
 
-        <Link href="/dashboard/owner/listings/new">
-          <Button variant="primary" className="gap-2 shadow-md">
-            <PlusCircle className="w-4 h-4" /> Add New Business Listing
-          </Button>
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href="/dashboard/owner/products">
+            <Button variant="outline" className="gap-2 border-sea text-sea hover:bg-brand-50">
+              <Package className="w-4 h-4" /> Manage Products
+            </Button>
+          </Link>
+          <Link href="/dashboard/owner/listings/new">
+            <Button variant="primary" className="gap-2 shadow-md">
+              <PlusCircle className="w-4 h-4" /> Add New Business
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Metrics Row */}
@@ -142,10 +150,8 @@ export default async function OwnerDashboardPage() {
                       </Badge>
                     </td>
                     <td className="p-3 text-xs font-semibold text-amber-600">★ {b.avgRating.toFixed(1)}</td>
-                    <td className="p-3 text-right space-x-2">
-                      <Link href={`/business/${b.slug}`}>
-                        <Button variant="outline" size="sm">View Public</Button>
-                      </Link>
+                    <td className="p-3 text-right">
+                      <BusinessActions businessId={b.id} businessSlug={b.slug} />
                     </td>
                   </tr>
                 ))}

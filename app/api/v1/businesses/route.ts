@@ -48,8 +48,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = BusinessListingSchema.parse(body);
 
-    const isAutoApproved = user.role === Role.ADMINISTRATOR || user.role === Role.MODERATOR;
-
     const business = await BusinessRepository.create({
       ownerId: user.id,
       name: validated.name,
@@ -70,15 +68,13 @@ export async function POST(req: NextRequest) {
       longitude: validated.longitude || null,
       logo: validated.logo || null,
       coverImage: validated.coverImage || null,
-      status: isAutoApproved ? BusinessStatus.APPROVED : BusinessStatus.PENDING,
+      status: BusinessStatus.APPROVED,
     });
 
     return NextResponse.json(
       {
         success: true,
-        message: isAutoApproved
-          ? 'Business listing published successfully.'
-          : 'Business listing submitted successfully and is pending administrator review.',
+        message: 'Business listing published successfully on the marketplace.',
         business,
       },
       { status: 201 }
