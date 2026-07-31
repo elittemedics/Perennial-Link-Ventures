@@ -12,9 +12,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
-      primary: 'bg-sea hover:bg-brand-600 text-white focus:ring-brand-500 shadow-sm shadow-sea/20',
+      primary: 'bg-gold-700 hover:bg-gold-800 text-white focus:ring-gold-500 shadow-sm shadow-gold-700/20',
       secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-800 focus:ring-slate-400',
-      outline: 'border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 focus:ring-brand-500',
+      outline: 'border border-gold-300 bg-white hover:bg-gold-50 text-sea focus:ring-gold-500',
       danger: 'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-500',
       ghost: 'bg-transparent hover:bg-slate-100 text-slate-700 focus:ring-slate-300',
     };

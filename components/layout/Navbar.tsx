@@ -196,7 +196,7 @@ export default function Navbar() {
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
               Home
             </Link>
-            <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-sky-50 font-bold text-sea">
+            <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-gold-50 font-bold text-gold-700">
               🛍️ Marketplace Products
             </Link>
             <Link href="/categories" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
@@ -216,7 +216,7 @@ export default function Navbar() {
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
             <a
               href="tel:0545898775"
-              className="flex items-center justify-center gap-2 text-sm font-semibold text-sea bg-brand-50 py-2 rounded-lg border border-brand-200"
+              className="flex items-center justify-center gap-2 text-sm font-semibold text-gold-700 bg-gold-50 py-2 rounded-lg border border-gold-200"
             >
               <PhoneCall className="w-4 h-4" />
               Call Support: 0545898775

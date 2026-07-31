@@ -36,7 +36,6 @@ export default function Footer() {
                   className="object-contain"
                 />
               </div>
-              </div>
               <span className="font-extrabold text-white text-xl tracking-tight">
                 Perennial Link
               </span>
@@ -50,11 +49,11 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">Quick Links</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/" className="hover:text-sky-400 transition-colors">Home</Link></li>
-              <li><Link href="/products" className="hover:text-sky-400 transition-colors">Marketplace Products</Link></li>
-              <li><Link href="/listings" className="hover:text-sky-400 transition-colors">Browse Business Directory</Link></li>
-              <li><Link href="/register" className="hover:text-sky-400 transition-colors">Register Your Business</Link></li>
-              <li><Link href="/about" className="hover:text-sky-400 transition-colors">About Us</Link></li>
+              <li><Link href="/" className="hover:text-gold-400 transition-colors">Home</Link></li>
+              <li><Link href="/products" className="hover:text-gold-400 transition-colors">Marketplace Products</Link></li>
+              <li><Link href="/listings" className="hover:text-gold-400 transition-colors">Browse Business Directory</Link></li>
+              <li><Link href="/register" className="hover:text-gold-400 transition-colors">Register Your Business</Link></li>
+              <li><Link href="/about" className="hover:text-gold-400 transition-colors">About Us</Link></li>
             </ul>
           </div>
 
@@ -66,7 +65,7 @@ export default function Footer() {
                 <li key={cat.slug}>
                   <Link
                     href={`/products?category=${encodeURIComponent(cat.slug)}`}
-                    className="hover:text-sky-400 transition-colors text-xs leading-relaxed block"
+                    className="hover:text-gold-400 transition-colors text-xs leading-relaxed block"
                   >
                     {cat.name}
                   </Link>
@@ -83,7 +82,7 @@ export default function Footer() {
                 <Phone className="w-4 h-4 text-sea shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-semibold text-white">Telephone</span>
-                  <a href="tel:0545898775" className="hover:text-sky-400 transition-colors">0545898775</a>
+                  <a href="tel:0545898775" className="hover:text-gold-400 transition-colors">0545898775</a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -97,7 +96,7 @@ export default function Footer() {
                 <Mail className="w-4 h-4 text-sea shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-semibold text-white">Email Address</span>
-                  <a href="mailto:info@perenniallink.com" className="hover:text-sky-400 transition-colors">
+                  <a href="mailto:info@perenniallink.com" className="hover:text-gold-400 transition-colors">
                     info@perenniallink.com
                   </a>
                 </div>
@@ -111,9 +110,9 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} Perennial Link Ventures. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/terms" className="hover:text-slate-400">Terms of Service</Link>
-            <Link href="/privacy" className="hover:text-slate-400">Privacy Policy</Link>
-            <Link href="/sitemap.xml" className="hover:text-slate-400">Sitemap</Link>
+            <Link href="/terms" className="hover:text-gold-400">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-gold-400">Privacy Policy</Link>
+            <Link href="/sitemap.xml" className="hover:text-gold-400">Sitemap</Link>
           </div>
         </div>
       </div>
