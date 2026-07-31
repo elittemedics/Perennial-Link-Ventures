@@ -65,7 +65,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     const validated = BusinessListingSchema.partial().parse(body);
 
-    const updated = await BusinessRepository.update(id, validated);
+    // Strip null values for fields Prisma requires as non-nullable strings.
+    // Our Zod schema permits null for optional fields but Prisma rejects it.
+    const updateData = Object.fromEntries(
+      Object.entries(validated).filter(([, v]) => v !== null && v !== undefined)
+    );
+
+    const updated = await BusinessRepository.update(id, updateData as Parameters<typeof BusinessRepository.update>[1]);
 
     return NextResponse.json({ success: true, business: updated });
   } catch (error) {
