@@ -1,0 +1,930 @@
+// Production PostgreSQL Prisma Schema for Perennial Link Ventures Business Directory Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  VISITOR
+  BUSINESS_OWNER
+  MODERATOR
+  ADMINISTRATOR
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum BusinessStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum SubscriptionPlanEnum {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatusEnum {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PENDING
+}
+
+enum AdPlacement {
+  HOMEPAGE_HERO
+  SIDEBAR
+  CATEGORY_TOP
+  LISTING_FOOTER
+}
+
+enum AdStatus {
+  ACTIVE
+  PAUSED
+  EXPIRED
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  SYSTEM
+  BUSINESS
+  REVIEW
+  SUBSCRIPTION
+  INQUIRY
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ClickTarget {
+  PHONE
+  EMAIL
+  WEBSITE
+  WHATSAPP
+  DIRECTIONS
+}
+
+// ── Authentication & Access Control Models ─────────────────────────────────
+
+model User {
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String?
+  email              String     @unique
+  emailVerified      DateTime?
+  passwordHash       String?
+  role               Role       @default(VISITOR)
+  image              String?
+  phone              String?
+  status             UserStatus @default(ACTIVE)
+  twoFactorToken     String?
+  twoFactorExpires   DateTime?
+  deletedAt          DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  userRoles          UserRole[]
+  businesses         Business[]          @relation("OwnerBusinesses")
+  reviews            Review[]
+  reviewReplies      ReviewReply[]
+  favorites          Favorite[]
+  bookmarks          Bookmark[]
+  subscriptions      Subscription[]
+  payments           Payment[]
+  invoices           Invoice[]
+  notifications      Notification[]
+  supportTickets     SupportTicket[]
+  supportReplies     SupportReply[]
+  adminLogs          AdminLog[]          @relation("AdminUser")
+  auditLogs          AuditLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+}
+
+model RolePermissionModel {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  userRoles        UserRole[]
+  rolePermissions  RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  code        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+}
+
+model UserRole {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @db.Uuid
+  roleId    String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role RolePermissionModel @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model RolePermission {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  roleId       String   @db.Uuid
+  permissionId String   @db.Uuid
+  createdAt    DateTime @default(now())
+
+  role       RolePermissionModel @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission          @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model Account {
+  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+// ── Location Models (Global Support) ───────────────────────────────────────
+
+model Country {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  code       String   @unique // e.g., US, GH, DE, GB, NG, JP, SG, CA
+  phoneCode  String?  // e.g., +1, +233, +49
+  flagEmoji  String?
+  currency   String   @default("USD")
+  isFeatured Boolean  @default(false)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  regions    Region[]
+  cities     City[]
+  businesses Business[]
+}
+
+model Region {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String   @unique
+  countryId String   @db.Uuid
+  code      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country    Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  cities     City[]
+  businesses Business[]
+
+  @@index([countryId])
+  @@index([slug])
+}
+
+model City {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  slug       String   @unique
+  regionId   String?  @db.Uuid
+  countryId  String   @db.Uuid
+  latitude   Float?
+  longitude  Float?
+  isFeatured Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  region     Region?    @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  country    Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  businesses Business[]
+
+  @@index([countryId])
+  @@index([regionId])
+  @@index([slug])
+}
+
+// ── Categories & Business Core ─────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String   @unique
+  icon        String?
+  description String?  @db.Text
+  parentId    String?  @db.Uuid
+  isFeatured  Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent        Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  subcategories Category[]    @relation("CategoryHierarchy")
+  subs          Subcategory[]
+  businesses    Business[]
+
+  @@index([slug])
+  @@index([parentId])
+}
+
+model Subcategory {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String   @unique
+  categoryId  String   @db.Uuid
+  description String?  @db.Text
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  businesses Business[]
+
+  @@index([categoryId])
+  @@index([slug])
+}
+
+model Business {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId         String         @db.Uuid
+  name            String
+  slug            String         @unique
+  tagline         String?
+  description     String         @db.Text
+  categoryId      String         @db.Uuid
+  subcategoryId   String?        @db.Uuid
+  phone           String
+  whatsapp        String?
+  email           String
+  website         String?
+  address         String
+  cityId          String?        @db.Uuid
+  regionId        String?        @db.Uuid
+  countryId       String?        @db.Uuid
+  cityName        String
+  stateName       String?
+  countryName     String         @default("Ghana")
+  zipCode         String?
+  latitude        Float?
+  longitude       Float?
+  logo            String?
+  coverImage      String?
+  status          BusinessStatus @default(PENDING)
+  isFeatured      Boolean        @default(false)
+  isVerified      Boolean        @default(false)
+  viewCount       Int            @default(0)
+  clickCount      Int            @default(0)
+  avgRating       Float          @default(0.0)
+  totalReviews    Int            @default(0)
+  rejectionReason String?        @db.Text
+  deletedAt       DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  owner            User                     @relation("OwnerBusinesses", fields: [ownerId], references: [id], onDelete: Cascade)
+  category         Category                 @relation(fields: [categoryId], references: [id])
+  subcategory      Subcategory?             @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  city             City?                    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  region           Region?                  @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  country          Country?                 @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  gallery          BusinessGallery[]
+  logos            BusinessLogo[]
+  covers           BusinessCover[]
+  videos           BusinessVideo[]
+  services         BusinessService[]
+  products         BusinessProduct[]
+  contacts         BusinessContact[]
+  socialLinks      BusinessSocialLink[]
+  openingHours     BusinessOpeningHour[]
+  faqs             BusinessFAQ[]
+  tags             BusinessTag[]
+  features         BusinessFeature[]
+  documents        BusinessDocument[]
+  reviews          Review[]
+  favorites        Favorite[]
+  bookmarks        Bookmark[]
+  inquiries        InquiryMessage[]
+  businessViews    BusinessView[]
+  businessClicks   BusinessClick[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([ownerId])
+  @@index([status])
+  @@index([cityName])
+  @@index([countryName])
+  @@index([isFeatured])
+  @@index([deletedAt])
+}
+
+model BusinessGallery {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  url        String
+  caption    String?
+  mediaType  String   @default("IMAGE") // IMAGE, VIDEO
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessLogo {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  url        String
+  width      Int?
+  height     Int?
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessCover {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  url        String
+  width      Int?
+  height     Int?
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessVideo {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  videoUrl   String
+  title      String?
+  provider   String   @default("YOUTUBE") // YOUTUBE, VIMEO, LOCAL
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessService {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  name        String
+  description String?  @db.Text
+  price       Float?
+  currency    String   @default("USD")
+  icon        String?
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessProduct {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId         String   @db.Uuid
+  title              String
+  description        String?  @db.Text
+  price              Float
+  originalPrice      Float?
+  discountPercentage Int?     @default(0)
+  currency           String   @default("USD")
+  image              String?
+  whatsappPhone      String?
+  productCategory    String   @default("Other categories")
+  isAvailable        Boolean  @default(true)
+  isFeatured         Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([productCategory])
+}
+
+model BusinessContact {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @db.Uuid
+  contactName String
+  title       String?
+  phone       String?
+  email       String?
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessSocialLink {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  platform   String   // facebook, instagram, twitter, linkedin, whatsapp, tiktok
+  url        String
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessOpeningHour {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String    @db.Uuid
+  dayOfWeek  DayOfWeek
+  openTime   String?   // e.g. "08:00"
+  closeTime  String?   // e.g. "17:00"
+  isClosed   Boolean   @default(false)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, dayOfWeek])
+}
+
+model BusinessFAQ {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  question   String
+  answer     String   @db.Text
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessTag {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String @db.Uuid
+  tag        String
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([tag])
+}
+
+model BusinessFeature {
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String  @db.Uuid
+  name       String
+  icon       String?
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessDocument {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  title      String
+  fileUrl    String
+  fileType   String?
+  fileSize   Int?
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+// ── Interactions & Community ───────────────────────────────────────────────
+
+model Review {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  userId     String   @db.Uuid
+  rating     Int      // 1 to 5
+  title      String
+  comment    String   @db.Text
+  isApproved Boolean  @default(true)
+  deletedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies  ReviewReply[]
+
+  @@index([businessId])
+  @@index([userId])
+}
+
+model ReviewReply {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId  String   @db.Uuid
+  userId    String   @db.Uuid
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+}
+
+model Favorite {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @db.Uuid
+  businessId String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
+}
+
+model Bookmark {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @db.Uuid
+  businessId String   @db.Uuid
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+}
+
+model InquiryMessage {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String    @db.Uuid
+  senderName  String
+  senderEmail String
+  senderPhone String?
+  subject     String
+  message     String    @db.Text
+  isRead      Boolean   @default(false)
+  reply       String?   @db.Text
+  replyAt     DateTime?
+  createdAt   DateTime  @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+// ── Monetization, Ads & Subscriptions ──────────────────────────────────────
+
+model Advertisement {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  bannerUrl   String
+  targetUrl   String
+  placement   AdPlacement @default(HOMEPAGE_HERO)
+  status      AdStatus    @default(ACTIVE)
+  impressions Int         @default(0)
+  clicks      Int         @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model SubscriptionPlan {
+  id             String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  plan           SubscriptionPlanEnum @unique
+  price          Float
+  currency       String               @default("USD")
+  billingCycle   String               @default("MONTHLY") // MONTHLY, YEARLY
+  maxListings    Int                  @default(1)
+  maxPhotos      Int                  @default(5)
+  maxProducts    Int                  @default(10)
+  maxServices    Int                  @default(10)
+  isFeatured     Boolean              @default(false)
+  prioritySupport Boolean             @default(false)
+  description    String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId        String                 @db.Uuid
+  planId         String?                @db.Uuid
+  plan           SubscriptionPlanEnum   @default(FREE)
+  price          Float                  @default(0.0)
+  currency       String                 @default("USD")
+  billingCycle   String                 @default("MONTHLY")
+  status         SubscriptionStatusEnum @default(ACTIVE)
+  startDate      DateTime               @default(now())
+  endDate        DateTime?
+  transactionRef String?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  owner       User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  planDetails SubscriptionPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  payments    Payment[]
+
+  @@index([ownerId])
+}
+
+model Payment {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subscriptionId String?       @db.Uuid
+  userId         String        @db.Uuid
+  amount         Float
+  currency       String        @default("USD")
+  status         PaymentStatus @default(PENDING)
+  paymentMethod  String        @default("CARD") // CARD, PAYPAL, MOBILE_MONEY, BANK_TRANSFER
+  transactionRef String        @unique
+  gatewayResponse String?      @db.Text
+  createdAt      DateTime      @default(now())
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoice      Invoice?
+
+  @@index([userId])
+}
+
+model Invoice {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paymentId     String   @unique @db.Uuid
+  invoiceNumber String   @unique
+  userId        String   @db.Uuid
+  amount        Float
+  currency      String   @default("USD")
+  taxAmount     Float    @default(0.0)
+  totalAmount   Float
+  pdfUrl        String?
+  status        String   @default("PAID") // DRAFT, PAID, VOID
+  issuedAt      DateTime @default(now())
+  dueAt         DateTime?
+  createdAt     DateTime @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Coupon {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String    @unique
+  discountType  String    @default("PERCENTAGE") // PERCENTAGE, FIXED
+  discountValue Float
+  maxUses       Int       @default(100)
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+}
+
+// ── Notifications, Support & Communications ────────────────────────────────
+
+model Notification {
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String           @db.Uuid
+  title     String
+  message   String           @db.Text
+  type      NotificationType @default(SYSTEM)
+  isRead    Boolean          @default(false)
+  actionUrl String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model SupportTicket {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String         @db.Uuid
+  ticketNumber String         @unique
+  subject      String
+  description  String         @db.Text
+  priority     TicketPriority @default(MEDIUM)
+  status       TicketStatus   @default(OPEN)
+  category     String         @default("General")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies SupportReply[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SupportReply {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ticketId     String   @db.Uuid
+  userId       String   @db.Uuid
+  message      String   @db.Text
+  isStaffReply Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+// ── Analytics & Audit Logs ──────────────────────────────────────────────────
+
+model BusinessView {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String   @db.Uuid
+  visitorIp  String?
+  userAgent  String?
+  referer    String?
+  viewedAt   DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([viewedAt])
+}
+
+model BusinessClick {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId String      @db.Uuid
+  targetType ClickTarget @default(WEBSITE)
+  visitorIp  String?
+  clickedAt  DateTime    @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model SearchLog {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  query        String
+  categorySlug String?
+  location     String?
+  resultCount  Int      @default(0)
+  visitorIp    String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model VisitorLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  visitorIp String?
+  path      String
+  userAgent String?
+  referer   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model AdminLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  adminId    String   @db.Uuid
+  action     String
+  targetType String
+  targetId   String?
+  details    String?  @db.Text
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  admin User @relation("AdminUser", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String?  @db.Uuid
+  action    String
+  entity    String
+  entityId  String?
+  details   String?  @db.Text
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model SiteSetting {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  group       String   @default("general")
+  updatedAt   DateTime @updatedAt
+}

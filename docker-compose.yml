@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://perennial_user:perennial_pass@postgres:5432/perennial_directory?schema=public
+      - NEXTAUTH_SECRET=replace-with-a-unique-32-character-production-secret
+      - NEXTAUTH_URL=http://localhost:3000
+    depends_on:
+      - postgres
+    restart: always
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: perennial_postgres
+    environment:
+      POSTGRES_DB: perennial_directory
+      POSTGRES_USER: perennial_user
+      POSTGRES_PASSWORD: perennial_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:
