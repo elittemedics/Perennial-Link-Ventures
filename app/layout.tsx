@@ -7,6 +7,11 @@ import Providers from '@/components/common/Providers';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
+  icons: {
+    icon: [{ url: '/icon.png', type: 'image/png' }],
+    apple: [{ url: '/icon.png', type: 'image/png' }],
+  },
+  themeColor: '#1A2D44',
   title: {
     default: 'Perennial Link Ventures | Global Business Directory',
     template: '%s | Perennial Link Ventures',
