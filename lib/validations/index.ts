@@ -37,7 +37,7 @@ export const ChangeEmailSchema = z.object({
 export const BusinessListingSchema = z.object({
   name: z.string().min(2, 'Business name is required.'),
   tagline: z.string().optional(),
-  description: z.string().min(20, 'Description must be at least 20 characters.'),
+  description: z.string().trim().optional().nullable().or(z.literal('')),
   categoryId: z.string().min(1, 'Category selection is required.'),
   subcategoryId: z.string().optional().nullable(),
   phone: z.string().optional().nullable().or(z.literal('')),

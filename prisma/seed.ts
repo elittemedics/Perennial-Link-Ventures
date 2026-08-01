@@ -304,7 +304,8 @@ async function main() {
   // 6. Seed Businesses across Global Markets
   console.log('5️⃣ Seeding Sample Global Business Directory Listings...');
 
-  const sampleBusinesses = [
+  // Demo listings are opt-in only. Real deployments should begin with genuine user submissions.
+  const sampleBusinesses = process.env.SEED_SAMPLE_DATA === 'true' ? [
     {
       name: 'Perennial Global Cloud Systems',
       slug: 'perennial-global-cloud-systems',
@@ -365,7 +366,7 @@ async function main() {
       totalReviews: 15,
       viewCount: 860,
     },
-  ];
+  ] : [];
 
   for (const b of sampleBusinesses) {
     const categoryId = categoryMap[b.categorySlug] || Object.values(categoryMap)[0];

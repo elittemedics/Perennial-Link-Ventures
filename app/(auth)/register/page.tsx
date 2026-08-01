@@ -22,10 +22,18 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isValidEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address, for example name@example.com.');
+      return;
+    }
+
+    setIsLoading(true);
 
     const fullPhone = phone.startsWith('+') ? phone : `${countryDialCode}${phone.replace(/^0+/, '')}`;
 
@@ -33,7 +41,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/v1/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone: fullPhone, password, role }),
+        body: JSON.stringify({ name, email: email.trim(), phone: fullPhone, password, role }),
       });
 
       const data = await readApiResponse<{ success?: boolean; error?: string }>(res);
@@ -72,7 +80,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             
             {/* Account Role Selector */}
             <div>
@@ -122,7 +130,13 @@ export default function RegisterPage() {
               required
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (error) setError(null);
+              }}
+              onBlur={() => {
+                if (email && !isValidEmail(email)) setError('Please enter a valid email address, for example name@example.com.');
+              }}
               placeholder="kwame@example.com"
               leftIcon={<Mail className="w-4 h-4" />}
             />

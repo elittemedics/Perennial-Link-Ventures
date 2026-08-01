@@ -7,6 +7,7 @@ import { BusinessStatus, Role } from '@prisma/client';
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const mine = searchParams.get('mine') === 'true';
     const query = searchParams.get('q') || undefined;
     const categorySlug = searchParams.get('category') || undefined;
     const countryName = searchParams.get('country') || undefined;
@@ -15,6 +16,27 @@ export async function GET(req: NextRequest) {
     const featuredOnly = searchParams.get('featured') === 'true';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '12', 10) || 12));
+
+    if (mine) {
+      const user = await getSessionUser();
+      if (!user) {
+        return NextResponse.json({ success: false, error: 'Unauthorized access. Please login first.' }, { status: 401 });
+      }
+
+      const { default: db } = await import('@/lib/db');
+      const listings = await db.business.findMany({
+        where: { ownerId: user.id, deletedAt: null },
+        select: { id: true, name: true, slug: true, cityName: true, phone: true, whatsapp: true },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      });
+
+      return NextResponse.json({
+        success: true,
+        listings,
+        pagination: { page: 1, limit, total: listings.length, totalPages: 1 },
+      });
+    }
 
     const result = await BusinessRepository.findMany({
       query,
@@ -52,7 +74,7 @@ export async function POST(req: NextRequest) {
       ownerId: user.id,
       name: validated.name,
       tagline: validated.tagline,
-      description: validated.description,
+      description: validated.description || '',
       categoryId: validated.categoryId,
       subcategoryId: validated.subcategoryId || null,
       phone: validated.phone || '',

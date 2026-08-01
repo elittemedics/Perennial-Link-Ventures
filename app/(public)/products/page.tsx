@@ -13,6 +13,7 @@ export interface ProductsPageProps {
     q?: string;
     category?: string;
     sort?: string;
+    business?: string;
   }>;
 }
 
@@ -36,6 +37,7 @@ export default async function ProductsPage(props: ProductsPageProps) {
   const query = searchParams.q || '';
   const selectedCategory = searchParams.category || '';
   const sort = searchParams.sort || 'newest';
+  const businessSlug = searchParams.business || '';
 
   let products: any[] = [];
 
@@ -51,6 +53,10 @@ export default async function ProductsPage(props: ProductsPageProps) {
 
     if (selectedCategory) {
       where.productCategory = selectedCategory;
+    }
+
+    if (businessSlug) {
+      where.business = { slug: businessSlug };
     }
 
     let orderBy: any = { createdAt: 'desc' };
@@ -77,7 +83,7 @@ export default async function ProductsPage(props: ProductsPageProps) {
       {/* Header Banner */}
       <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2">
-          <Badge className="bg-emerald-600 text-white border-none px-3 py-1">Jumia-Style Marketplace Catalog</Badge>
+          <Badge className="bg-emerald-600 text-white border-none px-3 py-1">Perennial Link Marketplace</Badge>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Browse Products & Direct Deals</h1>
           <p className="text-slate-300 text-xs sm:text-sm">
             Contact business owners directly via WhatsApp or Phone without middleman fees.

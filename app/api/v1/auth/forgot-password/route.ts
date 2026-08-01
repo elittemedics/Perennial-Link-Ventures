@@ -18,11 +18,15 @@ export async function POST(req: NextRequest) {
       const token = await createPasswordResetToken(user.email);
       const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
 
-      await sendEmail({
+      const delivered = await sendEmail({
         to: user.email,
         subject: 'Reset Your Perennial Link Ventures Password',
         html: EmailTemplates.passwordReset(resetUrl),
       });
+
+      if (!delivered) {
+        throw new Error('We could not send the password reset email. Please try again later.');
+      }
     }
 
     return NextResponse.json({

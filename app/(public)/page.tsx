@@ -53,6 +53,12 @@ export default async function HomePage() {
         include: {
           category: { select: { name: true, slug: true, icon: true } },
           _count: { select: { reviews: true, favorites: true } },
+          products: {
+            where: { isAvailable: true },
+            take: 2,
+            orderBy: { createdAt: 'desc' },
+            select: { id: true, title: true, price: true, currency: true, image: true },
+          },
         },
         orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
       }),
@@ -160,21 +166,21 @@ export default async function HomePage() {
             </div>
 
             {/* Right — 3D Handshake Image (Visible on ALL screens now, optimized for mobile) */}
-            <div className="flex flex-col items-center justify-center relative animate-slide-right mt-2 lg:mt-0">
+            <div className="order-last lg:order-none flex w-full flex-col items-center justify-center relative animate-slide-right mt-8 lg:mt-0">
               {/* Decorative rings */}
-              <div className="absolute w-[280px] sm:w-[420px] h-[280px] sm:h-[420px] rounded-full border border-white/10 animate-pulse-glow" />
-              <div className="absolute w-[220px] sm:w-[340px] h-[220px] sm:h-[340px] rounded-full border border-white/15 animate-float-slow" style={{ animationDelay: '1s' }} />
-              <div className="absolute w-[180px] sm:w-[260px] h-[180px] sm:h-[260px] rounded-full bg-gradient-to-br from-sky-500/20 to-blue-600/20 blur-xl" />
+              <div className="absolute w-[260px] sm:w-[380px] lg:w-[420px] h-[220px] sm:h-[280px] lg:h-[420px] rounded-full border border-white/10 animate-pulse-glow" />
+              <div className="absolute w-[210px] sm:w-[310px] lg:w-[340px] h-[180px] sm:h-[240px] lg:h-[340px] rounded-full border border-white/15 animate-float-slow" style={{ animationDelay: '1s' }} />
+              <div className="absolute w-[180px] sm:w-[240px] lg:w-[260px] h-[160px] sm:h-[210px] lg:h-[260px] rounded-full bg-gradient-to-br from-sky-500/20 to-blue-600/20 blur-xl" />
 
               {/* Hero Person Image */}
-              <div className="hero-image-3d relative z-10 w-full max-w-[300px] sm:w-[340px] h-[220px] sm:h-[420px] rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl">
+              <div className="hero-image-3d relative z-10 w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[340px] h-[210px] sm:h-[280px] lg:h-[420px] rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl">
                 <Image
                   src="/images/hero-handshake.jpg"
                   alt="Professional business handshake on Perennial Link"
                   fill
                   priority
                   className="object-cover"
-                  sizes="(max-width: 640px) 300px, 340px"
+                  sizes="(max-width: 640px) 280px, (max-width: 1023px) 420px, 340px"
                 />
                 {/* Overlay gradient at bottom for text */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
@@ -187,11 +193,11 @@ export default async function HomePage() {
               </div>
 
               {/* Floating stat cards around the image (Responsive position) */}
-              <div className="absolute top-2 left-0 sm:-left-6 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
+              <div className="hidden lg:block absolute top-2 left-0 sm:-left-6 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
                 <p className="text-xl sm:text-2xl font-black text-white">500+</p>
                 <p className="text-[9px] sm:text-[10px] text-sky-300 font-semibold uppercase tracking-wider">Verified Vendors</p>
               </div>
-              <div className="absolute bottom-2 right-0 sm:bottom-6 sm:-right-8 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
+              <div className="hidden lg:block absolute bottom-2 right-0 sm:bottom-6 sm:-right-8 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
                 <p className="text-xl sm:text-2xl font-black text-white">4.9 ★</p>
                 <p className="text-[9px] sm:text-[10px] text-sky-300 font-semibold uppercase tracking-wider">Avg. Rating</p>
               </div>
@@ -243,10 +249,10 @@ export default async function HomePage() {
             <div>
               <Badge variant="info" className="mb-2.5 px-3.5 py-1 text-xs">Verified Directory</Badge>
               <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                Featured &amp; Newly Registered Businesses
+                Businesses &amp; Their Latest Offers
               </h2>
               <p className="text-slate-500 text-sm sm:text-base mt-1.5">
-                Explore companies registered on Perennial Link. Uploaded business profiles and catalog images reflect live instantly.
+                Browse a company first, then preview the products it has just added—all in one clear marketplace flow.
               </p>
             </div>
             <Link href="/listings">
@@ -257,10 +263,10 @@ export default async function HomePage() {
           </div>
 
           {recentBusinesses.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
               {recentBusinesses.map((biz) => (
-                <div key={biz.id} className="card-3d group bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between">
-                  <div className="relative h-44 bg-slate-100 overflow-hidden">
+                <div key={biz.id} className="card-3d group bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
+                  <div className="relative h-40 bg-slate-100 overflow-hidden">
                     {biz.coverImage || biz.logo ? (
                       <Image
                         src={biz.coverImage || biz.logo}
@@ -286,7 +292,7 @@ export default async function HomePage() {
                       )}
                     </div>
                   </div>
-                  <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                  <div className="p-5 space-y-4">
                     <div>
                       <h3 className="text-xl font-bold text-slate-900 group-hover:text-sea transition-colors leading-snug">
                         {biz.name}
@@ -295,15 +301,31 @@ export default async function HomePage() {
                         <p className="text-xs text-slate-500 line-clamp-2 mt-1 italic">"{biz.tagline}"</p>
                       )}
                     </div>
-                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
                       <span className="flex items-center gap-1 text-amber-500 font-bold">
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> {biz.avgRating || '5.0'} ({biz.totalReviews || 12})
                       </span>
                       <span>{biz.cityName || 'Accra'}, Ghana</span>
                     </div>
-                    <Link href={`/business/${biz.slug}`} className="block pt-2">
+                    {biz.products.length > 0 ? (
+                      <div className="space-y-2 rounded-2xl bg-slate-50 p-3">
+                        <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Latest from this business</p>
+                        {biz.products.map((product: { id: string; title: string; price: number; currency: string; image: string | null }) => (
+                          <Link key={product.id} href={`/products?business=${biz.slug}`} className="flex items-center gap-2 rounded-xl bg-white p-2 transition-colors hover:bg-gold-50">
+                            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                              {product.image ? <Image src={product.image} alt="" fill sizes="36px" className="object-cover" /> : null}
+                            </div>
+                            <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-700">{product.title}</span>
+                            <span className="text-xs font-black text-navy">{product.currency === 'GHS' ? 'GH₵' : `${product.currency} `}{product.price.toLocaleString()}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500">This business has not added products yet.</p>
+                    )}
+                    <Link href={`/business/${biz.slug}`} className="block pt-1">
                       <Button variant="secondary" className="w-full rounded-xl font-bold gap-2 group-hover:bg-sea group-hover:text-white transition-colors">
-                        View Profile &amp; Contact <ArrowRight className="w-4 h-4" />
+                        View business &amp; contact <ArrowRight className="w-4 h-4" />
                       </Button>
                     </Link>
                   </div>
@@ -336,19 +358,22 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/50 sm:p-4">
+            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {JUMIA_CATS.map(({ name, slug, Icon, color }) => (
               <Link key={slug} href={`/products?category=${encodeURIComponent(name)}`}>
-                <div className="card-3d group flex flex-col items-center justify-center gap-3 p-5 bg-white rounded-2xl border border-slate-200 hover:border-sea/40 shadow-sm hover:shadow-xl text-center cursor-pointer">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="w-6 h-6 text-white" />
+                <div className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-all hover:bg-gold-50 hover:shadow-sm sm:px-4">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105`}>
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-xs font-bold text-slate-700 group-hover:text-sea transition-colors leading-tight">
+                  <span className="flex-1 text-left text-sm font-bold text-slate-700 group-hover:text-navy transition-colors">
                     {name}
                   </span>
+                  <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-gold-600" />
                 </div>
               </Link>
             ))}
+            </div>
           </div>
         </div>
       </section>
@@ -376,7 +401,7 @@ export default async function HomePage() {
           </div>
 
           {trendingProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {trendingProducts.map((prod) => (
                 <ProductCard key={prod.id} product={prod} />
               ))}

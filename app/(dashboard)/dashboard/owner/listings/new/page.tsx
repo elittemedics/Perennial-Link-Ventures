@@ -71,13 +71,13 @@ export default function CreateListingPage() {
         }),
       });
 
-      const data = await readApiResponse<{ success?: boolean; error?: string }>(res);
+      const data = await readApiResponse<{ success?: boolean; error?: string; business?: { id: string } }>(res);
 
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to submit business listing.');
       }
 
-      router.push('/dashboard/owner');
+      router.push(`/dashboard/owner/products?businessId=${data.business?.id || ''}`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Submission failed');
@@ -268,8 +268,7 @@ export default function CreateListingPage() {
             </div>
 
             <Textarea
-              label="Detailed Business Description"
-              required
+              label="Detailed Business Description (optional)"
               rows={5}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}

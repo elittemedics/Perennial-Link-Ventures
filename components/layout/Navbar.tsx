@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, PhoneCall } from 'lucide-react';
+import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
@@ -72,30 +72,13 @@ export default function Navbar() {
               <span className="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
               Marketplace
             </Link>
-            <Link href="/categories" className="hover:text-gold transition-colors">
-              Categories
-            </Link>
             <Link href="/listings" className="hover:text-gold transition-colors">
               Businesses
-            </Link>
-            <Link href="/advertise" className="hover:text-gold transition-colors">
-              Advertise Free
-            </Link>
-            <Link href="/about" className="hover:text-gold transition-colors">
-              About Us
             </Link>
           </nav>
 
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <a
-              href="tel:0545898775"
-              className="flex items-center gap-1.5 text-xs font-semibold text-gold-700 bg-gold-50 hover:bg-gold-100 px-3 py-1.5 rounded-full transition-colors border border-gold-200"
-            >
-              <PhoneCall className="w-3.5 h-3.5" />
-              <span>0545898775</span>
-            </a>
-
             {isAuthenticated ? (
               <div className="relative">
                 {/* Profile Icon / Avatar Button */}
@@ -104,6 +87,7 @@ export default function Navbar() {
                   onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
                   className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 border border-slate-200 transition-all focus:outline-none focus:ring-2 focus:ring-sea/30"
                   aria-label="User profile menu"
+                  aria-expanded={isProfileDropdownOpen}
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-navy to-gold text-white font-bold text-xs flex items-center justify-center shadow-sm">
                     {userInitials}
@@ -165,8 +149,9 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Log In
+                  <Button variant="outline" size="sm" className="gap-2 rounded-lg border-slate-200 bg-white font-bold text-slate-700 hover:border-gold-300 hover:bg-gold-50 hover:text-navy">
+                    <User className="w-4 h-4 text-gold-600" />
+                    Sign in
                   </Button>
                 </Link>
                 <Link href="/register">
@@ -199,31 +184,23 @@ export default function Navbar() {
             <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-gold-50 font-bold text-gold-700">
               🛍️ Marketplace Products
             </Link>
-            <Link href="/categories" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
-              Categories
-            </Link>
             <Link href="/listings" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
               Browse Businesses
-            </Link>
-            <Link href="/advertise" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
-              Advertise Free
-            </Link>
-            <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
-              About Us
             </Link>
           </nav>
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            <a
-              href="tel:0545898775"
-              className="flex items-center justify-center gap-2 text-sm font-semibold text-gold-700 bg-gold-50 py-2 rounded-lg border border-gold-200"
-            >
-              <PhoneCall className="w-4 h-4" />
-              Call Support: 0545898775
-            </a>
-
             {isAuthenticated ? (
               <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-navy to-gold text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                    {userInitials}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">{user?.name || 'Your account'}</p>
+                    <p className="text-xs text-emerald-700 font-medium">Signed in</p>
+                  </div>
+                </div>
                 <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <LayoutDashboard className="w-4 h-4" />
@@ -242,8 +219,9 @@ export default function Navbar() {
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">
-                    Log In
+                  <Button variant="outline" className="w-full gap-2 rounded-lg border-slate-200 font-bold">
+                    <User className="w-4 h-4 text-gold-600" />
+                    Sign in
                   </Button>
                 </Link>
                 <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>

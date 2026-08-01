@@ -71,14 +71,20 @@ export default function OwnerProductsPage() {
     setIsFetching(true);
     try {
       // Fetch owner's businesses
-      const res = await fetch('/api/v1/businesses?limit=100');
+      const res = await fetch('/api/v1/businesses?mine=true&limit=100');
       const data = await readApiResponse<{ listings?: Business[] }>(res);
       if (data.listings && data.listings.length > 0) {
         setBusinesses(data.listings);
-        setFormData((prev) => ({ ...prev, businessId: prev.businessId || data.listings![0].id }));
+        const requestedBusinessId = new URLSearchParams(window.location.search).get('businessId');
+        const selectedBusiness = data.listings.find((business) => business.id === requestedBusinessId) || data.listings[0];
+        setFormData((prev) => ({
+          ...prev,
+          businessId: prev.businessId || selectedBusiness.id,
+          location: prev.location || selectedBusiness.cityName,
+        }));
         
         // Fetch products for first business
-        const prodRes = await fetch(`/api/v1/products?businessId=${data.listings[0].id}`);
+        const prodRes = await fetch(`/api/v1/products?businessId=${selectedBusiness.id}`);
         const prodData = await readApiResponse<{ products?: Product[] }>(prodRes);
         if (prodData.products) setProducts(prodData.products);
       }
@@ -410,4 +416,3 @@ export default function OwnerProductsPage() {
     </div>
   );
 }
-
