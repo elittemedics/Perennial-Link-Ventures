@@ -40,17 +40,23 @@ export async function POST(req: NextRequest) {
     const otp = String(crypto.randomInt(100000, 1000000));
     const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // Save OTP to database
-    await db.user.update({
-      where: { id: user.id },
-      data: { twoFactorToken: otp, twoFactorExpires: expires },
-    });
-
-    // Send OTP email
-    await sendEmail({
+    const wasDelivered = await sendEmail({
       to: user.email,
       subject: `${otp} – Your Perennial Link Login Code`,
       html: getLoginOTPTemplate(user.name || '', otp),
+    });
+
+    if (!wasDelivered) {
+      return NextResponse.json(
+        { error: 'We could not deliver a verification code. Please contact support or try again later.' },
+        { status: 503 }
+      );
+    }
+
+    // Persist a code only after the email provider accepts the message.
+    await db.user.update({
+      where: { id: user.id },
+      data: { twoFactorToken: otp, twoFactorExpires: expires },
     });
 
     return NextResponse.json({ success: true, message: 'Verification code sent to your email address.' });

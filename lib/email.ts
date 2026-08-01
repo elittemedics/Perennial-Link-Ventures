@@ -26,8 +26,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
   try {
     if (!process.env.SMTP_USER) {
-      console.log(' [DEV EMAIL LOG]: To:', options.to, '| Subject:', options.subject);
-      return true;
+      console.error('[EMAIL_CONFIGURATION_ERROR] SMTP_USER is not configured.');
+      return false;
     }
 
     await transporter.sendMail({
