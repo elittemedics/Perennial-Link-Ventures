@@ -109,7 +109,7 @@ export const ProductSchema = z.object({
   businessId: z.string().min(1),
   title: z.string().min(2, 'Product title is required.'),
   description: z.string().optional().nullable(),
-  price: z.number().min(0, 'Price must be non-negative.'),
+  price: z.number().min(0, 'Price must be non-negative.').optional().default(0),
   originalPrice: z.number().optional().nullable(),
   currency: z.string().default('GHS'),
   image: z.string().optional().nullable(),

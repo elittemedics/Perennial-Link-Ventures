@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { imageProcessor } from '@/lib/storage/sharpProcessor';
+import { storageProvider } from '@/lib/storage';
 import { getSessionUser } from '@/lib/auth/better-auth';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Process image through Sharp WebP optimization pipeline
-    const processed = await imageProcessor.processAndSaveImage(buffer, file.name, prefix);
+    const processed = await storageProvider.uploadImage(buffer, file.name, prefix);
 
     return NextResponse.json({
       success: true,

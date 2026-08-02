@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSessionUser } from '@/lib/auth/better-auth';
+import { ProductSchema } from '@/lib/validations';
 
 export async function DELETE(
   req: NextRequest,
@@ -47,7 +48,6 @@ export async function PUT(
 
     const { id } = await params;
     const body = await req.json();
-    const { image } = body; // Accept image updates (either a new URL or null to delete)
 
     const product = await db.businessProduct.findUnique({
       where: { id },
@@ -62,11 +62,17 @@ export async function PUT(
       return NextResponse.json({ success: false, error: 'Permission denied.' }, { status: 403 });
     }
 
+    const validated = ProductSchema.partial().omit({ businessId: true }).parse(body);
+    const updateData = Object.fromEntries(
+      Object.entries(validated).filter(([, value]) => value !== undefined)
+    );
+
+    // A product never stores a separate customer contact; it inherits it from its business.
+    delete updateData.whatsappPhone;
+
     const updated = await db.businessProduct.update({
       where: { id },
-      data: {
-        image: image !== undefined ? image : product.image,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({ success: true, product: updated });

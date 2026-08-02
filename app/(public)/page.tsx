@@ -32,21 +32,14 @@ const JUMIA_CATS = [
 ];
 
 export default async function HomePage() {
-  let trendingProducts: any[] = [];
+  // Kept empty while the homepage focuses on businesses and category discovery.
+  const trendingProducts: any[] = [];
   let recentBusinesses: any[] = [];
   let totalBusinesses = 0;
   let totalReviews = 0;
 
   try {
     const res = await Promise.all([
-      db.businessProduct.findMany({
-        where: { isAvailable: true },
-        take: 6,
-        include: {
-          business: { select: { name: true, slug: true, phone: true, isVerified: true, cityName: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
       db.business.findMany({
         where: { status: 'APPROVED', deletedAt: null },
         take: 6,
@@ -65,10 +58,9 @@ export default async function HomePage() {
       db.business.count({ where: { status: 'APPROVED' } }),
       db.review.count({ where: { isApproved: true } }),
     ]);
-    trendingProducts  = res[0];
-    recentBusinesses  = res[1];
-    totalBusinesses   = res[2];
-    totalReviews      = res[3];
+    recentBusinesses  = res[0];
+    totalBusinesses   = res[1];
+    totalReviews      = res[2];
   } catch {
     // DB offline fallback for build/preview
   }
@@ -332,14 +324,7 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="p-12 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200 space-y-4">
-              <p className="text-slate-600 font-medium">No registered businesses listed yet. Be the first to list your company!</p>
-              <Link href="/register">
-                <Button variant="primary" className="rounded-xl font-bold">Register Business Free</Button>
-              </Link>
-            </div>
-          )}
+          ) : null}
         </div>
       </section>
 
@@ -348,14 +333,21 @@ export default async function HomePage() {
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-f8fafc py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-10">
-          <div className="text-center space-y-3">
-            <Badge variant="info" className="px-4">Shop By Category</Badge>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Explore Marketplace Categories
-            </h2>
-            <p className="text-slate-500 text-sm sm:text-base max-w-2xl mx-auto">
-              Click any category to instantly browse products from verified Ghanaian companies and contact sellers directly.
-            </p>
+          <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+            <div className="space-y-3">
+              <Badge variant="info" className="px-4">Shop By Category</Badge>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Explore Marketplace Categories
+              </h2>
+              <p className="text-slate-500 text-sm sm:text-base max-w-2xl">
+                Find products from verified Ghanaian companies by category, then contact the seller directly.
+              </p>
+            </div>
+            <Link href="/products">
+              <Button variant="outline" className="shrink-0 gap-2 rounded-xl font-bold">
+                View All Products <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
 
           <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/50 sm:p-4">
@@ -381,17 +373,11 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           5. TRENDING PRODUCTS
          ═══════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+      {/* Product browsing continues through the marketplace link above. */}
+      <section className="hidden bg-white py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <Badge variant="success" className="mb-2">Direct Deals</Badge>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Trending Products &amp; Deals
-              </h2>
-              <p className="text-slate-500 text-sm mt-1">
-                Enquire directly on WhatsApp — no cart, no commission, no delay.
-              </p>
             </div>
             <Link href="/products">
               <Button variant="outline" className="gap-2 rounded-xl shrink-0">

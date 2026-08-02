@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
+import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
@@ -79,6 +79,18 @@ export default function Navbar() {
 
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            {role === 'BUSINESS_OWNER' && (
+              <Link href="/dashboard/owner/products">
+                <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-sea text-sea font-bold hover:bg-brand-50">
+                  <Package className="w-4 h-4" /> Add product
+                </Button>
+              </Link>
+            )}
+            <Link href={role === 'BUSINESS_OWNER' ? '/dashboard/owner/listings/new' : '/register'}>
+              <Button variant="primary" size="sm" className="gap-1.5 whitespace-nowrap">
+                <PlusCircle className="w-4 h-4" /> Add Business
+              </Button>
+            </Link>
             {isAuthenticated ? (
               <div className="relative">
                 {/* Profile Icon / Avatar Button */}
@@ -154,12 +166,6 @@ export default function Navbar() {
                     Sign in
                   </Button>
                 </Link>
-                <Link href="/register">
-                  <Button variant="primary" size="sm" className="gap-1.5">
-                    <PlusCircle className="w-4 h-4" />
-                    <span>Add Business</span>
-                  </Button>
-                </Link>
               </div>
             )}
           </div>
@@ -207,6 +213,18 @@ export default function Navbar() {
                     Dashboard ({role})
                   </Button>
                 </Link>
+                {role === 'BUSINESS_OWNER' && (
+                  <Link href="/dashboard/owner/products" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="primary" className="w-full justify-start gap-2">
+                      <Package className="w-4 h-4" /> Add product
+                    </Button>
+                  </Link>
+                )}
+                <Link href={role === 'BUSINESS_OWNER' ? '/dashboard/owner/listings/new' : '/register'} onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start gap-2">
+                    <PlusCircle className="w-4 h-4" /> Add Business
+                  </Button>
+                </Link>
                 <Button
                   variant="ghost"
                   onClick={handleLogout}
@@ -225,8 +243,8 @@ export default function Navbar() {
                   </Button>
                 </Link>
                 <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" className="w-full">
-                    Add Business
+                  <Button variant="primary" className="w-full gap-1.5">
+                    <PlusCircle className="w-4 h-4" /> Add Business
                   </Button>
                 </Link>
               </div>

@@ -77,7 +77,8 @@ export async function POST(req: NextRequest) {
         image: validated.image || (validated.images && validated.images.length > 0 ? validated.images[0] : null),
         quantity: validated.quantity !== undefined ? validated.quantity : null,
         location: validated.location || null,
-        whatsappPhone: validated.whatsappPhone || business.whatsapp || business.phone,
+        // Product contact details always come from the selected business profile.
+        whatsappPhone: business.whatsapp || business.phone,
         productCategory: validated.productCategory || 'Other categories',
         images: validated.images && validated.images.length > 0 ? {
           create: validated.images.map((url, idx) => ({

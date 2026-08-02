@@ -26,9 +26,9 @@ export default function AboutPage() {
           <div className="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center">
             <ShieldCheck className="w-6 h-6 text-sea" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900">Rigorous Verification</h3>
+          <h3 className="text-xl font-bold text-slate-900">Built for Every Kind of Business</h3>
           <p className="text-slate-600 text-sm leading-relaxed">
-            Every business listing undergoes manual compliance and phone address checks to eliminate spam and protect buyers.
+            From independent professionals and local tradespeople to clinics, retailers, and growing companies, Perennial Link gives every legitimate service a clear place to be discovered.
           </p>
         </Card>
 

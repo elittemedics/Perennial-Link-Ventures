@@ -46,8 +46,8 @@ export default async function ProductsPage(props: ProductsPageProps) {
 
     if (query) {
       where.OR = [
-        { title: { contains: query } },
-        { description: { contains: query } },
+        { title: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
       ];
     }
 
@@ -71,8 +71,24 @@ export default async function ProductsPage(props: ProductsPageProps) {
         },
       },
       orderBy,
-      take: 40,
+      take: query ? 100 : 40,
     });
+
+    // Put the closest product-title matches first, like a marketplace search,
+    // then use recency as the tie-breaker. Every matching seller remains visible.
+    if (query && sort === 'newest') {
+      const term = query.trim().toLocaleLowerCase();
+      const relevance = (product: { title: string; description?: string | null }) => {
+        const title = product.title.toLocaleLowerCase();
+        const description = product.description?.toLocaleLowerCase() || '';
+        if (title === term) return 4;
+        if (title.startsWith(term)) return 3;
+        if (title.includes(term)) return 2;
+        return description.includes(term) ? 1 : 0;
+      };
+      products.sort((a, b) => relevance(b) - relevance(a) || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      products = products.slice(0, 40);
+    }
   } catch {
     // Fallback for offline DB
   }

@@ -110,7 +110,7 @@ export default function ProductCard({ product }: ProductItemProps) {
             {/* Price section */}
             <div className="pt-1 flex items-baseline gap-2">
               <span className="text-lg font-black text-slate-900">
-                {formatGHS(product.price)}
+                {product.price > 0 ? formatGHS(product.price) : 'Contact for price'}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
                 <span className="text-xs text-slate-400 line-through font-medium">

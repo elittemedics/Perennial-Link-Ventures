@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import ImageUpload from '@/components/common/ImageUpload';
-import { Package, PlusCircle, Trash2, ArrowLeft, Store, Tag, MapPin, Layers } from 'lucide-react';
+import { Package, PlusCircle, Trash2, ArrowLeft, Store, Pencil } from 'lucide-react';
 import { readApiResponse } from '@/lib/api-client';
 import { formatGHS } from '@/lib/utils';
 
@@ -54,6 +54,8 @@ export default function OwnerProductsPage() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editDraft, setEditDraft] = useState({ title: '', description: '', price: '', quantity: '', location: '', productCategory: 'Other categories', image: null as string | null });
 
   const [formData, setFormData] = useState({
     businessId: '',
@@ -201,6 +203,47 @@ export default function OwnerProductsPage() {
     }
   };
 
+  const openProductEditor = (product: Product) => {
+    setEditingProduct(product);
+    setEditDraft({
+      title: product.title,
+      description: product.description || '',
+      price: product.price ? String(product.price) : '',
+      quantity: product.quantity === null || product.quantity === undefined ? '' : String(product.quantity),
+      location: product.location || '',
+      productCategory: product.productCategory,
+      image: product.image || null,
+    });
+  };
+
+  const handleSaveProduct = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!editingProduct) return;
+    setError(null);
+    try {
+      const response = await fetch(`/api/v1/products/${editingProduct.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editDraft.title,
+          description: editDraft.description || null,
+          price: editDraft.price ? Number(editDraft.price) : 0,
+          quantity: editDraft.quantity ? Number(editDraft.quantity) : null,
+          location: editDraft.location || null,
+          productCategory: editDraft.productCategory,
+          image: editDraft.image,
+        }),
+      });
+      const data = await readApiResponse<{ success?: boolean; error?: string; product?: Product }>(response);
+      if (!response.ok || !data.success || !data.product) throw new Error(data.error || 'Unable to update product.');
+      setProducts((current) => current.map((product) => product.id === data.product?.id ? { ...product, ...data.product } : product));
+      setEditingProduct(null);
+      setSuccessMsg('Product updated successfully.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update product.');
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <Link href="/dashboard/owner">
@@ -266,10 +309,9 @@ export default function OwnerProductsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <Input
-                  label="Price (GHS)"
+                  label="Price (GHS, optional)"
                   type="number"
                   step="0.01"
-                  required
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   placeholder="150.00"
@@ -345,6 +387,26 @@ export default function OwnerProductsPage() {
             <Store className="w-5 h-5 text-sea" /> Store Inventory ({products.length})
           </h3>
 
+          {editingProduct && (
+            <Card className="border-sea/30 bg-sky-50/40 p-5">
+              <form onSubmit={handleSaveProduct} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-slate-900">Edit {editingProduct.title}</h4>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setEditingProduct(null)}>Cancel</Button>
+                </div>
+                <Input label="Product title" required value={editDraft.title} onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="Price (optional)" type="number" step="0.01" value={editDraft.price} onChange={(e) => setEditDraft({ ...editDraft, price: e.target.value })} />
+                  <Input label="Quantity (optional)" type="number" value={editDraft.quantity} onChange={(e) => setEditDraft({ ...editDraft, quantity: e.target.value })} />
+                </div>
+                <Input label="Location (optional)" value={editDraft.location} onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })} />
+                <Textarea label="Description (optional)" rows={3} value={editDraft.description} onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })} />
+                <ImageUpload label="Replace product image (optional)" value={editDraft.image} onChange={(url) => setEditDraft({ ...editDraft, image: url })} prefix="product" />
+                <Button type="submit" variant="primary" className="gap-2"><Pencil className="w-4 h-4" /> Save changes</Button>
+              </form>
+            </Card>
+          )}
+
           {products.length === 0 ? (
             <Card className="p-12 text-center space-y-3">
               <p className="text-slate-500 text-sm">No products added for this business yet.</p>
@@ -384,7 +446,7 @@ export default function OwnerProductsPage() {
                             {p.productCategory}
                           </span>
                           <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{p.title}</h4>
-                          <p className="font-extrabold text-slate-900 text-sm">{formatGHS(p.price)}</p>
+                          <p className="font-extrabold text-slate-900 text-sm">{p.price > 0 ? formatGHS(p.price) : 'Contact for price'}</p>
                           {p.quantity !== undefined && p.quantity !== null && (
                             <p className="text-xs text-emerald-700 font-medium">📦 Qty: {p.quantity}</p>
                           )}
@@ -396,15 +458,14 @@ export default function OwnerProductsPage() {
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                     <span className="text-[10px] text-slate-400">Added {new Date(p.createdAt).toLocaleDateString()}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteProduct(p.id)}
-                      className="text-rose-600 hover:bg-rose-50 h-8 px-2 text-xs gap-1"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> Delete
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button type="button" variant="ghost" size="sm" onClick={() => openProductEditor(p)} className="h-8 px-2 text-xs gap-1 text-sea">
+                        <Pencil className="w-3.5 h-3.5" /> Edit
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteProduct(p.id)} className="text-rose-600 hover:bg-rose-50 h-8 px-2 text-xs gap-1">
+                        <Trash2 className="w-3.5 h-3.5" /> Delete
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
