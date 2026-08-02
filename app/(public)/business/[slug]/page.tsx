@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
 import { Card } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
 import ClientInquiryForm from './ClientInquiryForm';
@@ -116,15 +117,12 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
         
         {/* Cover Image Banner */}
         <div className="relative h-72 sm:h-96 w-full bg-slate-900 overflow-hidden">
-          <Image
-            src={business.coverImage || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1600'}
-            alt={business.name}
-            fill
-            sizes="100vw"
-            className="object-cover opacity-80"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
+          {business.coverImage ? (
+            <>
+              <Image src={business.coverImage} alt={business.name} fill sizes="100vw" className="object-cover opacity-80" priority />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
+            </>
+          ) : <BusinessBrandFallback name={business.name} variant="cover" />}
         </div>
 
         {/* Business Header Info Card */}
@@ -136,9 +134,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                   <Image src={business.logo} alt={business.name} fill sizes="128px" className="object-cover" />
                 </div>
               ) : (
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-sea text-white flex items-center justify-center font-bold text-3xl shadow-lg shrink-0 -mt-12 sm:-mt-16 border-4 border-white">
-                  {business.name.slice(0, 2).toUpperCase()}
-                </div>
+                <BusinessBrandFallback name={business.name} className="w-24 h-24 sm:w-32 sm:h-32 text-3xl shrink-0 -mt-12 sm:-mt-16 border-4 border-white" />
               )}
 
               <div className="space-y-2">

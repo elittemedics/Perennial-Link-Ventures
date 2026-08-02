@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package } from 'lucide-react';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<{ name: string | null; role: string } | null>(null);
 
   useEffect(() => {
@@ -21,6 +22,17 @@ export default function Navbar() {
       .then((data) => setUser(data?.user ?? null))
       .catch(() => setUser(null));
   }, []);
+
+  useEffect(() => {
+    if (!isProfileDropdownOpen) return;
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
+  }, [isProfileDropdownOpen]);
 
   const handleLogout = async () => {
     await fetch('/api/v1/auth/logout', { method: 'POST' });
@@ -92,7 +104,7 @@ export default function Navbar() {
               </Button>
             </Link>
             {isAuthenticated ? (
-              <div className="relative">
+              <div ref={profileMenuRef} className="relative">
                 {/* Profile Icon / Avatar Button */}
                 <button
                   type="button"

@@ -102,7 +102,8 @@ export default function OwnerProductsPage() {
   }, []);
 
   const handleSelectBusiness = async (bId: string) => {
-    setFormData((prev) => ({ ...prev, businessId: bId }));
+    const selectedBusiness = businesses.find((business) => business.id === bId);
+    setFormData((prev) => ({ ...prev, businessId: bId, location: selectedBusiness?.cityName || prev.location }));
     try {
       const prodRes = await fetch(`/api/v1/products?businessId=${bId}`);
       const prodData = await readApiResponse<{ products?: Product[] }>(prodRes);
@@ -277,10 +278,10 @@ export default function OwnerProductsPage() {
             {error && <p className="text-xs text-rose-700 bg-rose-50 p-3 rounded-xl font-medium border border-rose-200">{error}</p>}
             {successMsg && <p className="text-xs text-emerald-800 bg-emerald-50 p-3 rounded-xl font-medium border border-emerald-200">{successMsg}</p>}
 
-            <form onSubmit={handleAddProduct} className="space-y-4">
+            <form onSubmit={handleAddProduct} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               
               {/* Select Business */}
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                   Select Business
                 </label>
@@ -290,13 +291,15 @@ export default function OwnerProductsPage() {
                   onChange={(e) => handleSelectBusiness(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-sm font-medium focus:border-sea focus:outline-none"
                 >
-                  {businesses.length === 0 && <option value="">No businesses found...</option>}
+                  <option value="" disabled>Select a business for this product</option>
+                  {businesses.length === 0 && <option value="" disabled>No businesses registered under this account</option>}
                   {businesses.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name} ({b.cityName})
                     </option>
                   ))}
                 </select>
+                <p className="mt-1 text-[11px] text-slate-500">All businesses registered under your account appear here.</p>
               </div>
 
               <Input
@@ -307,7 +310,7 @@ export default function OwnerProductsPage() {
                 placeholder="e.g. Organic Palm Oil 5L"
               />
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:col-span-2">
                 <Input
                   label="Price (GHS, optional)"
                   type="number"
@@ -326,7 +329,7 @@ export default function OwnerProductsPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:col-span-2">
                 <Input
                   label="Quantity Available (optional)"
                   type="number"
@@ -359,22 +362,26 @@ export default function OwnerProductsPage() {
                 </select>
               </div>
 
-              <Textarea
-                label="Description (optional)"
-                rows={3}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe your product details, specifications..."
-              />
+              <div className="sm:col-span-2">
+                <Textarea
+                  label="Description (optional)"
+                  rows={2}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe your product details, specifications..."
+                />
+              </div>
 
-              <ImageUpload
-                label="Product Image (Sharp Auto-WebP)"
-                value={formData.image}
-                onChange={(url) => setFormData({ ...formData, image: url })}
-                prefix="product"
-              />
+              <div className="sm:col-span-2">
+                <ImageUpload
+                  label="Product Image (Sharp Auto-WebP)"
+                  value={formData.image}
+                  onChange={(url) => setFormData({ ...formData, image: url })}
+                  prefix="product"
+                />
+              </div>
 
-              <Button type="submit" variant="primary" isLoading={isLoading} className="w-full gap-2">
+              <Button type="submit" variant="primary" isLoading={isLoading} className="w-full gap-2 sm:col-span-2">
                 <PlusCircle className="w-4 h-4" /> Save Product to Store
               </Button>
             </form>

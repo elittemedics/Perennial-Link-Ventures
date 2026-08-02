@@ -5,6 +5,7 @@ import db from '@/lib/db';
 import { Search, MapPin, Star, ShieldCheck, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
 import { Card, CardContent } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
@@ -179,12 +180,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
                 <Card key={b.id} className="group hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
                   <div>
                     <div className="relative h-44 w-full bg-slate-100 overflow-hidden">
-                      <Image
-                        src={b.coverImage || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800'}
-                        alt={b.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      {b.coverImage ? <Image src={b.coverImage} alt={b.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" /> : <BusinessBrandFallback name={b.name} variant="cover" />}
                       <div className="absolute top-3 left-3 flex gap-2">
                         <Badge variant="info" className="shadow-md">{b.category?.name}</Badge>
                         {b.isVerified && (
@@ -198,11 +194,11 @@ export default async function ListingsPage(props: ListingsPageProps) {
 
                     <CardContent className="p-5 space-y-3">
                       <div className="flex items-center gap-3">
-                        {b.logo && (
+                        {b.logo ? (
                           <div className="relative w-10 h-10 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0">
                             <Image src={b.logo} alt={b.name} fill className="object-cover" />
                           </div>
-                        )}
+                        ) : <BusinessBrandFallback name={b.name} className="w-10 h-10 text-xs shrink-0" />}
                         <div>
                           <h3 className="font-bold text-slate-900 text-base group-hover:text-sea transition-colors line-clamp-1">
                             {b.name}

@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import AnimatedCounter from '@/components/common/AnimatedCounter';
 import TypewriterText from '@/components/common/TypewriterText';
 import ProductCard from '@/components/products/ProductCard';
+import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
 
 export const dynamic = 'force-dynamic';
 
@@ -267,11 +268,7 @@ export default async function HomePage() {
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-slate-900 to-sky-900 flex items-center justify-center p-6 text-center">
-                        <span className="text-xl font-black text-white tracking-wide">{biz.name}</span>
-                      </div>
-                    )}
+                    ) : <BusinessBrandFallback name={biz.name} variant="cover" />}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
                     <div className="absolute top-3 left-3 flex gap-2">
                       <span className="bg-sea text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
