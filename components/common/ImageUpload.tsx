@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { Camera, Upload, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputId = useId();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,9 +93,9 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
             <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="gap-1.5">
               <Upload className="w-4 h-4" /> Upload from device
             </Button>
-            <Button type="button" variant="secondary" size="sm" onClick={() => cameraInputRef.current?.click()} disabled={isUploading} className="gap-1.5">
+            <label htmlFor={cameraInputId} className={`inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-200 ${isUploading ? 'pointer-events-none opacity-50' : ''}`}>
               <Camera className="w-4 h-4" /> Take a photo
-            </Button>
+            </label>
           </div>
           <input
             ref={fileInputRef}
@@ -106,10 +107,11 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
           />
           <input
             ref={cameraInputRef}
+            id={cameraInputId}
             type="file"
             accept="image/*"
             capture="environment"
-            className="hidden"
+            className="sr-only"
             onChange={handleFileChange}
             disabled={isUploading}
           />

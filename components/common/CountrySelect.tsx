@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { COUNTRIES, type CountryData } from '@/lib/countries-data';
 
@@ -13,30 +13,42 @@ type Props = {
 
 export function CountrySelect({ value, onChange, mode = 'country', className = '' }: Props) {
   const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const items = useMemo(() => {
     const term = query.trim().toLowerCase();
     return term ? COUNTRIES.filter((country) => `${country.name} ${country.code} ${country.phoneCode}`.toLowerCase().includes(term)) : COUNTRIES;
   }, [query]);
   const selected = COUNTRIES.find((country) => (mode === 'country' ? country.name : country.phoneCode) === value);
 
+  useEffect(() => {
+    const close = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, []);
+
   return (
-    <div className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`}>
       <div className="flex items-center rounded-lg border border-slate-300 bg-white px-2.5 focus-within:border-sea focus-within:ring-2 focus-within:ring-sea/20">
         <span aria-hidden="true" className="mr-1 text-base">{selected?.flagEmoji || '🌐'}</span>
         <Search className="h-3.5 w-3.5 shrink-0 text-slate-400" />
         <input
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onFocus={() => setIsOpen(true)}
+          onClick={() => setIsOpen(true)}
+          onChange={(event) => { setQuery(event.target.value); setIsOpen(true); }}
           placeholder={mode === 'country' ? selected?.name || 'Search country' : selected ? selected.phoneCode : 'Code'}
           aria-label={mode === 'country' ? 'Search country' : 'Search country dial code'}
           className="min-w-0 flex-1 bg-transparent px-1.5 py-2.5 text-sm text-slate-900 outline-none"
         />
       </div>
-      {query && (
+      {isOpen && (
         <div className="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-xl">
           {items.map((country) => (
-            <button key={country.code} type="button" onClick={() => { onChange(country); setQuery(''); }} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50">
+            <button key={country.code} type="button" onClick={() => { onChange(country); setQuery(''); setIsOpen(false); }} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50">
               <span>{country.flagEmoji}</span><span className="min-w-0 flex-1 truncate">{country.name}</span>
               {mode === 'dialCode' && <span className="text-slate-500">{country.phoneCode}</span>}
             </button>
