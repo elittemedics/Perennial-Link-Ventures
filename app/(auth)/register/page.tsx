@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { UserPlus, Building2, User, Eye, EyeOff, Mail } from 'lucide-react';
-import { COUNTRIES, DEFAULT_COUNTRY } from '@/lib/countries-data';
+import { DEFAULT_COUNTRY } from '@/lib/countries-data';
+import { CountrySelect } from '@/components/common/CountrySelect';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -147,18 +148,7 @@ export default function RegisterPage() {
                 Telephone Number
               </label>
               <div className="flex gap-2">
-                <select
-                  value={countryDialCode}
-                  onChange={(e) => setCountryDialCode(e.target.value)}
-                  className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 focus:border-sea focus:outline-none focus:ring-2 focus:ring-sea/20 shadow-sm"
-                  aria-label="Country dial code"
-                >
-                  {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.phoneCode}>
-                      {c.flagEmoji} {c.code} ({c.phoneCode})
-                    </option>
-                  ))}
-                </select>
+                <CountrySelect value={countryDialCode} mode="dialCode" className="w-40 shrink-0" onChange={(country) => setCountryDialCode(country.phoneCode)} />
                 <div className="flex-1">
                   <input
                     type="tel"

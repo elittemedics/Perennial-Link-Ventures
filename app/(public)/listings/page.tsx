@@ -27,7 +27,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
   const city = searchParams.city || '';
   const minRating = parseFloat(searchParams.rating || '0');
   const page = parseInt(searchParams.page || '1');
-  const limit = 9;
+  const limit = 24;
   const skip = (page - 1) * limit;
 
   let categories: any[] = [];
@@ -42,7 +42,14 @@ export default async function ListingsPage(props: ListingsPageProps) {
         { name: { contains: query, mode: 'insensitive' } },
         { description: { contains: query, mode: 'insensitive' } },
         { address: { contains: query, mode: 'insensitive' } },
+        { phone: { contains: query, mode: 'insensitive' } },
+        { whatsapp: { contains: query, mode: 'insensitive' } },
+        { email: { contains: query, mode: 'insensitive' } },
+        { website: { contains: query, mode: 'insensitive' } },
         { cityName: { contains: query, mode: 'insensitive' } },
+        { countryName: { contains: query, mode: 'insensitive' } },
+        { products: { some: { OR: [{ title: { contains: query, mode: 'insensitive' } }, { description: { contains: query, mode: 'insensitive' } }] } } },
+        { services: { some: { OR: [{ name: { contains: query, mode: 'insensitive' } }, { description: { contains: query, mode: 'insensitive' } }] } } },
       ];
     }
 
@@ -78,7 +85,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
       <div className="border-b border-slate-200 pb-6">
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Business Directory</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Showing {total} verified business listings across Ghana
+          Showing {total} verified businesses from around the world
         </p>
       </div>
 
@@ -100,7 +107,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
                 type="text"
                 name="q"
                 defaultValue={query}
-                placeholder="Business name, service..."
+                placeholder="Name, service, product, phone, email..."
                 className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
               />
             </div>
@@ -175,11 +182,11 @@ export default async function ListingsPage(props: ListingsPageProps) {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
               {listings.map((b) => (
                 <Card key={b.id} className="group hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
                   <div>
-                    <div className="relative h-44 w-full bg-slate-100 overflow-hidden">
+                    <div className="relative h-28 sm:h-32 w-full bg-slate-100 overflow-hidden">
                       {b.coverImage ? <Image src={b.coverImage} alt={b.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" /> : <BusinessBrandFallback name={b.name} variant="cover" />}
                       <div className="absolute top-3 left-3 flex gap-2">
                         <Badge variant="info" className="shadow-md">{b.category?.name}</Badge>
@@ -192,7 +199,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
                       </div>
                     </div>
 
-                    <CardContent className="p-5 space-y-3">
+                    <CardContent className="p-3 space-y-2">
                       <div className="flex items-center gap-3">
                         {b.logo ? (
                           <div className="relative w-10 h-10 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0">
@@ -216,7 +223,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
                     </CardContent>
                   </div>
 
-                  <div className="p-5 pt-0 border-t border-slate-100 flex items-center justify-between mt-3">
+                  <div className="p-3 pt-0 border-t border-slate-100 flex items-center justify-between mt-2">
                     <div className="flex items-center gap-1 text-amber-500">
                       <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                       <span className="font-bold text-xs text-slate-800">{b.avgRating?.toFixed(1) || '5.0'}</span>
@@ -224,8 +231,8 @@ export default async function ListingsPage(props: ListingsPageProps) {
                     </div>
 
                     <Link href={`/business/${b.slug}`}>
-                      <Button variant="primary" size="sm">
-                        View Profile
+                      <Button variant="primary" size="sm" className="px-2 text-[11px]">
+                        View
                       </Button>
                     </Link>
                   </div>

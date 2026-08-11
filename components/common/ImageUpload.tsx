@@ -36,7 +36,7 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
       formData.append('file', file);
       formData.append('prefix', prefix);
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/v1/upload', {
         method: 'POST',
         body: formData,
       });

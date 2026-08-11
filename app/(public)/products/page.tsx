@@ -48,6 +48,10 @@ export default async function ProductsPage(props: ProductsPageProps) {
       where.OR = [
         { title: { contains: query, mode: 'insensitive' } },
         { description: { contains: query, mode: 'insensitive' } },
+        { business: { is: { OR: [
+          { name: { contains: query, mode: 'insensitive' } }, { phone: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } }, { description: { contains: query, mode: 'insensitive' } },
+        ] } } },
       ];
     }
 
@@ -126,7 +130,7 @@ export default async function ProductsPage(props: ProductsPageProps) {
                 type="text"
                 name="q"
                 defaultValue={query}
-                placeholder="Product title, brand..."
+                placeholder="Product, company, phone, email..."
                 className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
               />
             </div>
@@ -170,7 +174,6 @@ export default async function ProductsPage(props: ProductsPageProps) {
           </form>
         </div>
 
-        {/* Product Grid Results (2 on Phone, 3 on Tablet, 5 on PC) */}
         <main className="space-y-6">
           {products.length === 0 ? (
             <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
@@ -186,7 +189,7 @@ export default async function ProductsPage(props: ProductsPageProps) {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
               {products.map((prod) => (
                 <ProductCard key={prod.id} product={prod} />
               ))}

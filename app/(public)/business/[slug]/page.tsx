@@ -246,7 +246,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                   <Package className="w-6 h-6 text-sea" /> Product Catalog &amp; Deals ({business.products.length})
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
                   {business.products.map((ps: any) => (
                     <ProductCard
                       key={ps.id}

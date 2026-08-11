@@ -22,4 +22,4 @@ export const COUNTRIES: CountryData[] = getCountries()
   }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-export const DEFAULT_COUNTRY = COUNTRIES[0]; // Ghana (+233)
+export const DEFAULT_COUNTRY = COUNTRIES.find((country) => country.code === 'GH') || COUNTRIES[0];

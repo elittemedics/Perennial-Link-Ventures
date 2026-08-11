@@ -41,7 +41,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Ghana's premier verified business directory and marketplace. Connecting buyers directly with trusted local vendors and enterprise sellers nationwide.
+              A global business directory and marketplace connecting customers directly with trusted businesses and service providers.
             </p>
           </div>
 
@@ -82,14 +82,14 @@ export default function Footer() {
                 <Phone className="w-4 h-4 text-sea shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-semibold text-white">Telephone</span>
-                  <a href="tel:0545898775" className="hover:text-gold-400 transition-colors">0545898775</a>
+                  <a href="tel:+233594772823" className="hover:text-gold-400 transition-colors">+233 (0) 594772823</a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-sea shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-semibold text-white">Headquarters</span>
-                  <span>Tuba / Weija, Greater Accra, Ghana</span>
+                  <span>Serving businesses worldwide</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">

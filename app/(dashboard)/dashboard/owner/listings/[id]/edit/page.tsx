@@ -11,6 +11,7 @@ import { Building2, Save, ArrowLeft, Loader2, Facebook, Instagram, Linkedin } fr
 import Link from 'next/link';
 import { readApiResponse } from '@/lib/api-client';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@/lib/countries-data';
+import { CountrySelect } from '@/components/common/CountrySelect';
 
 export default function EditListingPage() {
   const router = useRouter();
@@ -165,7 +166,7 @@ export default function EditListingPage() {
                 label="Tagline (Slogan)"
                 value={formData.tagline}
                 onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-                placeholder="e.g. Ghana's Premier Business Directory"
+                placeholder="e.g. Your trusted local and global partner"
               />
             </div>
 
@@ -190,17 +191,7 @@ export default function EditListingPage() {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Telephone / Contact Number</label>
                 <div className="flex gap-2">
-                  <select
-                    value={phoneDialCode}
-                    onChange={(e) => setPhoneDialCode(e.target.value)}
-                    className="bg-white border border-slate-300 rounded-lg px-2.5 py-2.5 text-xs font-medium text-slate-900 focus:border-sea focus:outline-none"
-                  >
-                    {COUNTRIES.map((c) => (
-                      <option key={c.code} value={c.phoneCode}>
-                        {c.flagEmoji} {c.code} ({c.phoneCode})
-                      </option>
-                    ))}
-                  </select>
+                  <CountrySelect value={phoneDialCode} mode="dialCode" className="w-40 shrink-0" onChange={(country) => setPhoneDialCode(country.phoneCode)} />
                   <input
                     type="tel"
                     value={formData.phone}
@@ -214,17 +205,7 @@ export default function EditListingPage() {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">WhatsApp Number (optional)</label>
                 <div className="flex gap-2">
-                  <select
-                    value={whatsappDialCode}
-                    onChange={(e) => setWhatsappDialCode(e.target.value)}
-                    className="bg-white border border-slate-300 rounded-lg px-2.5 py-2.5 text-xs font-medium text-slate-900 focus:border-sea focus:outline-none"
-                  >
-                    {COUNTRIES.map((c) => (
-                      <option key={c.code} value={c.phoneCode}>
-                        {c.flagEmoji} {c.code} ({c.phoneCode})
-                      </option>
-                    ))}
-                  </select>
+                  <CountrySelect value={whatsappDialCode} mode="dialCode" className="w-40 shrink-0" onChange={(country) => setWhatsappDialCode(country.phoneCode)} />
                   <input
                     type="tel"
                     value={formData.whatsapp}
@@ -289,25 +270,11 @@ export default function EditListingPage() {
               
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Country</label>
-                <select
-                  required
-                  value={formData.countryName}
-                  onChange={(e) => {
-                    const country = COUNTRIES.find((c) => c.name === e.target.value);
-                    setFormData({ ...formData, countryName: e.target.value });
-                    if (country) {
-                      setPhoneDialCode(country.phoneCode);
-                      setWhatsappDialCode(country.phoneCode);
-                    }
-                  }}
-                  className="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
-                >
-                  {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.name}>
-                      {c.flagEmoji} {c.name}
-                    </option>
-                  ))}
-                </select>
+                <CountrySelect value={formData.countryName} onChange={(country) => {
+                  setFormData({ ...formData, countryName: country.name });
+                  setPhoneDialCode(country.phoneCode);
+                  setWhatsappDialCode(country.phoneCode);
+                }} />
               </div>
             </div>
 
@@ -322,7 +289,7 @@ export default function EditListingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
               <ImageUpload
-                label="Company Logo (Sharp Auto-WebP)"
+                label="Company Logo (optional)"
                 value={formData.logo}
                 onChange={(url) => setFormData({ ...formData, logo: url })}
                 prefix="logo"

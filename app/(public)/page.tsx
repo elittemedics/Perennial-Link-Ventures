@@ -94,7 +94,7 @@ export default async function HomePage() {
                 <Sparkles className="w-3.5 h-3.5 mr-2 text-amber-300 shrink-0" />
                 <TypewriterText
                   texts={[
-                    "Ghana's #1 Business Marketplace & Directory",
+                    "A Global Business Marketplace & Directory",
                     "Connect Directly With Verified Vendors",
                     "List Products & Grow Your Business"
                   ]}
@@ -112,7 +112,7 @@ export default async function HomePage() {
               </p>
 
               {/* Hero Search Bar */}
-              <form action="/products" method="GET"
+              <form action="/listings" method="GET"
                 className="glass-panel rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-3 p-2.5 border border-white/30 max-w-xl"
               >
                 <div className="flex-1 flex items-center gap-3 px-4 py-2.5 bg-white/90 rounded-xl">
@@ -215,7 +215,7 @@ export default async function HomePage() {
             {[
               { end: totalBusinesses > 0 ? totalBusinesses : 500, suffix: '+', label: 'Verified Listings' },
               { end: totalReviews > 0 ? totalReviews : 1200, suffix: '+', label: 'Client Reviews' },
-              { end: 16, suffix: '', label: 'Regions Covered' },
+              { end: 190, suffix: '+', label: 'Countries Available' },
               { end: 99.9, suffix: '%', decimals: 1, label: 'Uptime Verified' },
             ].map((stat) => (
               <div key={stat.label}
@@ -256,7 +256,7 @@ export default async function HomePage() {
           </div>
 
           {recentBusinesses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
               {recentBusinesses.map((biz) => (
                 <div key={biz.id} className="card-3d group bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
                   <div className="relative h-40 bg-slate-100 overflow-hidden">
