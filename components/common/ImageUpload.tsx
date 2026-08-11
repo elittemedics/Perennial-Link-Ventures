@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useId, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Camera, Upload, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -13,16 +13,23 @@ export interface ImageUploadProps {
   prefix?: string;
 }
 
-export default function ImageUpload({ value, onChange, label = 'Upload Image', prefix = 'listing' }: ImageUploadProps) {
+export default function ImageUpload({
+  value,
+  onChange,
+  label = 'Upload Image',
+  prefix = 'listing',
+}: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputId = useId();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Reset input so the same file can be re-selected after removal
+    e.target.value = '';
 
     if (file.size > 5 * 1024 * 1024) {
       setError('Image file size must be less than 5MB.');
@@ -77,7 +84,7 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full min-h-40 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-4">
+        <div className="relative flex flex-col items-center justify-center w-full min-h-40 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-4">
           <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
             {isUploading ? (
               <Loader2 className="w-8 h-8 text-sea animate-spin mb-2" />
@@ -87,31 +94,52 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', p
             <p className="text-sm font-semibold text-slate-700">
               {isUploading ? 'Optimizing & Uploading image...' : 'Add a photo of your business or product'}
             </p>
-            <p className="text-xs text-slate-500 mt-1">PNG, JPG or WebP (Sharp Auto-Optimized up to 5MB)</p>
+            <p className="text-xs text-slate-500 mt-1">PNG, JPG or WebP (Auto-Optimized, max 5MB)</p>
           </div>
+
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="gap-1.5">
+            {/* Gallery / file picker */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="gap-1.5"
+            >
               <Upload className="w-4 h-4" /> Upload from device
             </Button>
-            <label htmlFor={cameraInputId} className={`inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-200 ${isUploading ? 'pointer-events-none opacity-50' : ''}`}>
+
+            {/* Camera — uses ref.click() for reliable cross-browser behaviour */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => cameraInputRef.current?.click()}
+              disabled={isUploading}
+              className="gap-1.5"
+            >
               <Camera className="w-4 h-4" /> Take a photo
-            </label>
+            </Button>
           </div>
+
+          {/* Hidden gallery input */}
           <input
             ref={fileInputRef}
             type="file"
             accept="image/png, image/jpeg, image/webp"
-            className="hidden"
+            style={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' }}
             onChange={handleFileChange}
             disabled={isUploading}
           />
+
+          {/* Hidden camera input — must NOT use display:none for camera to open on mobile */}
           <input
             ref={cameraInputRef}
-            id={cameraInputId}
             type="file"
             accept="image/*"
             capture="environment"
-            className="sr-only"
+            style={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' }}
             onChange={handleFileChange}
             disabled={isUploading}
           />

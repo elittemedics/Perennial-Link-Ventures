@@ -48,7 +48,7 @@ export default async function HomePage() {
           _count: { select: { reviews: true, favorites: true } },
           products: {
             where: { isAvailable: true },
-            take: 2,
+            take: 3,
             orderBy: { createdAt: 'desc' },
             select: { id: true, title: true, price: true, currency: true, image: true },
           },
@@ -164,7 +164,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right — 3D Handshake Image (Visible on ALL screens now, optimized for mobile) */}
+            {/* Right — 3D Handshake Image */}
             <div className="order-last lg:order-none flex w-full flex-col items-center justify-center relative animate-slide-right mt-8 lg:mt-0">
               {/* Decorative rings */}
               <div className="absolute w-[260px] sm:w-[380px] lg:w-[420px] h-[220px] sm:h-[280px] lg:h-[420px] rounded-full border border-white/10 animate-pulse-glow" />
@@ -191,7 +191,7 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* Floating stat cards around the image (Responsive position) */}
+              {/* Floating stat cards */}
               <div className="hidden lg:block absolute top-2 left-0 sm:-left-6 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
                 <p className="text-xl sm:text-2xl font-black text-white">500+</p>
                 <p className="text-[9px] sm:text-[10px] text-sky-300 font-semibold uppercase tracking-wider">Verified Vendors</p>
@@ -240,10 +240,10 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          3. REGISTERED BUSINESSES & PRODUCTS (Reflects newly uploaded businesses first!)
+          3. BUSINESSES & PRODUCTS — Jumia-style product strips + company cards
          ═══════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto space-y-12">
+      <section className="bg-white py-16 px-4 sm:px-6 lg:px-8 border-b border-slate-100">
+        <div className="max-w-7xl mx-auto space-y-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <Badge variant="info" className="mb-2.5 px-3.5 py-1 text-xs">Verified Directory</Badge>
@@ -251,7 +251,7 @@ export default async function HomePage() {
                 Businesses &amp; Their Latest Offers
               </h2>
               <p className="text-slate-500 text-sm sm:text-base mt-1.5">
-                Browse a company first, then preview the products it has just added—all in one clear marketplace flow.
+                Browse products directly, then contact the seller — all in one marketplace.
               </p>
             </div>
             <Link href="/listings">
@@ -262,70 +262,173 @@ export default async function HomePage() {
           </div>
 
           {recentBusinesses.length > 0 ? (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
-              {recentBusinesses.map((biz) => (
-                <div key={biz.id} className="card-3d group bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
-                  <div className="relative h-40 bg-slate-100 overflow-hidden">
-                    {biz.coverImage || biz.logo ? (
-                      <Image
-                        src={biz.coverImage || biz.logo}
-                        alt={biz.name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : <BusinessBrandFallback name={biz.name} variant="cover" />}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
-                    <div className="absolute top-3 left-3 flex gap-2">
-                      <span className="bg-sea text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
-                        {biz.category?.name || 'Business'}
-                      </span>
+            <div className="space-y-10">
+
+              {/* ── Businesses WITH products: Jumia-style product strips ── */}
+              {recentBusinesses.filter((b: any) => b.products.length > 0).map((biz: any) => (
+                <div key={biz.id} className="space-y-3">
+                  {/* Business header row */}
+                  <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden shrink-0 flex items-center justify-center">
+                        {biz.logo ? (
+                          <Image src={biz.logo} alt={biz.name} width={36} height={36} className="object-cover w-full h-full" />
+                        ) : (
+                          <span className="text-sm font-black text-sea">{biz.name.charAt(0)}</span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900 text-sm leading-tight">{biz.name}</p>
+                        {biz.cityName && (
+                          <p className="text-[11px] text-slate-400 leading-tight">{biz.cityName}, Ghana</p>
+                        )}
+                      </div>
                       {biz.isVerified && (
-                        <span className="bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
+                        <span className="hidden sm:flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
                           <ShieldCheck className="w-3 h-3" /> Verified
                         </span>
                       )}
                     </div>
+                    <Link
+                      href={`/business/${biz.slug}`}
+                      className="flex items-center gap-1 text-xs font-bold text-sea hover:underline shrink-0"
+                    >
+                      View business &amp; contact <ArrowRight className="w-3 h-3" />
+                    </Link>
                   </div>
-                  <div className="p-5 space-y-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-900 group-hover:text-sea transition-colors leading-snug">
-                        {biz.name}
-                      </h3>
-                      {biz.tagline && (
-                        <p className="text-xs text-slate-500 line-clamp-2 mt-1 italic">"{biz.tagline}"</p>
-                      )}
-                    </div>
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
-                      <span className="flex items-center gap-1 text-amber-500 font-bold">
-                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> {biz.avgRating || '5.0'} ({biz.totalReviews || 12})
-                      </span>
-                      <span>{biz.cityName || 'Accra'}, Ghana</span>
-                    </div>
-                    {biz.products.length > 0 ? (
-                      <div className="space-y-2 rounded-2xl bg-slate-50 p-3">
-                        <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Latest from this business</p>
-                        {biz.products.map((product: { id: string; title: string; price: number; currency: string; image: string | null }) => (
-                          <Link key={product.id} href={`/products?business=${biz.slug}`} className="flex items-center gap-2 rounded-xl bg-white p-2 transition-colors hover:bg-gold-50">
-                            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                              {product.image ? <Image src={product.image} alt="" fill sizes="36px" className="object-cover" /> : null}
-                            </div>
-                            <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-700">{product.title}</span>
-                            <span className="text-xs font-black text-navy">{product.currency === 'GHS' ? 'GH₵' : `${product.currency} `}{product.price.toLocaleString()}</span>
-                          </Link>
-                        ))}
+
+                  {/* Product cards — horizontal scroll */}
+                  <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+                    {biz.products.map((product: { id: string; title: string; price: number; currency: string; image: string | null }) => (
+                      <Link
+                        key={product.id}
+                        href={`/business/${biz.slug}#products`}
+                        className="w-[140px] shrink-0 snap-start sm:w-[160px]"
+                      >
+                        <div className="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200">
+                          <div className="relative aspect-square bg-slate-50">
+                            {product.image ? (
+                              <Image
+                                src={product.image}
+                                alt={product.title}
+                                fill
+                                sizes="160px"
+                                className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-4xl font-black text-slate-200">{product.title.charAt(0)}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-2">
+                            <h4 className="text-xs font-medium text-slate-800 line-clamp-2 leading-tight min-h-[2rem]">
+                              {product.title}
+                            </h4>
+                            <p className="text-sm font-extrabold text-slate-900 mt-1">
+                              {product.currency === 'GHS' ? 'GH₵' : `${product.currency} `}
+                              {product.price?.toLocaleString() ?? '—'}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                    {/* See all link card */}
+                    <Link href={`/business/${biz.slug}#products`} className="w-[100px] shrink-0 snap-start">
+                      <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 hover:bg-sea/5 hover:border-sea/30 transition-colors p-3 gap-2 min-h-[140px]">
+                        <div className="w-8 h-8 rounded-full bg-sea/10 flex items-center justify-center">
+                          <ArrowRight className="w-4 h-4 text-sea" />
+                        </div>
+                        <span className="text-[11px] font-bold text-sea text-center leading-tight">See all products</span>
                       </div>
-                    ) : (
-                      <p className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500">This business has not added products yet.</p>
-                    )}
-                    <Link href={`/business/${biz.slug}`} className="block pt-1">
-                      <Button variant="secondary" className="w-full rounded-xl font-bold gap-2 group-hover:bg-sea group-hover:text-white transition-colors">
-                        View business &amp; contact <ArrowRight className="w-4 h-4" />
-                      </Button>
                     </Link>
                   </div>
                 </div>
               ))}
+
+              {/* ── Businesses WITHOUT products: premium company profile cards ── */}
+              {recentBusinesses.filter((b: any) => b.products.length === 0).length > 0 && (
+                <div className="space-y-5 pt-4 border-t border-slate-100">
+                  <div>
+                    <p className="text-sm font-extrabold text-slate-700 uppercase tracking-wider">
+                      Also registered on our platform
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      These businesses haven&apos;t listed products yet — contact them directly.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {recentBusinesses.filter((b: any) => b.products.length === 0).map((biz: any) => (
+                      <div
+                        key={biz.id}
+                        className="card-3d group bg-white rounded-2xl border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+                      >
+                        {/* Cover banner */}
+                        <div className="relative h-28 bg-gradient-to-br from-sky-100 to-blue-200 overflow-hidden">
+                          {biz.coverImage ? (
+                            <Image src={biz.coverImage} alt={`${biz.name} cover`} fill sizes="448px" className="object-cover" />
+                          ) : biz.logo ? (
+                            <Image src={biz.logo} alt={biz.name} fill sizes="448px" className="object-cover opacity-20 blur-md scale-110" />
+                          ) : (
+                            <BusinessBrandFallback name={biz.name} variant="cover" />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                          {biz.isVerified && (
+                            <span className="absolute top-3 right-3 bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow">
+                              <ShieldCheck className="w-3 h-3" /> Verified
+                            </span>
+                          )}
+                          {/* Logo overlapping the banner */}
+                          <div className="absolute -bottom-6 left-4">
+                            <div className="w-14 h-14 rounded-xl border-4 border-white bg-white overflow-hidden shadow-lg flex items-center justify-center">
+                              {biz.logo ? (
+                                <Image src={biz.logo} alt={biz.name} width={56} height={56} className="object-cover w-full h-full" />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-sea to-navy flex items-center justify-center">
+                                  <span className="text-xl font-black text-white">{biz.name.charAt(0)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Business details */}
+                        <div className="pt-10 px-4 pb-4 space-y-3">
+                          <div>
+                            <h3 className="text-base font-bold text-slate-900 group-hover:text-sea transition-colors leading-snug">
+                              {biz.name}
+                            </h3>
+                            {biz.category?.name && (
+                              <p className="text-[11px] text-slate-500 font-medium mt-0.5">{biz.category.name}</p>
+                            )}
+                          </div>
+                          {biz.tagline && (
+                            <p className="text-sm text-slate-600 line-clamp-2 italic">&ldquo;{biz.tagline}&rdquo;</p>
+                          )}
+                          <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                            <span className="flex items-center gap-1 text-amber-500 font-bold">
+                              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                              {biz.avgRating || '5.0'} ({biz._count?.reviews || 0})
+                            </span>
+                            <span>{biz.cityName || 'Ghana'}</span>
+                          </div>
+                          <p className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                            No products listed yet — visit their profile to contact them directly.
+                          </p>
+                          <Link href={`/business/${biz.slug}`} className="block">
+                            <Button
+                              variant="secondary"
+                              className="w-full rounded-xl font-bold gap-2 group-hover:bg-sea group-hover:text-white transition-colors"
+                            >
+                              View business &amp; contact <ArrowRight className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : null}
         </div>
@@ -374,15 +477,17 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          5. TRENDING PRODUCTS
+          5. TRENDING PRODUCTS — Jumia-style responsive grid
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto space-y-10">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <Badge variant="info" className="mb-2 px-3 py-1 text-xs">Fresh listings</Badge>
               <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Latest products</h2>
-              <p className="mt-1 text-sm text-slate-500">Browse products quickly, then open the business profile to view and contact the seller.</p>
+              <p className="mt-1 text-sm text-slate-500">
+                Browse products quickly, then open the business profile to view and contact the seller.
+              </p>
             </div>
             <Link href="/products">
               <Button variant="outline" className="gap-2 rounded-xl shrink-0">
@@ -392,11 +497,9 @@ export default async function HomePage() {
           </div>
 
           {trendingProducts.length > 0 ? (
-            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {trendingProducts.map((prod) => (
-                <div key={prod.id} className="w-[132px] shrink-0 snap-start sm:w-[165px] lg:w-[180px]">
-                  <ProductCard product={prod} />
-                </div>
+                <ProductCard key={prod.id} product={prod} />
               ))}
             </div>
           ) : (
