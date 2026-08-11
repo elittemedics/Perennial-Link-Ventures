@@ -33,8 +33,7 @@ const JUMIA_CATS = [
 ];
 
 export default async function HomePage() {
-  // Kept empty while the homepage focuses on businesses and category discovery.
-  const trendingProducts: any[] = [];
+  let trendingProducts: any[] = [];
   let recentBusinesses: any[] = [];
   let totalBusinesses = 0;
   let totalReviews = 0;
@@ -58,10 +57,17 @@ export default async function HomePage() {
       }),
       db.business.count({ where: { status: 'APPROVED' } }),
       db.review.count({ where: { isApproved: true } }),
+      db.businessProduct.findMany({
+        where: { isAvailable: true, business: { status: 'APPROVED', deletedAt: null } },
+        include: { business: { select: { name: true, slug: true, phone: true, isVerified: true, cityName: true } } },
+        orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+        take: 18,
+      }),
     ]);
     recentBusinesses  = res[0];
     totalBusinesses   = res[1];
     totalReviews      = res[2];
+    trendingProducts  = res[3];
   } catch {
     // DB offline fallback for build/preview
   }
@@ -370,11 +376,13 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           5. TRENDING PRODUCTS
          ═══════════════════════════════════════════════════════════ */}
-      {/* Product browsing continues through the marketplace link above. */}
-      <section className="hidden bg-white py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+      <section className="bg-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
+              <Badge variant="info" className="mb-2 px-3 py-1 text-xs">Fresh listings</Badge>
+              <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Latest products</h2>
+              <p className="mt-1 text-sm text-slate-500">Browse products quickly, then open the business profile to view and contact the seller.</p>
             </div>
             <Link href="/products">
               <Button variant="outline" className="gap-2 rounded-xl shrink-0">
@@ -384,9 +392,11 @@ export default async function HomePage() {
           </div>
 
           {trendingProducts.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
               {trendingProducts.map((prod) => (
-                <ProductCard key={prod.id} product={prod} />
+                <div key={prod.id} className="w-[132px] shrink-0 snap-start sm:w-[165px] lg:w-[180px]">
+                  <ProductCard product={prod} />
+                </div>
               ))}
             </div>
           ) : (
