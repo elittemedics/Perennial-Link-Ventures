@@ -223,7 +223,7 @@ export default function EditListingPage() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="info@perenniallink.com"
+                placeholder="info@market-plv.com"
               />
               <Input
                 label="Official Website URL"

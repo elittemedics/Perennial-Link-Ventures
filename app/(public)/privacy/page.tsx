@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       <h2>Security and retention</h2>
       <p>We use reasonable technical and organizational safeguards. No online service can guarantee absolute security. We retain data only for as long as needed for the purposes described here or as required by law.</p>
       <h2>Your choices</h2>
-      <p>You may request access, correction, or deletion of your account information by contacting <a href="mailto:info@perenniallink.com">info@perenniallink.com</a>.</p>
+      <p>You may request access, correction, or deletion of your account information by contacting <a href="mailto:info@market-plv.com">info@market-plv.com</a>.</p>
     </main>
   );
 }

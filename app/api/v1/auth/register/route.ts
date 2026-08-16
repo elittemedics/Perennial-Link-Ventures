@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { RegisterSchema } from '@/lib/validations';
 import { hashPassword } from '@/lib/auth/argon2';
-import { createSession, createEmailVerificationToken } from '@/lib/auth/better-auth';
+import { createEmailVerificationToken } from '@/lib/auth/better-auth';
 import { sendEmail, EmailTemplates } from '@/lib/email';
 import { Role } from '@prisma/client';
 import { isRateLimited } from '@/lib/rate-limit';
@@ -35,17 +35,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Do not create session automatically so user must log in manually.
-
-    // Dispatch welcome & verification emails
     const token = await createEmailVerificationToken(user.email);
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/verify-email?token=${token}`;
-
-    sendEmail({
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
+    const delivered = await sendEmail({
       to: user.email,
-      subject: 'Welcome to Perennial Link Ventures - Verify Your Email',
+      subject: 'Verify your Perennial Link Ventures account',
       html: EmailTemplates.emailVerification(verificationUrl),
-    }).catch(() => null);
+    });
+
+    if (!delivered) {
+      return NextResponse.json(
+        { success: false, error: 'Your account was created, but we could not send the verification email. Please try again later.' },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       {

@@ -34,27 +34,13 @@ const JUMIA_CATS = [
 
 export default async function HomePage() {
   let trendingProducts: any[] = [];
-  let recentBusinesses: any[] = [];
+  // Business profile previews are intentionally deferred until a visitor opens a product.
+  const recentBusinesses: any[] = [];
   let totalBusinesses = 0;
   let totalReviews = 0;
 
   try {
     const res = await Promise.all([
-      db.business.findMany({
-        where: { status: 'APPROVED', deletedAt: null },
-        take: 6,
-        include: {
-          category: { select: { name: true, slug: true, icon: true } },
-          _count: { select: { reviews: true, favorites: true } },
-          products: {
-            where: { isAvailable: true },
-            take: 3,
-            orderBy: { createdAt: 'desc' },
-            select: { id: true, title: true, price: true, currency: true, image: true },
-          },
-        },
-        orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-      }),
       db.business.count({ where: { status: 'APPROVED' } }),
       db.review.count({ where: { isApproved: true } }),
       db.businessProduct.findMany({
@@ -64,10 +50,9 @@ export default async function HomePage() {
         take: 18,
       }),
     ]);
-    recentBusinesses  = res[0];
-    totalBusinesses   = res[1];
-    totalReviews      = res[2];
-    trendingProducts  = res[3];
+    totalBusinesses   = res[0];
+    totalReviews      = res[1];
+    trendingProducts  = res[2];
   } catch {
     // DB offline fallback for build/preview
   }
@@ -108,9 +93,9 @@ export default async function HomePage() {
               </Badge>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
-                Showcase Your Products
+                Showcase your business
                 <br />
-                <span className="gradient-text">To Thousands of Buyers</span>
+                <span className="gradient-text">to the world.</span>
               </h1>
 
               <p className="text-lg sm:text-xl text-sky-100 leading-relaxed max-w-xl">
@@ -242,7 +227,7 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           3. BUSINESSES & PRODUCTS — Jumia-style product strips + company cards
          ═══════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-16 px-4 sm:px-6 lg:px-8 border-b border-slate-100">
+      <section className="hidden" aria-hidden="true">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>

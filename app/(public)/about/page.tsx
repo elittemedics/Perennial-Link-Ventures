@@ -62,7 +62,7 @@ export default function AboutPage() {
             </p>
             <p className="flex items-center gap-3">
               <Mail className="w-4 h-4 text-sea" />
-              <span>Email: <strong>info@perenniallink.com</strong></span>
+              <span>Email: <strong>info@market-plv.com</strong></span>
             </p>
           </div>
         </div>

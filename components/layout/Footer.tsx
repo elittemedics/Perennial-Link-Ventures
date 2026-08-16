@@ -96,8 +96,8 @@ export default function Footer() {
                 <Mail className="w-4 h-4 text-sea shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-semibold text-white">Email Address</span>
-                  <a href="mailto:info@perenniallink.com" className="hover:text-gold-400 transition-colors">
-                    info@perenniallink.com
+                  <a href="mailto:info@market-plv.com" className="hover:text-gold-400 transition-colors">
+                    info@market-plv.com
                   </a>
                 </div>
               </li>

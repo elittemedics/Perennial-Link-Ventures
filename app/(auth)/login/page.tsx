@@ -33,17 +33,17 @@ function LoginContent() {
     setError(null);
 
     try {
-      const res = await fetch('/api/auth/send-otp', {
+      const res = await fetch('/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await readApiResponse<{ error?: string }>(res);
+      const data = await readApiResponse<{ success?: boolean; error?: string }>(res);
 
-      if (!res.ok) throw new Error(data.error || 'Failed to send verification code.');
+      if (!res.ok || !data.success) throw new Error(data.error || 'Login failed.');
 
-      setStep('otp');
-      setSuccessMsg(`A 6-digit verification code has been sent to ${email}. Check your inbox.`);
+      router.push('/dashboard');
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed.');
     } finally {
@@ -87,7 +87,7 @@ function LoginContent() {
           </CardTitle>
           <CardDescription className="text-slate-500 text-xs">
             {step === 'credentials'
-              ? 'Access your business dashboard, reviews, and inquiries.'
+                  ? 'Access your business dashboard, reviews, and inquiries.'
               : `We sent a 6-digit code to ${email}.`}
           </CardDescription>
         </CardHeader>
@@ -166,7 +166,7 @@ function LoginContent() {
                 {isLoading ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Sending Code…</>
                 ) : (
-                  <><LogIn className="w-4 h-4" /> Continue &amp; Send Code</>
+                  <><LogIn className="w-4 h-4" /> Sign In</>
                 )}
               </Button>
             </form>

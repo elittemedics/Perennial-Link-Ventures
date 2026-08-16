@@ -16,7 +16,7 @@ export default function TermsPage() {
       <h2>Accounts and security</h2>
       <p>Keep your password and verification codes private. Notify us promptly if you suspect unauthorized account access. We may suspend accounts that create a security risk or violate these terms.</p>
       <h2>Contact</h2>
-      <p>For questions about these terms, contact <a href="mailto:info@perenniallink.com">info@perenniallink.com</a>.</p>
+      <p>For questions about these terms, contact <a href="mailto:info@market-plv.com">info@market-plv.com</a>.</p>
     </main>
   );
 }

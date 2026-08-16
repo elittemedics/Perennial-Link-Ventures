@@ -20,14 +20,26 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const gmailFallbackTransporter =
+  process.env.GMAIL_SMTP_USER && process.env.GMAIL_SMTP_APP_PASSWORD
+    ? nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.GMAIL_SMTP_USER,
+          pass: process.env.GMAIL_SMTP_APP_PASSWORD,
+        },
+      })
+    : null;
+
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const fromName = process.env.EMAIL_FROM_NAME || 'Perennial Link Ventures';
-  const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_FROM || 'noreply@perenniallink.com';
+  const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_FROM || 'info@market-plv.com';
 
   try {
     if (!process.env.SMTP_USER) {
-      console.error('[EMAIL_CONFIGURATION_ERROR] SMTP_USER is not configured.');
-      return false;
+      throw new Error('SMTP_USER is not configured.');
     }
 
     await transporter.sendMail({
@@ -39,8 +51,24 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     });
     return true;
   } catch (error) {
-    console.error('Nodemailer Email Error:', error);
-    return false;
+    console.error('Primary email delivery failed:', error);
+
+    if (!gmailFallbackTransporter) return false;
+
+    try {
+      await gmailFallbackTransporter.sendMail({
+        from: `"${fromName}" <${process.env.GMAIL_SMTP_USER}>`,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text || options.subject,
+      });
+      console.warn('Email delivered through the Gmail fallback.');
+      return true;
+    } catch (fallbackError) {
+      console.error('Gmail fallback email delivery failed:', fallbackError);
+      return false;
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Camera, Upload, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -21,15 +21,13 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Reset input so the same file can be re-selected after removal
-    e.target.value = '';
+  const uploadFile = async (file: File) => {
 
     if (file.size > 5 * 1024 * 1024) {
       setError('Image file size must be less than 5MB.');
@@ -62,6 +60,63 @@ export default function ImageUpload({
       setIsUploading(false);
     }
   };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) await uploadFile(file);
+  };
+
+  const closeCamera = () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setIsCameraOpen(false);
+  };
+
+  const openCamera = async () => {
+    setError(null);
+    if (!navigator.mediaDevices?.getUserMedia) {
+      cameraInputRef.current?.click();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+      streamRef.current = stream;
+      setIsCameraOpen(true);
+      window.setTimeout(() => {
+        if (videoRef.current) videoRef.current.srcObject = stream;
+      }, 0);
+    } catch {
+      setError('Camera access was blocked or is unavailable. Allow camera access, then try again or upload a photo from your device.');
+    }
+  };
+
+  const takePhoto = async () => {
+    const video = videoRef.current;
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      setError('The camera is still loading. Please try again.');
+      return;
+    }
+
+    const largestSide = Math.max(video.videoWidth, video.videoHeight);
+    const scale = Math.min(1, 1600 / largestSide);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+    if (!blob) {
+      setError('We could not capture that photo. Please try again.');
+      return;
+    }
+    closeCamera();
+    await uploadFile(new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' }));
+  };
+
+  useEffect(() => () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+  }, []);
 
   return (
     <div className="space-y-2">
@@ -115,7 +170,7 @@ export default function ImageUpload({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => cameraInputRef.current?.click()}
+              onClick={openCamera}
               disabled={isUploading}
               className="gap-1.5"
             >
@@ -147,6 +202,18 @@ export default function ImageUpload({
       )}
 
       {error && <p className="text-xs text-rose-600 mt-1">{error}</p>}
+
+      {isCameraOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-4 shadow-2xl space-y-3">
+            <video ref={videoRef} autoPlay playsInline muted className="w-full max-h-[70vh] rounded-xl bg-slate-900 object-cover" />
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={closeCamera}>Cancel</Button>
+              <Button type="button" variant="primary" onClick={takePhoto} className="gap-2"><Camera className="w-4 h-4" /> Take photo</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

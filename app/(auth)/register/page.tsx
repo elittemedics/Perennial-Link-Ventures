@@ -51,8 +51,7 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed.');
       }
 
-      // Redirect to sign in page after successful registration
-      router.push('/login?registered=true');
+      router.push(`/verify-email?sent=true&email=${encodeURIComponent(email.trim())}`);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
