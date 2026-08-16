@@ -41,7 +41,7 @@ export default async function OwnerDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Link href="/dashboard/owner/products">
+          <Link href="/dashboard/owner/products#inventory">
             <Button variant="outline" className="gap-2 border-sea text-sea hover:bg-brand-50">
               <Package className="w-4 h-4" /> Manage Products
             </Button>

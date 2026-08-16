@@ -1,0 +1,1 @@
+ALTER TABLE "BusinessProduct" ADD COLUMN "viewCount" INTEGER NOT NULL DEFAULT 0;

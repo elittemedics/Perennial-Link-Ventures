@@ -22,6 +22,7 @@ export default function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -70,6 +71,7 @@ export default function ImageUpload({
   const closeCamera = () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
+    setIsCameraReady(false);
     setIsCameraOpen(false);
   };
 
@@ -84,9 +86,6 @@ export default function ImageUpload({
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
       streamRef.current = stream;
       setIsCameraOpen(true);
-      window.setTimeout(() => {
-        if (videoRef.current) videoRef.current.srcObject = stream;
-      }, 0);
     } catch {
       setError('Camera access was blocked or is unavailable. Allow camera access, then try again or upload a photo from your device.');
     }
@@ -117,6 +116,13 @@ export default function ImageUpload({
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
   }, []);
+
+  useEffect(() => {
+    if (isCameraOpen && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => null);
+    }
+  }, [isCameraOpen]);
 
   return (
     <div className="space-y-2">
@@ -205,11 +211,14 @@ export default function ImageUpload({
 
       {isCameraOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-4 shadow-2xl space-y-3">
-            <video ref={videoRef} autoPlay playsInline muted className="w-full max-h-[70vh] rounded-xl bg-slate-900 object-cover" />
+          <div className="w-full max-w-3xl rounded-2xl bg-white p-4 shadow-2xl space-y-3">
+            <div className="relative aspect-[3/4] max-h-[72vh] overflow-hidden rounded-xl bg-slate-950 sm:aspect-video">
+              <video ref={videoRef} autoPlay playsInline muted onLoadedMetadata={() => setIsCameraReady(true)} className="h-full w-full object-cover" />
+              {!isCameraReady && <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-white"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Opening camera…</div>}
+            </div>
             <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={closeCamera}>Cancel</Button>
-              <Button type="button" variant="primary" onClick={takePhoto} className="gap-2"><Camera className="w-4 h-4" /> Take photo</Button>
+              <Button type="button" variant="primary" onClick={takePhoto} disabled={!isCameraReady} className="gap-2"><Camera className="w-4 h-4" /> Take photo</Button>
             </div>
           </div>
         </div>

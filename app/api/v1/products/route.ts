@@ -7,12 +7,19 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const businessId = searchParams.get('businessId') || undefined;
+    const mine = searchParams.get('mine') === 'true';
     const category = searchParams.get('category') || undefined;
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)));
 
     const whereClause: any = { isAvailable: true };
     if (businessId) whereClause.businessId = businessId;
     if (category) whereClause.productCategory = category;
+    if (mine) {
+      const user = await getSessionUser();
+      if (!user) return NextResponse.json({ success: false, error: 'Unauthorized access.' }, { status: 401 });
+      whereClause.business = { ownerId: user.id, deletedAt: null };
+      delete whereClause.isAvailable;
+    }
 
     const products = await db.businessProduct.findMany({
       where: whereClause,

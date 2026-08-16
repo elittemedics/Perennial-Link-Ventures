@@ -499,6 +499,7 @@ model BusinessProduct {
   productCategory    String   @default("Other categories")
   isAvailable        Boolean  @default(true)
   isFeatured         Boolean  @default(false)
+  viewCount          Int      @default(0)
   createdAt          DateTime @default(now())
 
   business Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)

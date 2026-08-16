@@ -103,7 +103,7 @@ export default function Navbar() {
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
             {role === 'BUSINESS_OWNER' && (
-              <Link href="/dashboard/owner/products">
+              <Link href="/dashboard/owner/products#new-product">
                 <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-sea text-sea font-bold hover:bg-brand-50">
                   <Package className="w-4 h-4" /> Add product
                 </Button>
@@ -237,7 +237,7 @@ export default function Navbar() {
                   </Button>
                 </Link>
                 {role === 'BUSINESS_OWNER' && (
-                  <Link href="/dashboard/owner/products" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/dashboard/owner/products#new-product" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="primary" className="w-full justify-start gap-2">
                       <Package className="w-4 h-4" /> Add product
                     </Button>

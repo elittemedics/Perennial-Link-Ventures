@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatGHS } from '@/lib/utils';
@@ -24,7 +26,7 @@ export default function ProductCard({ product }: ProductItemProps) {
       : null);
 
   return (
-    <Link href={`/business/${product.business.slug}#products`} className="block group h-full">
+    <Link href={`/business/${product.business.slug}#products`} onClick={() => { fetch(`/api/v1/products/${product.id}/view`, { method: 'POST', keepalive: true }).catch(() => null); }} className="block group h-full">
       <article className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 flex flex-col h-full">
         {/* Product Image */}
         <div className="relative aspect-square bg-slate-50 overflow-hidden">

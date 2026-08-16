@@ -28,6 +28,7 @@ interface Product {
   location?: string | null;
   image?: string | null;
   productCategory: string;
+  viewCount?: number;
   createdAt: string;
   business: { name: string };
 }
@@ -85,8 +86,8 @@ export default function OwnerProductsPage() {
           location: prev.location || selectedBusiness.cityName,
         }));
         
-        // Fetch products for first business
-        const prodRes = await fetch(`/api/v1/products?businessId=${selectedBusiness.id}`);
+        // The inventory always shows every product owned by this account.
+        const prodRes = await fetch('/api/v1/products?mine=true&limit=100', { cache: 'no-store' });
         const prodData = await readApiResponse<{ products?: Product[] }>(prodRes);
         if (prodData.products) setProducts(prodData.products);
       }
@@ -104,13 +105,6 @@ export default function OwnerProductsPage() {
   const handleSelectBusiness = async (bId: string) => {
     const selectedBusiness = businesses.find((business) => business.id === bId);
     setFormData((prev) => ({ ...prev, businessId: bId, location: selectedBusiness?.cityName || prev.location }));
-    try {
-      const prodRes = await fetch(`/api/v1/products?businessId=${bId}`);
-      const prodData = await readApiResponse<{ products?: Product[] }>(prodRes);
-      if (prodData.products) setProducts(prodData.products);
-    } catch {
-      setProducts([]);
-    }
   };
 
   const handleAddProduct = async (e: React.FormEvent) => {
@@ -162,8 +156,8 @@ export default function OwnerProductsPage() {
         image: null,
       }));
 
-      // Refresh products list
-      handleSelectBusiness(formData.businessId);
+      // Refresh the complete inventory, including products from every business.
+      fetchData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add product');
     } finally {
@@ -267,7 +261,7 @@ export default function OwnerProductsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Form Column */}
-        <Card className="lg:col-span-1 p-6 space-y-6 h-fit shadow-md">
+        <Card id="new-product" className="lg:col-span-1 p-6 space-y-6 h-fit shadow-md">
           <CardHeader className="p-0 border-b border-slate-100 pb-3">
             <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <PlusCircle className="w-5 h-5 text-sea" /> Add New Product
@@ -389,7 +383,7 @@ export default function OwnerProductsPage() {
         </Card>
 
         {/* Existing Products Column */}
-        <div className="lg:col-span-2 space-y-4">
+        <div id="inventory" className="lg:col-span-2 space-y-4">
           <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Store className="w-5 h-5 text-sea" /> Store Inventory ({products.length})
           </h3>
@@ -416,8 +410,8 @@ export default function OwnerProductsPage() {
 
           {products.length === 0 ? (
             <Card className="p-12 text-center space-y-3">
-              <p className="text-slate-500 text-sm">No products added for this business yet.</p>
-              <p className="text-slate-400 text-xs">Fill out the form on the left to display products on your public business page.</p>
+              <p className="text-slate-500 text-sm">No products added to your inventory yet.</p>
+              <p className="text-slate-400 text-xs">Add a product to any of your businesses using the form above.</p>
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -457,6 +451,7 @@ export default function OwnerProductsPage() {
                           {p.quantity !== undefined && p.quantity !== null && (
                             <p className="text-xs text-emerald-700 font-medium">📦 Qty: {p.quantity}</p>
                           )}
+                          <p className="text-xs font-medium text-sky-700">Views: {p.viewCount || 0}</p>
                           {p.location && <p className="text-xs text-slate-500">📍 {p.location}</p>}
                         </div>
                       </>

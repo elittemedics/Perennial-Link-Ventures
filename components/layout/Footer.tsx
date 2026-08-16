@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, Mail, MapPin, Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt, ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse } from 'lucide-react';
+import { Phone, Mail, Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt, ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse } from 'lucide-react';
 
 const CATEGORIES = [
   { name: 'Supermarket',      slug: 'Supermarket' },
@@ -83,13 +83,6 @@ export default function Footer() {
                 <div>
                   <span className="block font-semibold text-white">Telephone</span>
                   <a href="tel:+233594772823" className="hover:text-gold-400 transition-colors">+233 (0) 594772823</a>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-sea shrink-0 mt-0.5" />
-                <div>
-                  <span className="block font-semibold text-white">Headquarters</span>
-                  <span>Serving businesses worldwide</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">
