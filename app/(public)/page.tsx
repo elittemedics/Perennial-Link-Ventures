@@ -422,6 +422,31 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           4. 12 JUMIA CATEGORIES — Clickable, with gradient icons
          ═══════════════════════════════════════════════════════════ */}
+      <section className="bg-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <Badge variant="info" className="mb-2 px-3 py-1 text-xs">Fresh listings</Badge>
+              <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Latest products</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Browse products quickly, then open the business profile to view and contact the seller.
+              </p>
+            </div>
+            <Link href="/products">
+              <Button variant="outline" className="gap-2 rounded-xl shrink-0">
+                View All Products <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          {trendingProducts.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+              {trendingProducts.map((prod) => <ProductCard key={prod.id} product={prod} />)}
+            </div>
+          ) : null}
+        </div>
+      </section>
+
       <section className="bg-f8fafc py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
@@ -464,7 +489,7 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           5. TRENDING PRODUCTS — Jumia-style responsive grid
          ═══════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+      <section className="hidden" aria-hidden="true">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>

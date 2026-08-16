@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function Navbar() {
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<{ name: string | null; role: string } | null>(null);
 
-  useEffect(() => {
+  const loadUser = useCallback(() => {
     fetch('/api/v1/auth/logout')
       .then(async (response) => response.ok
         ? readApiResponse<{ user?: { name: string | null; role: string } | null }>(response)
@@ -22,6 +22,17 @@ export default function Navbar() {
       .then((data) => setUser(data?.user ?? null))
       .catch(() => setUser(null));
   }, []);
+
+  useEffect(() => {
+    loadUser();
+    const handleAuthenticationChange = (event: Event) => {
+      const authenticatedUser = (event as CustomEvent<{ name: string | null; role: string }>).detail;
+      if (authenticatedUser) setUser(authenticatedUser);
+      else loadUser();
+    };
+    window.addEventListener('auth-changed', handleAuthenticationChange);
+    return () => window.removeEventListener('auth-changed', handleAuthenticationChange);
+  }, [loadUser]);
 
   useEffect(() => {
     if (!isProfileDropdownOpen) return;

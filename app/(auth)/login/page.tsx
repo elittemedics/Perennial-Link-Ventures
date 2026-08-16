@@ -38,12 +38,12 @@ function LoginContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await readApiResponse<{ success?: boolean; error?: string }>(res);
+      const data = await readApiResponse<{ success?: boolean; error?: string; user?: { name: string | null; role: string } }>(res);
 
       if (!res.ok || !data.success) throw new Error(data.error || 'Login failed.');
 
-      router.push('/dashboard');
-      router.refresh();
+      window.dispatchEvent(new CustomEvent('auth-changed', { detail: data.user }));
+      router.replace('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed.');
     } finally {

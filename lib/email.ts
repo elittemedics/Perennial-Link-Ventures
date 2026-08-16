@@ -35,7 +35,9 @@ const gmailFallbackTransporter =
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const fromName = process.env.EMAIL_FROM_NAME || 'Perennial Link Ventures';
-  const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_FROM || 'info@market-plv.com';
+  // Always use the verified marketplace domain unless an explicit production
+  // sender is configured. SMTP_FROM may still point to Resend's test address.
+  const fromEmail = process.env.EMAIL_FROM || 'info@market-plv.com';
 
   try {
     if (!process.env.SMTP_USER) {
