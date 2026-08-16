@@ -36,11 +36,10 @@ export async function POST(req: NextRequest) {
     });
 
     const token = await createEmailVerificationToken(user.email);
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
     const delivered = await sendEmail({
       to: user.email,
       subject: 'Verify your Perennial Link Ventures account',
-      html: EmailTemplates.emailVerification(verificationUrl),
+      html: EmailTemplates.emailVerificationCode(token),
     });
 
     if (!delivered) {

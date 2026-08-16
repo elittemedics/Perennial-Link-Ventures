@@ -5,6 +5,7 @@ export interface CountryData {
   code: string;
   phoneCode: string;
   flagEmoji: string;
+  flagUrl: string;
 }
 
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
@@ -19,6 +20,7 @@ export const COUNTRIES: CountryData[] = getCountries()
     code,
     phoneCode: `+${getCountryCallingCode(code)}`,
     flagEmoji: flagEmoji(code),
+    flagUrl: `https://flagcdn.com/w40/${code.toLowerCase()}.png`,
   }))
   .sort((a, b) => a.name.localeCompare(b.name));
 

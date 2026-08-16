@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyEmailToken } from '@/lib/auth/better-auth';
+import { isRateLimited } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   try {
-    const { token } = await req.json();
-    if (typeof token !== 'string' || !token) {
+    if (isRateLimited(req, 'verify-email', 8, 15 * 60 * 1000)) {
+      return NextResponse.json({ success: false, error: 'Too many attempts. Please try again later.' }, { status: 429 });
+    }
+    const { token, email } = await req.json();
+    if (typeof token !== 'string' || !/^\d{6}$/.test(token) || typeof email !== 'string') {
       return NextResponse.json({ success: false, error: 'Invalid verification link.' }, { status: 400 });
     }
 
-    const verified = await verifyEmailToken(token);
+    const verified = await verifyEmailToken(token, email);
     if (!verified) {
       return NextResponse.json(
         { success: false, error: 'This verification link is invalid or has expired.' },

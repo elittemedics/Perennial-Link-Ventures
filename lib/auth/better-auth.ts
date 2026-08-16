@@ -120,9 +120,10 @@ export async function destroySession(): Promise<void> {
  * Issue Email Verification Token
  */
 export async function createEmailVerificationToken(email: string): Promise<string> {
-  const token = generateSecureToken(24);
+  const token = generateNumericOTP();
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
+  await db.emailVerificationToken.deleteMany({ where: { email } });
   await db.emailVerificationToken.create({
     data: {
       email,
@@ -137,12 +138,12 @@ export async function createEmailVerificationToken(email: string): Promise<strin
 /**
  * Verify Email Token
  */
-export async function verifyEmailToken(token: string): Promise<boolean> {
+export async function verifyEmailToken(token: string, email?: string): Promise<boolean> {
   const record = await db.emailVerificationToken.findUnique({
     where: { token },
   });
 
-  if (!record || new Date() > record.expires) {
+  if (!record || new Date() > record.expires || (email && record.email !== email.toLowerCase().trim())) {
     return false;
   }
 

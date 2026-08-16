@@ -100,6 +100,15 @@ export const EmailTemplates = {
     </div>
   `,
 
+  emailVerificationCode: (code: string) => `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+      <h2 style="color: #0f172a;">Verify Your Email Address</h2>
+      <p>Enter this code on Perennial Link Ventures to confirm your email address. It expires in 24 hours.</p>
+      <div style="font-size: 32px; font-weight: 700; color: #0f172a; letter-spacing: 8px; text-align: center; padding: 18px; background: #f0f9ff; border-radius: 8px; margin: 24px 0;">${code}</div>
+      <p style="font-size: 13px; color: #64748b;">If you did not create an account, you can safely ignore this email.</p>
+    </div>
+  `,
+
   passwordReset: (resetUrl: string) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; borderRadius: 8px;">
       <h2 style="color: #0f172a;">Password Reset Request</h2>
