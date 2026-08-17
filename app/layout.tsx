@@ -91,7 +91,7 @@ export default function RootLayout({
     '@type': 'Organization',
     name: 'Perennial Link Ventures',
     url: appUrl,
-    telephone: '0545898775',
+    telephone: '0594772823',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Tuba / Weija',

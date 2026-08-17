@@ -22,7 +22,7 @@ export interface WhatsAppModalProps {
 }
 
 export default function WhatsAppModal({ isOpen, onClose, product }: WhatsAppModalProps) {
-  const defaultPhone = product.whatsappPhone || product.phone || '0545898775';
+  const defaultPhone = product.whatsappPhone || product.phone || '0594772823';
   const cleanPhone = defaultPhone.replace(/[^0-9]/g, '');
   // Format international number for Ghana (233)
   const formattedWhatsApp = cleanPhone.startsWith('0')

@@ -54,7 +54,7 @@ export default function AboutPage() {
           <div className="space-y-3 pt-2 text-sm">
             <p className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-sea" />
-              <span>Telephone: <strong>0545898775</strong></span>
+              <span>Telephone: <strong>0594772823</strong></span>
             </p>
             <p className="flex items-center gap-3">
               <MapPin className="w-4 h-4 text-sea" />

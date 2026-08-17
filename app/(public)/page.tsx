@@ -560,11 +560,11 @@ export default async function HomePage() {
                 Register Free Now <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <a href="tel:0545898775"
+            <a href="tel:0594772823"
               className="flex items-center gap-2.5 text-sm font-bold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/15 px-7 py-4 rounded-2xl transition-all"
             >
               <Phone className="w-4 h-4 text-sea" />
-              Call: 0545898775
+              Call: 0594772823
             </a>
           </div>
         </div>
