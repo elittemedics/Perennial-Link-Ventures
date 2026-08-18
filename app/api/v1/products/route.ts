@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         location: validated.location || null,
         // A standalone product keeps its own contact details; linked products
         // can still default to the selected business contact.
-        whatsappPhone: validated.whatsappPhone || business?.whatsapp || business?.phone || user.phone || null,
+        whatsappPhone: validated.whatsappPhone || business?.whatsapp || business?.phone || null,
         productCategory: validated.productCategory || 'Other categories',
         images: validated.images && validated.images.length > 0 ? {
           create: validated.images.map((url, idx) => ({
