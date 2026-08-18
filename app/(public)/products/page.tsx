@@ -29,6 +29,8 @@ const JUMIA_CATEGORIES = [
   'Sporting Goods',
   'Baby Products',
   'Gaming',
+  'Cars & Vehicles',
+  'Services',
   'Other categories',
 ];
 

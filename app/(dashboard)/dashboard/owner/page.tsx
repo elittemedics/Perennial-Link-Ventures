@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Building2, Eye, MessageSquare, PlusCircle, Star, ArrowRight, Package } from 'lucide-react';
 import { BusinessActions } from '@/components/dashboard/BusinessActions';
+import { FirstSignInPrompt } from '@/components/dashboard/FirstSignInPrompt';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,7 @@ export default async function OwnerDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <FirstSignInPrompt />
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
@@ -41,13 +43,18 @@ export default async function OwnerDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <Link href="/dashboard/owner/products#new-product">
+            <Button variant="primary" className="gap-2 shadow-md">
+              <PlusCircle className="w-4 h-4" /> Add Product
+            </Button>
+          </Link>
           <Link href="/dashboard/owner/products#inventory">
             <Button variant="outline" className="gap-2 border-sea text-sea hover:bg-brand-50">
               <Package className="w-4 h-4" /> Manage Products
             </Button>
           </Link>
           <Link href="/dashboard/owner/listings/new">
-            <Button variant="primary" className="gap-2 shadow-md">
+            <Button variant="outline" className="gap-2">
               <PlusCircle className="w-4 h-4" /> Add New Business
             </Button>
           </Link>

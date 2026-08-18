@@ -30,12 +30,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid email or password credentials.' }, { status: 401 });
     }
 
-    // Normal logins use password only. Clear codes left by the retired login-OTP flow.
-    await db.user.update({ where: { id: user.id }, data: { twoFactorToken: null, twoFactorExpires: null } });
+    // Normal logins use password only. The welcome choice is shown once per account.
+    const showOnboarding = user.role === 'BUSINESS_OWNER' && !user.onboardingSeenAt;
+    await db.user.update({
+      where: { id: user.id },
+      data: { twoFactorToken: null, twoFactorExpires: null, ...(showOnboarding ? { onboardingSeenAt: new Date() } : {}) },
+    });
     await createSession(user.id, req.headers.get('user-agent') || undefined);
 
     return NextResponse.json({
       success: true,
+      showOnboarding,
       user: {
         id: user.id,
         name: user.name,

@@ -23,7 +23,7 @@ export async function DELETE(
       return NextResponse.json({ success: false, error: 'Product not found.' }, { status: 404 });
     }
 
-    if (product.business.ownerId !== user.id && user.role !== 'ADMINISTRATOR') {
+    if (product.ownerId !== user.id && product.business?.ownerId !== user.id && user.role !== 'ADMINISTRATOR') {
       return NextResponse.json({ success: false, error: 'Permission denied.' }, { status: 403 });
     }
 
@@ -58,7 +58,7 @@ export async function PUT(
       return NextResponse.json({ success: false, error: 'Product not found.' }, { status: 404 });
     }
 
-    if (product.business.ownerId !== user.id && user.role !== 'ADMINISTRATOR') {
+    if (product.ownerId !== user.id && product.business?.ownerId !== user.id && user.role !== 'ADMINISTRATOR') {
       return NextResponse.json({ success: false, error: 'Permission denied.' }, { status: 403 });
     }
 
@@ -66,9 +66,6 @@ export async function PUT(
     const updateData = Object.fromEntries(
       Object.entries(validated).filter(([, value]) => value !== undefined)
     );
-
-    // A product never stores a separate customer contact; it inherits it from its business.
-    delete updateData.whatsappPhone;
 
     const updated = await db.businessProduct.update({
       where: { id },

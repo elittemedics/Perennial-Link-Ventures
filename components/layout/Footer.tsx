@@ -8,6 +8,8 @@ const CATEGORIES = [
   { name: 'Phones & Tablets', slug: 'Phones & Tablets' },
   { name: 'Health & Beauty',  slug: 'Health & Beauty' },
   { name: 'Home & Office',    slug: 'Home & Office' },
+  { name: 'Cars & Vehicles',  slug: 'Cars & Vehicles' },
+  { name: 'Services',         slug: 'Services' },
   { name: 'Appliances',       slug: 'Appliances' },
   { name: 'Electronics',      slug: 'Electronics' },
   { name: 'Computing',        slug: 'Computing' },

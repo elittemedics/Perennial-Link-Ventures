@@ -119,6 +119,7 @@ model User {
   status             UserStatus @default(ACTIVE)
   twoFactorToken     String?
   twoFactorExpires   DateTime?
+  onboardingSeenAt   DateTime?
   deletedAt          DateTime?
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
@@ -139,6 +140,7 @@ model User {
   supportReplies     SupportReply[]
   adminLogs          AdminLog[]          @relation("AdminUser")
   auditLogs          AuditLog[]
+  products           BusinessProduct[]   @relation("ProductOwner")
 
   @@index([email])
   @@index([role])
@@ -485,7 +487,8 @@ model BusinessService {
 
 model BusinessProduct {
   id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  businessId         String   @db.Uuid
+  businessId         String?  @db.Uuid
+  ownerId            String?  @db.Uuid
   title              String
   description        String?  @db.Text
   price              Float
@@ -502,10 +505,12 @@ model BusinessProduct {
   viewCount          Int      @default(0)
   createdAt          DateTime @default(now())
 
-  business Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business Business?              @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  owner    User?                  @relation("ProductOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   images   BusinessProductImage[]
 
   @@index([businessId])
+  @@index([ownerId])
   @@index([productCategory])
 }
 

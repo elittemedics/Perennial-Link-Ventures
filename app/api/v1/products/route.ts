@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
     if (mine) {
       const user = await getSessionUser();
       if (!user) return NextResponse.json({ success: false, error: 'Unauthorized access.' }, { status: 401 });
-      whereClause.business = { ownerId: user.id, deletedAt: null };
+      whereClause.OR = [
+        { ownerId: user.id },
+        { business: { ownerId: user.id, deletedAt: null } },
+      ];
       delete whereClause.isAvailable;
     }
 
@@ -59,23 +62,23 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = ProductSchema.parse(body);
 
-    // Verify business ownership or admin
-    const business = await db.business.findUnique({
-      where: { id: validated.businessId },
-    });
+    const business = validated.businessId
+      ? await db.business.findUnique({ where: { id: validated.businessId } })
+      : null;
 
-    if (!business) {
-      return NextResponse.json({ success: false, error: 'Business not found.' }, { status: 404 });
+    if (validated.businessId && !business) {
+      return NextResponse.json({ success: false, error: 'Selected business was not found.' }, { status: 404 });
     }
 
-    if (business.ownerId !== user.id && user.role !== 'ADMINISTRATOR') {
-      return NextResponse.json({ success: false, error: 'Permission denied.' }, { status: 403 });
+    if (business && business.ownerId !== user.id && user.role !== 'ADMINISTRATOR') {
+      return NextResponse.json({ success: false, error: 'You can only select one of your own businesses.' }, { status: 403 });
     }
 
     // Create product
     const product = await db.businessProduct.create({
       data: {
-        businessId: validated.businessId,
+        businessId: validated.businessId || null,
+        ownerId: user.id,
         title: validated.title,
         description: validated.description || null,
         price: validated.price,
@@ -84,8 +87,9 @@ export async function POST(req: NextRequest) {
         image: validated.image || (validated.images && validated.images.length > 0 ? validated.images[0] : null),
         quantity: validated.quantity !== undefined ? validated.quantity : null,
         location: validated.location || null,
-        // Product contact details always come from the selected business profile.
-        whatsappPhone: business.whatsapp || business.phone,
+        // A standalone product keeps its own contact details; linked products
+        // can still default to the selected business contact.
+        whatsappPhone: validated.whatsappPhone || business?.whatsapp || business?.phone || user.phone || null,
         productCategory: validated.productCategory || 'Other categories',
         images: validated.images && validated.images.length > 0 ? {
           create: validated.images.map((url, idx) => ({

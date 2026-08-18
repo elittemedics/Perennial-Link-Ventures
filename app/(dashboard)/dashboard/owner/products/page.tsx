@@ -30,7 +30,8 @@ interface Product {
   productCategory: string;
   viewCount?: number;
   createdAt: string;
-  business: { name: string };
+  whatsappPhone?: string | null;
+  business: { name: string } | null;
 }
 
 const CATEGORIES = [
@@ -45,6 +46,8 @@ const CATEGORIES = [
   'Sporting Goods',
   'Baby Products',
   'Gaming',
+  'Cars & Vehicles',
+  'Services',
   'Other categories',
 ];
 
@@ -56,7 +59,7 @@ export default function OwnerProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [editDraft, setEditDraft] = useState({ title: '', description: '', price: '', quantity: '', location: '', productCategory: 'Other categories', image: null as string | null });
+  const [editDraft, setEditDraft] = useState({ title: '', description: '', price: '', quantity: '', location: '', whatsappPhone: '', productCategory: 'Other categories', image: null as string | null });
 
   const [formData, setFormData] = useState({
     businessId: '',
@@ -66,6 +69,7 @@ export default function OwnerProductsPage() {
     originalPrice: '',
     quantity: '',
     location: '',
+    whatsappPhone: '',
     productCategory: 'Other categories',
     image: null as string | null,
   });
@@ -86,11 +90,12 @@ export default function OwnerProductsPage() {
           location: prev.location || selectedBusiness.cityName,
         }));
         
-        // The inventory always shows every product owned by this account.
-        const prodRes = await fetch('/api/v1/products?mine=true&limit=100', { cache: 'no-store' });
-        const prodData = await readApiResponse<{ products?: Product[] }>(prodRes);
-        if (prodData.products) setProducts(prodData.products);
       }
+      // The inventory always shows every product posted by this account,
+      // including standalone products without a business profile.
+      const prodRes = await fetch('/api/v1/products?mine=true&limit=100', { cache: 'no-store' });
+      const prodData = await readApiResponse<{ products?: Product[] }>(prodRes);
+      if (prodData.products) setProducts(prodData.products);
     } catch {
       // Fallback
     } finally {
@@ -109,11 +114,6 @@ export default function OwnerProductsPage() {
 
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.businessId) {
-      setError('Please select a business first.');
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
     setSuccessMsg(null);
@@ -127,6 +127,7 @@ export default function OwnerProductsPage() {
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
         quantity: formData.quantity ? parseInt(formData.quantity, 10) : undefined,
         location: formData.location || undefined,
+        whatsappPhone: formData.whatsappPhone || undefined,
         productCategory: formData.productCategory,
         image: formData.image || undefined,
         images: formData.image ? [formData.image] : [],
@@ -153,6 +154,7 @@ export default function OwnerProductsPage() {
         originalPrice: '',
         quantity: '',
         location: '',
+        whatsappPhone: '',
         image: null,
       }));
 
@@ -206,6 +208,7 @@ export default function OwnerProductsPage() {
       price: product.price ? String(product.price) : '',
       quantity: product.quantity === null || product.quantity === undefined ? '' : String(product.quantity),
       location: product.location || '',
+      whatsappPhone: product.whatsappPhone || '',
       productCategory: product.productCategory,
       image: product.image || null,
     });
@@ -225,6 +228,7 @@ export default function OwnerProductsPage() {
           price: editDraft.price ? Number(editDraft.price) : 0,
           quantity: editDraft.quantity ? Number(editDraft.quantity) : null,
           location: editDraft.location || null,
+          whatsappPhone: editDraft.whatsappPhone || null,
           productCategory: editDraft.productCategory,
           image: editDraft.image,
         }),
@@ -253,7 +257,7 @@ export default function OwnerProductsPage() {
             <Package className="w-8 h-8 text-sea" /> Manage Business Products &amp; Offerings
           </h1>
           <p className="text-slate-500 text-xs mt-1">
-            Upload images, prices, quantities, and descriptions of products your business sells.
+            Add a product in a few steps. Linking it to a business is optional; every product needs a contact number.
           </p>
         </div>
       </div>
@@ -277,23 +281,21 @@ export default function OwnerProductsPage() {
               {/* Select Business */}
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Select Business
+                  Link to a Business (optional)
                 </label>
                 <select
-                  required
                   value={formData.businessId}
                   onChange={(e) => handleSelectBusiness(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-sm font-medium focus:border-sea focus:outline-none"
                 >
-                  <option value="" disabled>Select a business for this product</option>
-                  {businesses.length === 0 && <option value="" disabled>No businesses registered under this account</option>}
+                  <option value="">No business — post as an individual seller</option>
                   {businesses.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name} ({b.cityName})
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-[11px] text-slate-500">All businesses registered under your account appear here.</p>
+                <p className="mt-1 text-[11px] text-slate-500">Choose your business if you have one. Otherwise, customers will use the contact number below.</p>
               </div>
 
               <Input
@@ -302,6 +304,17 @@ export default function OwnerProductsPage() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g. Organic Palm Oil 5L"
+              />
+
+              <Input
+                label="WhatsApp or Phone Number"
+                required
+                type="tel"
+                value={formData.whatsappPhone}
+                onChange={(e) => setFormData({ ...formData, whatsappPhone: e.target.value })}
+                placeholder="e.g. 0594772823"
+                helperText="Customers will use this number to contact you."
+                className="sm:col-span-2"
               />
 
               <div className="grid grid-cols-2 gap-3 sm:col-span-2">
@@ -401,6 +414,7 @@ export default function OwnerProductsPage() {
                   <Input label="Quantity (optional)" type="number" value={editDraft.quantity} onChange={(e) => setEditDraft({ ...editDraft, quantity: e.target.value })} />
                 </div>
                 <Input label="Location (optional)" value={editDraft.location} onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })} />
+                <Input label="WhatsApp or phone number" type="tel" value={editDraft.whatsappPhone} onChange={(e) => setEditDraft({ ...editDraft, whatsappPhone: e.target.value })} />
                 <Textarea label="Description (optional)" rows={3} value={editDraft.description} onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })} />
                 <ImageUpload label="Replace product image (optional)" value={editDraft.image} onChange={(url) => setEditDraft({ ...editDraft, image: url })} prefix="product" />
                 <Button type="submit" variant="primary" className="gap-2"><Pencil className="w-4 h-4" /> Save changes</Button>
@@ -411,7 +425,7 @@ export default function OwnerProductsPage() {
           {products.length === 0 ? (
             <Card className="p-12 text-center space-y-3">
               <p className="text-slate-500 text-sm">No products added to your inventory yet.</p>
-              <p className="text-slate-400 text-xs">Add a product to any of your businesses using the form above.</p>
+              <p className="text-slate-400 text-xs">Use the simple form above to post your first product. A business profile is optional.</p>
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

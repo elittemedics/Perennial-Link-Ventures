@@ -5,7 +5,7 @@ import db from '@/lib/db';
 import {
   Search, Phone, ArrowRight, Star, ShieldCheck, Sparkles,
   Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt,
-  ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse,
+  ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse, Car, BriefcaseBusiness,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,8 @@ const JUMIA_CATS = [
   { name: 'Phones & Tablets', slug: 'phones-tablets',   Icon: Smartphone,    color: 'from-blue-500 to-sky-600' },
   { name: 'Health & Beauty',  slug: 'health-beauty',    Icon: HeartPulse,    color: 'from-pink-500 to-rose-500' },
   { name: 'Home & Office',    slug: 'home-office',      Icon: Armchair,      color: 'from-emerald-500 to-teal-600' },
+  { name: 'Cars & Vehicles',  slug: 'cars-vehicles',    Icon: Car,           color: 'from-slate-500 to-slate-700' },
+  { name: 'Services',         slug: 'services',         Icon: BriefcaseBusiness, color: 'from-rose-500 to-pink-600' },
   { name: 'Appliances',       slug: 'appliances',       Icon: Refrigerator,  color: 'from-cyan-500 to-blue-600' },
   { name: 'Electronics',      slug: 'electronics',      Icon: Tv,            color: 'from-violet-500 to-purple-600' },
   { name: 'Computing',        slug: 'computing',        Icon: Laptop,        color: 'from-indigo-500 to-blue-600' },
@@ -34,8 +36,7 @@ const JUMIA_CATS = [
 
 export default async function HomePage() {
   let trendingProducts: any[] = [];
-  // Business profile previews are intentionally deferred until a visitor opens a product.
-  const recentBusinesses: any[] = [];
+  let recentBusinesses: any[] = [];
   let totalBusinesses = 0;
   let totalReviews = 0;
 
@@ -44,15 +45,22 @@ export default async function HomePage() {
       db.business.count({ where: { status: 'APPROVED' } }),
       db.review.count({ where: { isApproved: true } }),
       db.businessProduct.findMany({
-        where: { isAvailable: true, business: { status: 'APPROVED', deletedAt: null } },
+        where: { isAvailable: true },
         include: { business: { select: { name: true, slug: true, phone: true, isVerified: true, cityName: true } } },
         orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
         take: 18,
+      }),
+      db.business.findMany({
+        where: { status: 'APPROVED', deletedAt: null },
+        select: { id: true, name: true, slug: true, cityName: true, isVerified: true, category: { select: { name: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: 6,
       }),
     ]);
     totalBusinesses   = res[0];
     totalReviews      = res[1];
     trendingProducts  = res[2];
+    recentBusinesses = res[3];
   } catch {
     // DB offline fallback for build/preview
   }
@@ -444,6 +452,26 @@ export default async function HomePage() {
               {trendingProducts.map((prod) => <ProductCard key={prod.id} product={prod} />)}
             </div>
           ) : null}
+        </div>
+      </section>
+
+      <section className="border-y border-slate-100 bg-white px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <Badge variant="info" className="mb-2 text-xs">Businesses &amp; services</Badge>
+              <h2 className="text-2xl font-black text-slate-900">Find registered companies</h2>
+              <p className="mt-1 max-w-2xl text-sm text-slate-500">Businesses and service providers appear here even when they do not sell physical products. Product sellers may add a business profile, but it is optional.</p>
+            </div>
+            <Link href="/listings"><Button variant="outline" className="shrink-0 gap-2">View all businesses <ArrowRight className="h-4 w-4" /></Button></Link>
+          </div>
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {recentBusinesses.map((business) => (
+              <Link key={business.id} href={`/business/${business.slug}`} className="rounded-xl border border-slate-200 p-4 transition-colors hover:border-sea hover:bg-sky-50/40">
+                <div className="flex items-start justify-between gap-3"><div><h3 className="font-bold text-slate-900">{business.name}</h3><p className="mt-1 text-xs text-slate-500">{business.category?.name || 'Business'}{business.cityName ? ` · ${business.cityName}` : ''}</p></div>{business.isVerified && <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-600" />}</div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

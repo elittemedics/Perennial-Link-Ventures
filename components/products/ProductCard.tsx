@@ -14,7 +14,8 @@ export interface ProductItemProps {
     discountPercentage?: number | null;
     image?: string | null;
     quantity?: number | null;
-    business: { name: string; slug: string; phone: string; isVerified?: boolean; cityName?: string };
+    whatsappPhone?: string | null;
+    business: { name: string; slug: string; phone: string; isVerified?: boolean; cityName?: string } | null;
   };
 }
 
@@ -25,8 +26,8 @@ export default function ProductCard({ product }: ProductItemProps) {
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
       : null);
 
-  return (
-    <Link href={`/business/${product.business.slug}#products`} onClick={() => { fetch(`/api/v1/products/${product.id}/view`, { method: 'POST', keepalive: true }).catch(() => null); }} className="block group h-full">
+  const trackView = () => { fetch(`/api/v1/products/${product.id}/view`, { method: 'POST', keepalive: true }).catch(() => null); };
+  const content = (
       <article className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 flex flex-col h-full">
         {/* Product Image */}
         <div className="relative aspect-square bg-slate-50 overflow-hidden">
@@ -69,6 +70,16 @@ export default function ProductCard({ product }: ProductItemProps) {
           </div>
         </div>
       </article>
-    </Link>
   );
+
+  if (product.business) {
+    return <Link href={`/business/${product.business.slug}#products`} onClick={trackView} className="block group h-full">{content}</Link>;
+  }
+
+  const contact = product.whatsappPhone?.replace(/[^0-9+]/g, '');
+  return contact ? (
+    <a href={`tel:${contact}`} onClick={trackView} className="block group h-full" aria-label={`Call seller about ${product.title}`}>
+      {content}
+    </a>
+  ) : <div className="group h-full">{content}</div>;
 }

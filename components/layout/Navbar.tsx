@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package } from 'lucide-react';
+import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package, House } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
@@ -102,7 +102,7 @@ export default function Navbar() {
 
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            {role === 'BUSINESS_OWNER' && (
+            {isAuthenticated && (
               <Link href="/dashboard/owner/products#new-product">
                 <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-sea text-sea font-bold hover:bg-brand-50">
                   <Package className="w-4 h-4" /> Add product
@@ -193,13 +193,19 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Keep Home visible on every signed-in phone screen. */}
+          <div className="md:hidden flex items-center gap-1">
+            <Link href="/" aria-label="Home" className="inline-flex items-center gap-1 rounded-lg bg-navy px-2.5 py-2 text-xs font-bold text-white shadow-sm">
+              <House className="w-4 h-4" /> <span>Home</span>
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none"
+              aria-label="Open menu"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -236,7 +242,7 @@ export default function Navbar() {
                     Dashboard ({role})
                   </Button>
                 </Link>
-                {role === 'BUSINESS_OWNER' && (
+                {isAuthenticated && (
                   <Link href="/dashboard/owner/products#new-product" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="primary" className="w-full justify-start gap-2">
                       <Package className="w-4 h-4" /> Add product

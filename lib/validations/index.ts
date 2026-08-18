@@ -106,7 +106,7 @@ export const SupportTicketSchema = z.object({
 });
 
 export const ProductSchema = z.object({
-  businessId: z.string().min(1),
+  businessId: z.string().uuid().optional().nullable(),
   title: z.string().min(2, 'Product title is required.'),
   description: z.string().optional().nullable(),
   price: z.number().min(0, 'Price must be non-negative.').optional().default(0),
@@ -116,7 +116,7 @@ export const ProductSchema = z.object({
   images: z.array(z.string()).optional().default([]),
   quantity: z.number().optional().nullable(),
   location: z.string().optional().nullable(),
-  whatsappPhone: z.string().optional().nullable(),
+  whatsappPhone: z.string().min(6, 'Please add a WhatsApp or phone number customers can use.').optional().nullable(),
   productCategory: z.string().default('Other categories'),
 });
 

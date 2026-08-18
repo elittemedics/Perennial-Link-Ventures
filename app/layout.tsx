@@ -113,7 +113,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
-      <body className="flex flex-col min-h-screen bg-slate-50 antialiased text-slate-900">
+      <body className="flex flex-col min-h-screen bg-slate-50 antialiased text-slate-900 overflow-x-hidden">
         <Providers>
           <Navbar />
           <main className="flex-grow">{children}</main>

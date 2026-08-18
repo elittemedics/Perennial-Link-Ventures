@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { RegisterSchema } from '@/lib/validations';
 import { hashPassword } from '@/lib/auth/argon2';
-import { createEmailVerificationToken } from '@/lib/auth/better-auth';
-import { sendEmail, EmailTemplates } from '@/lib/email';
 import { Role } from '@prisma/client';
 import { isRateLimited } from '@/lib/rate-limit';
 
@@ -34,20 +32,6 @@ export async function POST(req: NextRequest) {
         role: validated.role === 'BUSINESS_OWNER' ? Role.BUSINESS_OWNER : Role.VISITOR,
       },
     });
-
-    const token = await createEmailVerificationToken(user.email);
-    const delivered = await sendEmail({
-      to: user.email,
-      subject: 'Verify your Perennial Link Ventures account',
-      html: EmailTemplates.emailVerificationCode(token),
-    });
-
-    if (!delivered) {
-      return NextResponse.json(
-        { success: false, error: 'Your account was created, but we could not send the verification email. Please try again later.' },
-        { status: 503 }
-      );
-    }
 
     return NextResponse.json(
       {
