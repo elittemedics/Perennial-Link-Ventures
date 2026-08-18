@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt,
   ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse,
+  Car, BriefcaseBusiness,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ const STATIC_CATEGORIES = [
   { name: 'Health & Beauty',  slug: 'Health & Beauty',  icon: 'HeartPulse',   description: 'Skincare, Fragrances, Haircare, Makeup, Personal Grooming, and Oral Hygiene.', color: 'from-pink-500 to-rose-500',   count: 0 },
   { name: 'Home & Office',    slug: 'Home & Office',    icon: 'Armchair',     description: 'Furniture, Bedding, Kitchenware, Office Stationery, Lighting, and Decor.',      color: 'from-emerald-500 to-teal-600',count: 0 },
   { name: 'Cars & Vehicles',  slug: 'Cars & Vehicles',  icon: 'Car',          description: 'Cars, motorbikes, parts, tyres, and vehicle accessories.',                       color: 'from-slate-500 to-slate-700',count: 0 },
-  { name: 'Services',         slug: 'Services',         icon: 'Briefcase',    description: 'Professional, home, creative, and other services.',                               color: 'from-rose-500 to-pink-600',count: 0 },
+  { name: 'Services',         slug: 'Services',         icon: 'BriefcaseBusiness', description: 'Professional, home, creative, and other services.',                          color: 'from-rose-500 to-pink-600',count: 0 },
   { name: 'Appliances',       slug: 'Appliances',       icon: 'Refrigerator', description: 'Refrigerators, Washing Machines, Air Conditioners, and Microwaves.',            color: 'from-cyan-500 to-blue-600',   count: 0 },
   { name: 'Electronics',      slug: 'Electronics',      icon: 'Tv',           description: 'Smart TVs, Home Theatre Systems, Cameras, Audio Speakers, and Amplifiers.',    color: 'from-violet-500 to-purple-600',count: 0 },
   { name: 'Computing',        slug: 'Computing',        icon: 'Laptop',       description: 'Laptops, Desktop PCs, Monitors, Printers, Storage and Networking devices.',    color: 'from-indigo-500 to-blue-600', count: 0 },
@@ -31,6 +32,7 @@ const STATIC_CATEGORIES = [
 const IconMap: Record<string, React.ElementType> = {
   ShoppingCart, Smartphone, HeartPulse, Armchair, Refrigerator,
   Tv, Laptop, Shirt, Dumbbell, Baby, Gamepad2, MoreHorizontal,
+  Car, BriefcaseBusiness, Briefcase: BriefcaseBusiness,
 };
 
 export default async function CategoriesIndexPage() {

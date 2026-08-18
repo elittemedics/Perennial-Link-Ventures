@@ -37,25 +37,27 @@ export default async function OwnerDashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
-          <Badge variant="info">Business Owner Portal</Badge>
-          <h1 className="text-3xl font-bold text-slate-900 mt-1">Welcome back, {user.name}</h1>
-          <p className="text-slate-500 text-xs">Manage your business listings, inquiries, and customer feedback.</p>
+          <Badge variant="info">Business &amp; Seller Portal</Badge>
+          <h1 className="text-3xl font-extrabold text-slate-900 mt-1">Welcome back, {user.name}</h1>
+          <p className="text-slate-500 text-xs">
+            Post products to sell, add your business or service profile, and respond to customer inquiries.
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/dashboard/owner/products#new-product">
-            <Button variant="primary" className="gap-2 shadow-md">
+            <Button variant="primary" className="gap-2 shadow-md font-bold">
               <PlusCircle className="w-4 h-4" /> Add Product
             </Button>
           </Link>
           <Link href="/dashboard/owner/products#inventory">
-            <Button variant="outline" className="gap-2 border-sea text-sea hover:bg-brand-50">
+            <Button variant="outline" className="gap-2 border-sea text-sea font-bold hover:bg-brand-50">
               <Package className="w-4 h-4" /> Manage Products
             </Button>
           </Link>
           <Link href="/dashboard/owner/listings/new">
-            <Button variant="outline" className="gap-2">
-              <PlusCircle className="w-4 h-4" /> Add New Business
+            <Button variant="outline" className="gap-2 font-bold">
+              <Building2 className="w-4 h-4 text-sea" /> Add Business
             </Button>
           </Link>
         </div>

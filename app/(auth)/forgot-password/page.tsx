@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
           <CardDescription className="text-slate-500 text-xs">
             {sent
               ? 'If an account exists for this email, a password reset link has been sent.'
-              : 'Enter your email address below and we\'ll send you a secure link to reset your password.'}
+              : 'Enter your email address below and we\'ll send you a secure link to reset your password. If you don\'t see the email, check your spam/junk folder.'}
           </CardDescription>
         </CardHeader>
 
@@ -63,17 +63,17 @@ export default function ForgotPasswordPage() {
                 <p className="font-bold text-emerald-800 text-sm">Reset Link Sent!</p>
                 <p className="text-emerald-700 text-xs leading-relaxed">
                   A password reset link has been sent to <strong>{email}</strong>. 
-                  Check your inbox (and spam folder). The link expires in <strong>1 hour</strong>.
+                  Please check your inbox. <strong>If you do not see it in your main inbox, please check your Spam or Junk folder.</strong> The link expires in <strong>1 hour</strong>.
                 </p>
               </div>
 
               <p className="text-xs text-slate-500 text-center">
-                Didn&apos;t receive the email?{' '}
+                Didn&apos;t receive the email? Check your <strong>Spam/Junk folder</strong> first, or{' '}
                 <button
                   onClick={() => { setSent(false); setEmail(''); }}
                   className="font-semibold text-sea hover:underline"
                 >
-                  Try again
+                  try again
                 </button>
               </p>
 

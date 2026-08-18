@@ -193,14 +193,19 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Keep Home visible on every signed-in phone screen. */}
-          <div className="md:hidden flex items-center gap-1">
-            <Link href="/" aria-label="Home" className="inline-flex items-center gap-1 rounded-lg bg-navy px-2.5 py-2 text-xs font-bold text-white shadow-sm">
-              <House className="w-4 h-4" /> <span>Home</span>
+          {/* Mobile View: Home button always visible at top right next to menu */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link
+              href="/"
+              aria-label="Home page"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-sea text-white px-3 py-1.5 text-xs font-bold shadow-md hover:bg-sea-600 transition-colors"
+            >
+              <House className="w-4 h-4" />
+              <span>Home</span>
             </Link>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none"
+              className="p-2 rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 focus:outline-none transition-colors"
               aria-label="Open menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
