@@ -4,52 +4,90 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Providers from '@/components/common/Providers';
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
 
 export const metadata: Metadata = {
   icons: {
     icon: [{ url: '/icon.png', type: 'image/png' }],
-    apple: [{ url: '/icon.png', type: 'image/png' }],
+    apple: [{ url: '/apple-icon.png', type: 'image/png' }],
   },
   title: {
-    default: 'Perennial Link Ventures | Global Business Directory',
+    default: 'Perennial Link Ventures | Ghana Business Directory',
     template: '%s | Perennial Link Ventures',
   },
   description:
-    'Discover, compare, and contact trusted businesses directly by phone, WhatsApp, email, and website. Free global business listings for products and services.',
+    "Ghana's premier verified business directory. Discover, compare, and contact trusted businesses in Accra, Tema, Kumasi & beyond — by WhatsApp, phone, email, or website. Free to list.",
   keywords: [
-    'Business Directory Ghana',
+    // Brand
     'Perennial Link Ventures',
-    'Accra Business Listings',
+    'market-plv.com',
+    // Directory — Ghana
+    'Business Directory Ghana',
     'Ghana Yellow Pages',
-    'Tuba Weija Businesses',
-    'Verified Companies Ghana',
     'Ghana Business Registry',
-    'Local Services Ghana',
-    'Ghana Directory Search',
+    'Verified Companies Ghana',
+    'Accra Business Listings',
+    'Tuba Weija Businesses',
+    'Greater Accra Business Directory',
+    'Ghana Local Business Search',
+    // Long-tail intent
+    'find businesses in Ghana',
+    'contact businesses on WhatsApp Ghana',
+    'free business listing Ghana',
+    'list my business in Ghana',
+    'Ghana company directory',
+    'buy products Ghana online',
+    'Ghana services directory',
+    'verified suppliers Ghana',
+    'local services Accra',
+    'small business Ghana',
+    // Global
     'global business directory',
     'free business advertising',
-    'contact businesses on WhatsApp',
+    'WhatsApp business contact',
   ],
   authors: [{ name: 'Perennial Link Ventures' }],
   creator: 'Perennial Link Ventures',
   publisher: 'Perennial Link Ventures',
+  category: 'Business Directory',
+  classification: 'Business',
   metadataBase: new URL(appUrl),
   alternates: {
     canonical: '/',
   },
+  // ── Geo / Local SEO meta tags ─────────────────────────────────────────────
+  other: {
+    'geo.region': 'GH-AA',
+    'geo.placename': 'Accra, Greater Accra, Ghana',
+    'geo.position': '5.5502;-0.2174',
+    'ICBM': '5.5502, -0.2174',
+    'DC.title': 'Perennial Link Ventures — Ghana Business Directory',
+    'DC.subject': 'Business Directory; Ghana; Accra',
+    'DC.language': 'en',
+  },
   openGraph: {
-    title: 'Perennial Link Ventures | Global Business Directory',
-    description: 'Find trusted businesses and contact them directly by WhatsApp, phone, email, or website.',
+    title: 'Perennial Link Ventures | Ghana Business Directory',
+    description:
+      'Find verified businesses in Ghana and contact them directly by WhatsApp, phone, email, or website. Free to list.',
     url: appUrl,
     siteName: 'Perennial Link Ventures',
     locale: 'en_GH',
     type: 'website',
+    images: [
+      {
+        url: `${appUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Perennial Link Ventures — Ghana Business Directory',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Perennial Link Ventures | Premier Business Directory',
-    description: 'Find trusted businesses and contact them directly by WhatsApp, phone, email, or website.',
+    title: 'Perennial Link Ventures | Ghana Business Directory',
+    description:
+      'Find verified businesses in Ghana and contact them by WhatsApp, phone, email, or website.',
+    images: [`${appUrl}/og-image.png`],
   },
   robots: {
     index: true,
@@ -73,7 +111,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Google Structured Data for Organization and SearchAction Sitelinks
+  // ── JSON-LD Structured Data ───────────────────────────────────────────────
+
+  // 1. WebSite — enables Google Sitelinks Search Box
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -86,12 +126,44 @@ export default function RootLayout({
     },
   };
 
+  // 2. Organization — brand knowledge panel signals
   const orgSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Perennial Link Ventures',
     url: appUrl,
-    telephone: '0594772823',
+    logo: `${appUrl}/icon.png`,
+    sameAs: [],
+    telephone: '+233594772823',
+    email: 'info@market-plv.com',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Tuba / Weija',
+      addressLocality: 'Accra',
+      addressRegion: 'Greater Accra',
+      postalCode: 'GA',
+      addressCountry: 'GH',
+    },
+  };
+
+  // 3. LocalBusiness — local SEO signals (maps, local pack)
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Perennial Link Ventures',
+    description:
+      "Ghana's premier verified business directory connecting customers with local businesses via WhatsApp, phone, email, and website.",
+    url: appUrl,
+    telephone: '+233594772823',
+    email: 'info@market-plv.com',
+    image: `${appUrl}/og-image.png`,
+    priceRange: 'Free',
+    currenciesAccepted: 'GHS',
+    paymentAccepted: 'Free listing',
+    areaServed: {
+      '@type': 'Country',
+      name: 'Ghana',
+    },
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Tuba / Weija',
@@ -99,6 +171,19 @@ export default function RootLayout({
       addressRegion: 'Greater Accra',
       addressCountry: 'GH',
     },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 5.5502,
+      longitude: -0.2174,
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '08:00',
+        closes: '18:00',
+      },
+    ],
   };
 
   return (
@@ -111,6 +196,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
       </head>
       <body className="flex flex-col min-h-screen bg-slate-50 antialiased text-slate-900 overflow-x-hidden">

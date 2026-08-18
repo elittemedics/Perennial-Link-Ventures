@@ -37,20 +37,52 @@ export interface BusinessPageProps {
 
 export async function generateMetadata(props: BusinessPageProps): Promise<Metadata> {
   const params = await props.params;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
   const business = await db.business.findUnique({
     where: { slug: params.slug },
-    select: { name: true, tagline: true, description: true, cityName: true, logo: true, coverImage: true },
+    select: {
+      name: true,
+      tagline: true,
+      description: true,
+      cityName: true,
+      logo: true,
+      coverImage: true,
+      category: { select: { name: true } },
+    },
   });
 
   if (!business) return { title: 'Business Not Found' };
 
+  const title = `${business.name} — ${business.cityName}, Ghana`;
+  const description = (business.tagline || business.description).slice(0, 160);
+  const canonicalUrl = `${baseUrl}/business/${params.slug}`;
+  const ogImage = business.coverImage || business.logo || `${baseUrl}/og-image.png`;
+
   return {
-    title: `${business.name} - ${business.cityName}, Ghana`,
-    description: business.tagline || business.description.slice(0, 160),
+    title,
+    description,
+    keywords: [
+      business.name,
+      `${business.name} ${business.cityName}`,
+      `${business.category?.name ?? ''} Ghana`,
+      `${business.category?.name ?? ''} ${business.cityName}`,
+      `${business.name} contact`,
+      `${business.name} WhatsApp`,
+      `businesses in ${business.cityName} Ghana`,
+    ].filter(Boolean),
+    alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: `${business.name} | Perennial Link Directory`,
-      description: business.description.slice(0, 160),
-      images: business.coverImage ? [{ url: business.coverImage }] : [],
+      title: `${business.name} | Perennial Link Ventures`,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: business.name }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${business.name} | Perennial Link Ventures`,
+      description,
+      images: [ogImage],
     },
   };
 }
@@ -85,15 +117,24 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
     notFound();
   }
 
-  // Generate JSON-LD Schema markup for Google Rich Results
-  const jsonLd = {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+
+  // ── LocalBusiness JSON-LD — enables rich results (star ratings, address, hours) ──
+  const approvedReviews = business.reviews ?? [];
+  const avgRating =
+    approvedReviews.length > 0
+      ? approvedReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / approvedReviews.length
+      : null;
+
+  const jsonLd: Record<string, any> = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
+    '@type': business.category?.name ? 'LocalBusiness' : 'LocalBusiness',
     name: business.name,
+    description: business.description,
     image: business.coverImage || business.logo,
     telephone: business.phone,
     email: business.email,
-    url: business.website || `${process.env.NEXT_PUBLIC_APP_URL}/business/${business.slug}`,
+    url: business.website || `${baseUrl}/business/${business.slug}`,
     address: {
       '@type': 'PostalAddress',
       streetAddress: business.address,
@@ -101,6 +142,23 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
       addressRegion: business.stateName || 'Greater Accra',
       addressCountry: 'GH',
     },
+    ...(avgRating !== null && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: approvedReviews.length,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
+    ...(business.openingHours?.length > 0 && {
+      openingHoursSpecification: business.openingHours.map((h: any) => ({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: h.day,
+        opens: h.openTime,
+        closes: h.closeTime,
+      })),
+    }),
   };
   const whatsappNumber = business.whatsapp?.replace(/\D/g, '');
   const hasPhone = business.phone && business.phone !== 'Not provided';

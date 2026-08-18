@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Metadata } from 'next';
 import db from '@/lib/db';
 import { Search, MapPin, Star, ShieldCheck, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,33 @@ export interface ListingsPageProps {
     rating?: string;
     page?: string;
   }>;
+}
+
+export async function generateMetadata(props: ListingsPageProps): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+  const isFiltered = !!(searchParams.q || searchParams.category || searchParams.city || searchParams.rating);
+
+  // Filtered pages are noindexed to avoid duplicate-content crawl waste
+  if (isFiltered) {
+    return {
+      robots: { index: false, follow: true },
+    };
+  }
+
+  return {
+    title: 'All Business Listings in Ghana',
+    description:
+      'Browse all verified businesses listed on Perennial Link Ventures. Filter by category, city, and rating. Contact any business directly by WhatsApp, phone, or email.',
+    alternates: { canonical: `${baseUrl}/listings` },
+    openGraph: {
+      title: 'All Business Listings in Ghana | Perennial Link Ventures',
+      description:
+        'Browse all verified businesses in Ghana. Filter by category, city, and rating. Free to contact.',
+      url: `${baseUrl}/listings`,
+      type: 'website',
+    },
+  };
 }
 
 export default async function ListingsPage(props: ListingsPageProps) {

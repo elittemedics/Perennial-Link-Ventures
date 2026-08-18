@@ -1,9 +1,23 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShieldCheck, Phone, MapPin, Mail, Users } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'About Us — Ghana\'s Premier Business Directory',
+  description:
+    'Learn about Perennial Link Ventures — headquartered in Tuba/Weija, Accra. We bridge the gap between high-intent clients and verified local businesses across Ghana.',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About Perennial Link Ventures | Ghana Business Directory',
+    description:
+      'Learn how Perennial Link Ventures connects customers with verified local businesses across Ghana via WhatsApp, phone, email, and web.',
+    type: 'website',
+  },
+};
 
 export default function AboutPage() {
   return (

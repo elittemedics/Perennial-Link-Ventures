@@ -1,10 +1,24 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import db from '@/lib/db';
 import ProductCard from '@/components/products/ProductCard';
 import { Search, Filter, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+
+export const metadata: Metadata = {
+  title: 'Browse Products from Ghana Businesses',
+  description:
+    'Discover products sold by verified businesses across Ghana on Perennial Link Ventures. Browse by category or search for specific items and contact the seller directly.',
+  alternates: { canonical: '/products' },
+  openGraph: {
+    title: 'Browse Products from Ghana Businesses | Perennial Link Ventures',
+    description:
+      'Find products from verified businesses across Ghana. Search by category, view prices, and contact sellers directly by WhatsApp or phone.',
+    type: 'website',
+  },
+};
 
 export const dynamic = 'force-dynamic';
 

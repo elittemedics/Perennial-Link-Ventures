@@ -4,10 +4,32 @@ import { ArrowRight, BadgeCheck, Globe2, MessageCircle, Search } from 'lucide-re
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: 'Advertise Your Business Free',
-  description: 'Create a free business profile on Perennial Link Ventures. Be discovered in search and let customers contact you directly by WhatsApp, phone, email, or website.',
+  title: 'List Your Business Free \u2014 Reach Customers in Ghana',
+  description:
+    'Create a free business profile on Perennial Link Ventures. Be discovered in Google search and let customers contact you directly by WhatsApp, phone, email, or website. No commissions.',
+  keywords: [
+    'list my business Ghana',
+    'free business listing Ghana',
+    'advertise business Ghana',
+    'add business to Ghana directory',
+    'free WhatsApp business profile',
+    'Ghana business advertising',
+  ],
   alternates: { canonical: '/advertise' },
+  openGraph: {
+    title: 'List Your Business Free in Ghana | Perennial Link Ventures',
+    description:
+      'Create a free verified business profile and be discovered by customers searching for your products and services in Ghana.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'List Your Business Free in Ghana | Perennial Link Ventures',
+    description:
+      'Create a free verified business profile and be discovered by customers across Ghana.',
+  },
 };
+
 
 const benefits = [
   ['Free to list', 'Create a professional profile without listing fees or sales commissions.'],

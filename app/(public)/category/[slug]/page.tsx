@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Metadata } from 'next';
 import db from '@/lib/db';
 import { MapPin, Star, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,40 @@ export const dynamic = 'force-dynamic';
 
 export interface CategoryPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata(props: CategoryPageProps): Promise<Metadata> {
+  const params = await props.params;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+  const category = await db.category.findUnique({
+    where: { slug: params.slug },
+    select: { name: true, slug: true, description: true },
+  });
+
+  if (!category) return { title: 'Category Not Found' };
+
+  const title = `${category.name} Businesses in Ghana`;
+  const description =
+    category.description ||
+    `Browse verified ${category.name} businesses in Ghana. Find contact details, WhatsApp numbers, and reviews for top ${category.name} providers.`;
+  const canonicalUrl = `${baseUrl}/category/${category.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title: `${title} | Perennial Link Ventures`,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Perennial Link Ventures`,
+      description,
+    },
+  };
 }
 
 export default async function CategoryDetailPage(props: CategoryPageProps) {
