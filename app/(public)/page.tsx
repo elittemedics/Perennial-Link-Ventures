@@ -52,7 +52,15 @@ export default async function HomePage() {
       }),
       db.business.findMany({
         where: { status: 'APPROVED', deletedAt: null },
-        select: { id: true, name: true, slug: true, cityName: true, isVerified: true, category: { select: { name: true } } },
+        include: {
+          category: { select: { name: true } },
+          products: {
+            where: { isAvailable: true },
+            select: { id: true, title: true, price: true, currency: true, image: true },
+            take: 6,
+          },
+          _count: { select: { reviews: true } },
+        },
         orderBy: { createdAt: 'desc' },
         take: 6,
       }),
@@ -258,7 +266,7 @@ export default async function HomePage() {
             <div className="space-y-10">
 
               {/* ── Businesses WITH products: Jumia-style product strips ── */}
-              {recentBusinesses.filter((b: any) => b.products.length > 0).map((biz: any) => (
+              {recentBusinesses.filter((b: any) => Array.isArray(b.products) && b.products.length > 0).map((biz: any) => (
                 <div key={biz.id} className="space-y-3">
                   {/* Business header row */}
                   <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100">
@@ -292,7 +300,7 @@ export default async function HomePage() {
 
                   {/* Product cards — horizontal scroll */}
                   <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
-                    {biz.products.map((product: { id: string; title: string; price: number; currency: string; image: string | null }) => (
+                    {biz.products?.map((product: { id: string; title: string; price: number; currency: string; image: string | null }) => (
                       <Link
                         key={product.id}
                         href={`/business/${biz.slug}#products`}
@@ -340,7 +348,7 @@ export default async function HomePage() {
               ))}
 
               {/* ── Businesses WITHOUT products: premium company profile cards ── */}
-              {recentBusinesses.filter((b: any) => b.products.length === 0).length > 0 && (
+              {recentBusinesses.filter((b: any) => !b.products || b.products.length === 0).length > 0 && (
                 <div className="space-y-5 pt-4 border-t border-slate-100">
                   <div>
                     <p className="text-sm font-extrabold text-slate-700 uppercase tracking-wider">
@@ -351,7 +359,7 @@ export default async function HomePage() {
                     </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {recentBusinesses.filter((b: any) => b.products.length === 0).map((biz: any) => (
+                    {recentBusinesses.filter((b: any) => !b.products || b.products.length === 0).map((biz: any) => (
                       <div
                         key={biz.id}
                         className="card-3d group bg-white rounded-2xl border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
