@@ -101,7 +101,7 @@ function LoginContent() {
           {isRegistered && !successMsg && !error && (
             <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-medium flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Account created successfully! Please sign in with your credentials below.</span>
+              <span>Account created, continue to sign in.</span>
             </div>
           )}
           {error && (

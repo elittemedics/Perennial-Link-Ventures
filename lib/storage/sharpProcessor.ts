@@ -68,20 +68,22 @@ export class ImageProcessor {
     if (!metadata.width || !metadata.height || metadata.width * metadata.height > 25_000_000) {
       throw new Error('Image dimensions exceed the 25 megapixel limit.');
     }
-    const mainBuffer = await source
-      .resize(1200, 1200, {
-        fit: 'inside',
-        withoutEnlargement: true,
-      })
-      .webp({ quality: 80 })
-      .toBuffer();
-    const thumbnailBuffer = await sharp(buffer, { limitInputPixels: 25_000_000 })
-      .resize(400, 400, {
-        fit: 'cover',
-        position: 'center',
-      })
-      .webp({ quality: 75 })
-      .toBuffer();
+    const [mainBuffer, thumbnailBuffer] = await Promise.all([
+      source
+        .resize(1200, 1200, {
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .webp({ quality: 80, effort: 2 })
+        .toBuffer(),
+      sharp(buffer, { limitInputPixels: 25_000_000 })
+        .resize(400, 400, {
+          fit: 'cover',
+          position: 'center',
+        })
+        .webp({ quality: 75, effort: 2 })
+        .toBuffer(),
+    ]);
 
     return {
       filename: mainFilename,

@@ -28,16 +28,61 @@ export default function ImageUpload({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const uploadFile = async (file: File) => {
+/** Fast browser-side image resizer to make uploads instantaneous */
+async function compressImageBeforeUpload(file: File, maxDimension = 1600, quality = 0.85): Promise<File> {
+  if (!file.type.startsWith('image/') || file.size < 300 * 1024) return file;
+  return new Promise((resolve) => {
+    const img = document.createElement('img');
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width <= maxDimension && height <= maxDimension) {
+        resolve(file);
+        return;
+      }
+      if (width > height) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { resolve(file); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { resolve(file); return; }
+          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), {
+            type: 'image/webp',
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        },
+        'image/webp',
+        quality
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image file size must be less than 5MB.');
-      return;
-    }
-
+  const uploadFile = async (rawFile: File) => {
     try {
       setIsUploading(true);
       setError(null);
+
+      const file = await compressImageBeforeUpload(rawFile);
+
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image file size must be less than 10MB.');
+        return;
+      }
 
       const formData = new FormData();
       formData.append('file', file);
