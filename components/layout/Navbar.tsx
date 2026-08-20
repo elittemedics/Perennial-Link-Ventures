@@ -15,7 +15,7 @@ export default function Navbar() {
   const [user, setUser] = useState<{ name: string | null; role: string } | null>(null);
 
   const loadUser = useCallback(() => {
-    fetch('/api/v1/auth/logout', { cache: 'no-store', credentials: 'same-origin' })
+    fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
       .then(async (response) => response.ok
         ? readApiResponse<{ user?: { name: string | null; role: string } | null }>(response)
         : null)

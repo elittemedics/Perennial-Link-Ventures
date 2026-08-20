@@ -122,8 +122,8 @@ body {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50%       { background-position: 100% 50%; }
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
 }
 
 @keyframes slideInRight {
@@ -149,11 +149,20 @@ body {
   animation: shimmer 3s infinite;
 }
 
-/* Animated hero bg gradient — navy + gold pulse */
+/* Hero bg — static navy gradient with composited pseudo-element overlay */
 .hero-bg-animated {
-  background: linear-gradient(270deg, #0f1e2e, #1a2d44, #243d5e, #1a2d44);
-  background-size: 400% 400%;
+  background: linear-gradient(135deg, #0f1e2e 0%, #1a2d44 40%, #243d5e 70%, #1a2d44 100%);
+  position: relative;
+}
+.hero-bg-animated::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(270deg, #243d5e, #0f1e2e, #1a2d44);
+  opacity: 0;
   animation: gradient-shift 10s ease infinite;
+  pointer-events: none;
+  will-change: opacity;
 }
 
 /* Gold accent divider line */

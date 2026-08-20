@@ -6,6 +6,7 @@ import {
   Search, Phone, ArrowRight, Star, ShieldCheck, Sparkles,
   Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt,
   ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse, Car, BriefcaseBusiness,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,20 +19,21 @@ import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback
 export const dynamic = 'force-dynamic';
 
 const JUMIA_CATS = [
-  { name: 'Supermarket',      slug: 'supermarket',      Icon: ShoppingCart,  color: 'from-amber-500 to-orange-500' },
-  { name: 'Phones & Tablets', slug: 'phones-tablets',   Icon: Smartphone,    color: 'from-blue-500 to-sky-600' },
-  { name: 'Health & Beauty',  slug: 'health-beauty',    Icon: HeartPulse,    color: 'from-pink-500 to-rose-500' },
-  { name: 'Home & Office',    slug: 'home-office',      Icon: Armchair,      color: 'from-emerald-500 to-teal-600' },
-  { name: 'Cars & Vehicles',  slug: 'cars-vehicles',    Icon: Car,           color: 'from-slate-500 to-slate-700' },
-  { name: 'Services',         slug: 'services',         Icon: BriefcaseBusiness, color: 'from-rose-500 to-pink-600' },
-  { name: 'Appliances',       slug: 'appliances',       Icon: Refrigerator,  color: 'from-cyan-500 to-blue-600' },
-  { name: 'Electronics',      slug: 'electronics',      Icon: Tv,            color: 'from-violet-500 to-purple-600' },
-  { name: 'Computing',        slug: 'computing',        Icon: Laptop,        color: 'from-indigo-500 to-blue-600' },
-  { name: 'Fashion',          slug: 'fashion',          Icon: Shirt,         color: 'from-fuchsia-500 to-pink-600' },
-  { name: 'Sporting Goods',   slug: 'sporting-goods',   Icon: Dumbbell,      color: 'from-orange-500 to-red-500' },
-  { name: 'Baby Products',    slug: 'baby-products',    Icon: Baby,          color: 'from-sky-400 to-cyan-500' },
-  { name: 'Gaming',           slug: 'gaming',           Icon: Gamepad2,      color: 'from-purple-600 to-indigo-600' },
-  { name: 'Other categories', slug: 'other-categories', Icon: MoreHorizontal,color: 'from-slate-500 to-slate-600' },
+  { name: 'Supermarket',       slug: 'supermarket',       Icon: ShoppingCart,    color: 'from-amber-500 to-orange-500' },
+  { name: 'Food & Beverages',  slug: 'food-beverages',    Icon: UtensilsCrossed, color: 'from-green-500 to-emerald-600' },
+  { name: 'Phones & Tablets',  slug: 'phones-tablets',    Icon: Smartphone,      color: 'from-blue-500 to-sky-600' },
+  { name: 'Health & Beauty',   slug: 'health-beauty',     Icon: HeartPulse,      color: 'from-pink-500 to-rose-500' },
+  { name: 'Home & Office',     slug: 'home-office',       Icon: Armchair,        color: 'from-emerald-500 to-teal-600' },
+  { name: 'Cars & Vehicles',   slug: 'cars-vehicles',     Icon: Car,             color: 'from-slate-500 to-slate-700' },
+  { name: 'Services',          slug: 'services',          Icon: BriefcaseBusiness, color: 'from-rose-500 to-pink-600' },
+  { name: 'Appliances',        slug: 'appliances',        Icon: Refrigerator,    color: 'from-cyan-500 to-blue-600' },
+  { name: 'Electronics',       slug: 'electronics',       Icon: Tv,              color: 'from-violet-500 to-purple-600' },
+  { name: 'Computing',         slug: 'computing',         Icon: Laptop,          color: 'from-indigo-500 to-blue-600' },
+  { name: 'Fashion',           slug: 'fashion',           Icon: Shirt,           color: 'from-fuchsia-500 to-pink-600' },
+  { name: 'Sporting Goods',    slug: 'sporting-goods',    Icon: Dumbbell,        color: 'from-orange-500 to-red-500' },
+  { name: 'Baby Products',     slug: 'baby-products',     Icon: Baby,            color: 'from-sky-400 to-cyan-500' },
+  { name: 'Gaming',            slug: 'gaming',            Icon: Gamepad2,        color: 'from-purple-600 to-indigo-600' },
+  { name: 'Other categories',  slug: 'other-categories',  Icon: MoreHorizontal,  color: 'from-slate-500 to-slate-600' },
 ];
 
 export default async function HomePage() {

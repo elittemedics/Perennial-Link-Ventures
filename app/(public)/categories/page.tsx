@@ -6,33 +6,34 @@ import { Badge } from '@/components/ui/badge';
 import {
   Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt,
   ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse,
-  Car, BriefcaseBusiness,
+  Car, BriefcaseBusiness, UtensilsCrossed,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 // Hardcoded Jumia categories as guaranteed fallback
 const STATIC_CATEGORIES = [
-  { name: 'Supermarket',      slug: 'Supermarket',      icon: 'ShoppingCart', description: 'Groceries, Beverages, Snacks, Food Staples, Household Cleaning Supplies.',       color: 'from-amber-500 to-orange-500', count: 0 },
-  { name: 'Phones & Tablets', slug: 'Phones & Tablets', icon: 'Smartphone',   description: 'Smartphones, iPads, Tablets, Smartwatches, and Mobile Accessories.',           color: 'from-blue-500 to-sky-600',    count: 0 },
-  { name: 'Health & Beauty',  slug: 'Health & Beauty',  icon: 'HeartPulse',   description: 'Skincare, Fragrances, Haircare, Makeup, Personal Grooming, and Oral Hygiene.', color: 'from-pink-500 to-rose-500',   count: 0 },
-  { name: 'Home & Office',    slug: 'Home & Office',    icon: 'Armchair',     description: 'Furniture, Bedding, Kitchenware, Office Stationery, Lighting, and Decor.',      color: 'from-emerald-500 to-teal-600',count: 0 },
-  { name: 'Cars & Vehicles',  slug: 'Cars & Vehicles',  icon: 'Car',          description: 'Cars, motorbikes, parts, tyres, and vehicle accessories.',                       color: 'from-slate-500 to-slate-700',count: 0 },
+  { name: 'Supermarket',      slug: 'Supermarket',      icon: 'ShoppingCart',    description: 'Groceries, Beverages, Snacks, Food Staples, Household Cleaning Supplies.',       color: 'from-amber-500 to-orange-500', count: 0 },
+  { name: 'Food & Beverages', slug: 'Food & Beverages', icon: 'UtensilsCrossed', description: 'Restaurants, Fast Food, Catering, Drinks, Juices, Wines & Spirits, Bakeries.',     color: 'from-green-500 to-emerald-600', count: 0 },
+  { name: 'Phones & Tablets', slug: 'Phones & Tablets', icon: 'Smartphone',      description: 'Smartphones, iPads, Tablets, Smartwatches, and Mobile Accessories.',           color: 'from-blue-500 to-sky-600',    count: 0 },
+  { name: 'Health & Beauty',  slug: 'Health & Beauty',  icon: 'HeartPulse',      description: 'Skincare, Fragrances, Haircare, Makeup, Personal Grooming, and Oral Hygiene.', color: 'from-pink-500 to-rose-500',   count: 0 },
+  { name: 'Home & Office',    slug: 'Home & Office',    icon: 'Armchair',        description: 'Furniture, Bedding, Kitchenware, Office Stationery, Lighting, and Decor.',      color: 'from-emerald-500 to-teal-600',count: 0 },
+  { name: 'Cars & Vehicles',  slug: 'Cars & Vehicles',  icon: 'Car',             description: 'Cars, motorbikes, parts, tyres, and vehicle accessories.',                       color: 'from-slate-500 to-slate-700',count: 0 },
   { name: 'Services',         slug: 'Services',         icon: 'BriefcaseBusiness', description: 'Professional, home, creative, and other services.',                          color: 'from-rose-500 to-pink-600',count: 0 },
-  { name: 'Appliances',       slug: 'Appliances',       icon: 'Refrigerator', description: 'Refrigerators, Washing Machines, Air Conditioners, and Microwaves.',            color: 'from-cyan-500 to-blue-600',   count: 0 },
-  { name: 'Electronics',      slug: 'Electronics',      icon: 'Tv',           description: 'Smart TVs, Home Theatre Systems, Cameras, Audio Speakers, and Amplifiers.',    color: 'from-violet-500 to-purple-600',count: 0 },
-  { name: 'Computing',        slug: 'Computing',        icon: 'Laptop',       description: 'Laptops, Desktop PCs, Monitors, Printers, Storage and Networking devices.',    color: 'from-indigo-500 to-blue-600', count: 0 },
-  { name: 'Fashion',          slug: 'Fashion',          icon: 'Shirt',        description: 'Men & Women Clothing, Shoes, Watches, Designer Bags, and Jewelry.',            color: 'from-fuchsia-500 to-pink-600',count: 0 },
-  { name: 'Sporting Goods',   slug: 'Sporting Goods',   icon: 'Dumbbell',     description: 'Fitness Equipment, Treadmills, Jerseys, Sports Wear, and Camping Gear.',       color: 'from-orange-500 to-red-500',  count: 0 },
-  { name: 'Baby Products',    slug: 'Baby Products',    icon: 'Baby',         description: 'Diapers, Baby Food, Strollers, Car Seats, Baby Clothing, and Toys.',           color: 'from-sky-400 to-cyan-500',    count: 0 },
-  { name: 'Gaming',           slug: 'Gaming',           icon: 'Gamepad2',     description: 'PlayStation 5, Xbox, Nintendo Switch, Gaming PCs, VR Headsets, Controllers.',  color: 'from-purple-600 to-indigo-600',count: 0 },
-  { name: 'Other categories', slug: 'Other categories', icon: 'MoreHorizontal',description: 'Automotive, Industrial Equipment, Books, Musical Instruments, and more.',     color: 'from-slate-500 to-slate-600', count: 0 },
+  { name: 'Appliances',       slug: 'Appliances',       icon: 'Refrigerator',    description: 'Refrigerators, Washing Machines, Air Conditioners, and Microwaves.',            color: 'from-cyan-500 to-blue-600',   count: 0 },
+  { name: 'Electronics',      slug: 'Electronics',      icon: 'Tv',              description: 'Smart TVs, Home Theatre Systems, Cameras, Audio Speakers, and Amplifiers.',    color: 'from-violet-500 to-purple-600',count: 0 },
+  { name: 'Computing',        slug: 'Computing',        icon: 'Laptop',          description: 'Laptops, Desktop PCs, Monitors, Printers, Storage and Networking devices.',    color: 'from-indigo-500 to-blue-600', count: 0 },
+  { name: 'Fashion',          slug: 'Fashion',          icon: 'Shirt',           description: 'Men & Women Clothing, Shoes, Watches, Designer Bags, and Jewelry.',            color: 'from-fuchsia-500 to-pink-600',count: 0 },
+  { name: 'Sporting Goods',   slug: 'Sporting Goods',   icon: 'Dumbbell',        description: 'Fitness Equipment, Treadmills, Jerseys, Sports Wear, and Camping Gear.',       color: 'from-orange-500 to-red-500',  count: 0 },
+  { name: 'Baby Products',    slug: 'Baby Products',    icon: 'Baby',            description: 'Diapers, Baby Food, Strollers, Car Seats, Baby Clothing, and Toys.',           color: 'from-sky-400 to-cyan-500',    count: 0 },
+  { name: 'Gaming',           slug: 'Gaming',           icon: 'Gamepad2',        description: 'PlayStation 5, Xbox, Nintendo Switch, Gaming PCs, VR Headsets, Controllers.',  color: 'from-purple-600 to-indigo-600',count: 0 },
+  { name: 'Other categories', slug: 'Other categories', icon: 'MoreHorizontal',  description: 'Automotive, Industrial Equipment, Books, Musical Instruments, and more.',     color: 'from-slate-500 to-slate-600', count: 0 },
 ];
 
 const IconMap: Record<string, React.ElementType> = {
   ShoppingCart, Smartphone, HeartPulse, Armchair, Refrigerator,
   Tv, Laptop, Shirt, Dumbbell, Baby, Gamepad2, MoreHorizontal,
-  Car, BriefcaseBusiness, Briefcase: BriefcaseBusiness,
+  Car, BriefcaseBusiness, Briefcase: BriefcaseBusiness, UtensilsCrossed,
 };
 
 export default async function CategoriesIndexPage() {
@@ -44,14 +45,21 @@ export default async function CategoriesIndexPage() {
       include: { _count: { select: { businesses: { where: { status: 'APPROVED' } } } } },
     });
     if (dbCats.length > 0) {
-      categories = dbCats.map((c) => ({
+      const dbMap = new Set(dbCats.map((c) => c.name.toLowerCase()));
+      const combined = dbCats.map((c) => ({
         name:        c.name,
         slug:        c.name, // use name for product filter
         icon:        c.icon || 'MoreHorizontal',
         description: c.description || '',
-        color:       STATIC_CATEGORIES.find((s) => s.name === c.name)?.color || 'from-slate-500 to-slate-600',
+        color:       STATIC_CATEGORIES.find((s) => s.name.toLowerCase() === c.name.toLowerCase())?.color || 'from-slate-500 to-slate-600',
         count:       c._count.businesses,
       }));
+      STATIC_CATEGORIES.forEach((stat) => {
+        if (!dbMap.has(stat.name.toLowerCase())) {
+          combined.push(stat);
+        }
+      });
+      categories = combined;
     }
   } catch {
     // DB offline — use hardcoded fallback

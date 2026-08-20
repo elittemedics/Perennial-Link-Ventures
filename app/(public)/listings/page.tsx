@@ -201,7 +201,7 @@ export default async function ListingsPage(props: ListingsPageProps) {
               <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
                 <Search className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900">No Business Listings Found</h3>
+              <h2 className="text-xl font-bold text-slate-900">No Business Listings Found</h2>
               <p className="text-slate-500 text-sm max-w-md mx-auto">
                 We couldn&apos;t find any businesses matching your filter criteria. Try adjusting your keywords or category.
               </p>
@@ -210,37 +210,40 @@ export default async function ListingsPage(props: ListingsPageProps) {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {listings.map((b) => (
-                <Card key={b.id} className="group hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                <Card key={b.id} className="group hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden">
                   <div>
-                    <div className="relative h-28 sm:h-32 w-full bg-slate-100 overflow-hidden">
+                    {/* Cover Image */}
+                    <div className="relative h-36 w-full bg-slate-100 overflow-hidden">
                       {b.coverImage ? <Image src={b.coverImage} alt={b.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" /> : <BusinessBrandFallback name={b.name} variant="cover" />}
-                      <div className="absolute top-3 left-3 flex gap-2">
-                        <Badge variant="info" className="shadow-md">{b.category?.name}</Badge>
-                        {b.isVerified && (
-                          <Badge variant="success" className="gap-1 shadow-md">
-                            <ShieldCheck className="w-3 h-3" />
-                            Verified
-                          </Badge>
-                        )}
-                      </div>
                     </div>
 
-                    <CardContent className="p-3 space-y-2">
-                      <div className="flex items-center gap-3">
+                    {/* Category + Verified badges — below image, no overlap */}
+                    <div className="flex items-center gap-1.5 px-3 pt-2.5 flex-wrap">
+                      <Badge variant="info" className="text-[10px] px-2 py-0.5">{b.category?.name}</Badge>
+                      {b.isVerified && (
+                        <Badge variant="success" className="gap-1 text-[10px] px-2 py-0.5">
+                          <ShieldCheck className="w-3 h-3" />
+                          Verified
+                        </Badge>
+                      )}
+                    </div>
+
+                    <CardContent className="p-3 pt-2 space-y-1.5">
+                      <div className="flex items-center gap-2">
                         {b.logo ? (
-                          <div className="relative w-10 h-10 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0">
+                          <div className="relative w-9 h-9 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0">
                             <Image src={b.logo} alt={b.name} fill className="object-cover" />
                           </div>
-                        ) : <BusinessBrandFallback name={b.name} className="w-10 h-10 text-xs shrink-0" />}
-                        <div>
-                          <h3 className="font-bold text-slate-900 text-base group-hover:text-sea transition-colors line-clamp-1">
+                        ) : <BusinessBrandFallback name={b.name} className="w-9 h-9 text-xs shrink-0" />}
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-slate-900 text-sm group-hover:text-sea transition-colors line-clamp-1">
                             {b.name}
                           </h3>
                           <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5 text-sea shrink-0" />
-                            <span>{b.cityName}</span>
+                            <MapPin className="w-3 h-3 text-sea shrink-0" />
+                            <span className="truncate">{b.cityName}</span>
                           </p>
                         </div>
                       </div>
@@ -253,13 +256,13 @@ export default async function ListingsPage(props: ListingsPageProps) {
 
                   <div className="p-3 pt-0 border-t border-slate-100 flex items-center justify-between mt-2">
                     <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       <span className="font-bold text-xs text-slate-800">{b.avgRating?.toFixed(1) || '5.0'}</span>
                       <span className="text-[11px] text-slate-400">({b.totalReviews || 0})</span>
                     </div>
 
                     <Link href={`/business/${b.slug}`}>
-                      <Button variant="primary" size="sm" className="px-2 text-[11px]">
+                      <Button variant="primary" size="sm" className="px-3 py-1.5 text-xs min-h-[36px]">
                         View
                       </Button>
                     </Link>
