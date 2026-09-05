@@ -180,7 +180,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
       <div className="bg-slate-50 pb-16">
         
         {/* Cover Image Banner */}
-        <div className="relative h-72 sm:h-96 w-full bg-slate-900 overflow-hidden">
+        <div className="relative h-40 sm:h-56 w-full bg-slate-900 overflow-hidden">
           {business.coverImage ? (
             <>
               <Image src={business.coverImage} alt={business.name} fill sizes="100vw" className="object-cover opacity-80" priority />
@@ -190,15 +190,15 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
         </div>
 
         {/* Business Header Info Card */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 flex flex-col md:flex-row gap-6 items-start justify-between">
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+          <div className="bg-white rounded-3xl p-4 sm:p-5 shadow-xl border border-slate-200 flex flex-col md:flex-row gap-5 items-start justify-between">
+            <div className="flex flex-col sm:flex-row gap-5 items-start">
               {business.logo ? (
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-white shrink-0 -mt-12 sm:-mt-16">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-white shrink-0 -mt-10 sm:-mt-12">
                   <Image src={business.logo} alt={business.name} fill sizes="128px" className="object-cover" />
                 </div>
               ) : (
-                <BusinessBrandFallback name={business.name} className="w-24 h-24 sm:w-32 sm:h-32 text-3xl shrink-0 -mt-12 sm:-mt-16 border-4 border-white" />
+                <BusinessBrandFallback name={business.name} className="w-20 h-20 sm:w-24 sm:h-24 text-3xl shrink-0 -mt-10 sm:-mt-12 border-4 border-white" />
               )}
 
               <div className="space-y-2">
@@ -217,7 +217,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                   />
                 </div>
 
-                <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                   {business.name}
                 </h1>
                 {business.tagline && (
@@ -241,30 +241,30 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
             </div>
 
             {/* Quick Action Contact Buttons */}
-            <div className="flex flex-wrap md:flex-col gap-2.5 w-full md:w-auto shrink-0">
+            <div className="grid grid-cols-2 gap-2 w-full md:w-auto shrink-0 mt-4 md:mt-0">
               {whatsappNumber && (
                 <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="w-full">
-                  <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md">
-                    <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+                  <Button size="sm" className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md">
+                    <MessageCircle className="w-4 h-4" /> Chat
                   </Button>
                 </a>
               )}
               {hasPhone && (
                 <a href={`tel:${business.phone}`} className="w-full">
-                  <Button variant="primary" className="w-full gap-2 shadow-md">
-                    <Phone className="w-4 h-4" /> Call business
+                  <Button size="sm" variant="primary" className="w-full gap-2 shadow-md">
+                    <Phone className="w-4 h-4" /> Call
                   </Button>
                 </a>
               )}
               {hasEmail && (
                 <a href={`mailto:${business.email}`} className="w-full">
-                  <Button variant="outline" className="w-full gap-2"><Mail className="w-4 h-4 text-sea" /> Send email</Button>
+                  <Button size="sm" variant="outline" className="w-full gap-2"><Mail className="w-4 h-4 text-sea" /> Email</Button>
                 </a>
               )}
               {business.website && (
                 <a href={business.website} target="_blank" rel="noopener noreferrer" className="w-full">
-                  <Button variant="outline" className="w-full gap-2">
-                    <Globe className="w-4 h-4 text-sea" /> Visit Website
+                  <Button size="sm" variant="outline" className="w-full gap-2">
+                    <Globe className="w-4 h-4 text-sea" /> Website
                   </Button>
                 </a>
               )}
@@ -272,7 +272,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
           </div>
 
           {/* Buyer Direct Contact Notice Banner */}
-          <div className="mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div className="mt-4 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0">
                 📢
@@ -295,7 +295,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
         </div>
 
         {/* Main Content Layout */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Left Column - Detailed Sections */}
           <div className="lg:col-span-2 space-y-8">

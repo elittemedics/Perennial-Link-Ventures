@@ -76,7 +76,7 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           1. HERO SECTION — Compact, centered, static text
          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative hero-bg-animated text-white overflow-hidden py-10 sm:py-14 lg:py-16 flex items-center">
+      <section className="relative hero-bg-animated text-white overflow-hidden py-8 sm:py-10 lg:py-12 flex items-center">
 
         {/* Background floating orbs */}
         <div className="orb w-[400px] h-[400px] bg-sky-400/20 top-[-100px] left-[-100px] animate-pulse-glow" />
@@ -97,37 +97,6 @@ export default async function HomePage() {
             List your business, upload your products, and let customers contact you directly on whatsapp or phone - no middlemen, no commission fees.
           </p>
 
-          {/* Search Bar */}
-          <form action="/search" method="GET" className="max-w-xl mx-auto pt-2">
-            <div className="flex flex-col sm:flex-row gap-2 bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-sky-200" />
-                <input
-                  type="text"
-                  name="q"
-                  placeholder="Search businesses, products, services, or cities..."
-                  className="w-full pl-10 pr-4 py-3 bg-white/15 text-white placeholder-sky-200/70 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
-                />
-              </div>
-              <Button type="submit" className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-lg transition-all hover:scale-105 shrink-0">
-                Search
-              </Button>
-            </div>
-          </form>
-
-          {/* Quick Action Pills */}
-          <div className="flex flex-wrap gap-2 justify-center text-xs pt-1">
-            <span className="text-sky-200 self-center font-medium">Popular:</span>
-            {['Phones', 'Supermarket', 'Electronics', 'Fashion', 'Cars', 'Services'].map((tag) => (
-              <Link
-                key={tag}
-                href={`/search?q=${encodeURIComponent(tag)}`}
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-sky-100 font-medium transition-colors border border-white/10"
-              >
-                {tag}
-              </Link>
-            ))}
-          </div>
         </div>
 
         {/* Bottom wave */}
@@ -145,19 +114,40 @@ export default async function HomePage() {
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="flex flex-col gap-5">
             <div>
               <Badge variant="info" className="mb-2 px-3 py-1 text-xs">Fresh listings</Badge>
               <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Latest products</h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500 max-w-2xl">
                 Browse products quickly, then open the business profile to view and contact the seller to buy products.
               </p>
             </div>
-            <Link href="/products">
-              <Button variant="outline" className="gap-2 rounded-xl shrink-0">
-                View All Products <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
+
+            {/* Search Bar */}
+            <form action="/search" method="GET" className="max-w-2xl w-full">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="text"
+                    name="q"
+                    placeholder="Search businesses, products, services..."
+                    className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm shadow-sm"
+                  />
+                </div>
+                <Button type="submit" className="bg-amber-400 hover:bg-amber-500 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-md shrink-0">
+                  Search
+                </Button>
+              </div>
+            </form>
+
+            <div>
+              <Link href="/products">
+                <Button variant="outline" className="gap-2 rounded-xl shrink-0 mt-2">
+                  View All Products <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {trendingProducts.length > 0 ? (
