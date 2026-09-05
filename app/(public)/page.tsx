@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import TypewriterText from '@/components/common/TypewriterText';
 import ProductCard from '@/components/products/ProductCard';
 import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
 
@@ -75,14 +74,13 @@ export default async function HomePage() {
     <div className="space-y-0 overflow-hidden">
 
       {/* ═══════════════════════════════════════════════════════════
-          1. HERO SECTION — 3D animated, pro gradient, person image
+          1. HERO SECTION — Compact, centered, static text
          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative hero-bg-animated text-white overflow-hidden min-h-[auto] lg:min-h-[92vh] flex items-center">
+      <section className="relative hero-bg-animated text-white overflow-hidden py-10 sm:py-14 lg:py-16 flex items-center">
 
-        {/* Background 3D floating orbs */}
-        <div className="orb w-[500px] h-[500px] bg-sky-400/20 top-[-100px] left-[-150px] animate-pulse-glow" />
-        <div className="orb w-[400px] h-[400px] bg-blue-300/15 bottom-[-80px] right-[10%] animate-pulse-glow" style={{ animationDelay: '2s' }} />
-        <div className="orb w-[200px] h-[200px] bg-cyan-400/25 top-[30%] left-[40%] animate-float-slow" style={{ animationDelay: '1s' }} />
+        {/* Background floating orbs */}
+        <div className="orb w-[400px] h-[400px] bg-sky-400/20 top-[-100px] left-[-100px] animate-pulse-glow" />
+        <div className="orb w-[300px] h-[300px] bg-blue-300/15 bottom-[-60px] right-[10%] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
         {/* Grid mesh overlay */}
         <div className="absolute inset-0 opacity-[0.04]" style={{
@@ -90,104 +88,51 @@ export default async function HomePage() {
           backgroundSize: '60px 60px',
         }} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 w-full">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-snug">
+            Showcase Your Products to <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-sky-200 to-white">Thousands of Buyers</span>
+          </h1>
 
-            {/* Left — Text Content */}
-            <div className="space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sky-200 text-xs sm:text-sm font-semibold shadow-lg">
-                <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
-                Ghana&apos;s #1 Verified Business & Product Directory
-              </div>
+          <p className="text-sm sm:text-base text-sky-100 max-w-2xl mx-auto font-normal leading-relaxed">
+            List your business, upload your products, and let customers contact you directly on whatsapp or phone - no middlemen, no commission fees.
+          </p>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
-                Connect with <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-sky-200 to-white">
-                  <TypewriterText texts={['Verified Businesses', 'Direct Product Deals', 'Trusted Local Services', 'Wholesale Suppliers']} />
-                </span>
-              </h1>
-
-              <p className="text-sm sm:text-base lg:text-lg text-sky-100 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Discover top rated African businesses, explore direct product listings, and contact sellers directly with zero middleman fees.
-              </p>
-
-              {/* Search Bar */}
-              <form action="/search" method="GET" className="max-w-xl mx-auto lg:mx-0">
-                <div className="flex flex-col sm:flex-row gap-2 bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-sky-200" />
-                    <input
-                      type="text"
-                      name="q"
-                      placeholder="Search businesses, products, services, or cities..."
-                      className="w-full pl-10 pr-4 py-3 bg-white/15 text-white placeholder-sky-200/70 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
-                    />
-                  </div>
-                  <Button type="submit" className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-lg transition-all hover:scale-105 shrink-0">
-                    Search
-                  </Button>
-                </div>
-              </form>
-
-              {/* Quick Action Pills */}
-              <div className="flex flex-wrap gap-2 justify-center lg:justify-start text-xs pt-2">
-                <span className="text-sky-200 self-center font-medium">Popular:</span>
-                {['Phones', 'Supermarket', 'Electronics', 'Fashion', 'Cars', 'Services'].map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/search?q=${encodeURIComponent(tag)}`}
-                    className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-sky-100 font-medium transition-colors border border-white/10"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Right — 3D Hero Graphic */}
-            <div className="relative hidden lg:flex justify-center items-center">
-              <div className="relative w-[480px] h-[480px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 group transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                <Image
-                  src="/african-business-male-people-shaking-hands_1303-18516.jpg"
-                  alt="Verified Business Partners Shaking Hands"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  priority
+          {/* Search Bar */}
+          <form action="/search" method="GET" className="max-w-xl mx-auto pt-2">
+            <div className="flex flex-col sm:flex-row gap-2 bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-sky-200" />
+                <input
+                  type="text"
+                  name="q"
+                  placeholder="Search businesses, products, services, or cities..."
+                  className="w-full pl-10 pr-4 py-3 bg-white/15 text-white placeholder-sky-200/70 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
-                {/* Floating 3D Badge 1 */}
-                <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md text-slate-900 px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-3 border border-white animate-float">
-                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
-                  <div>
-                    <p className="text-xs font-black">Verified & Trusted</p>
-                    <p className="text-[10px] text-slate-500">Direct WhatsApp Sellers</p>
-                  </div>
-                </div>
-
-                {/* Floating 3D Badge 2 */}
-                <div className="absolute bottom-6 left-6 bg-slate-900/90 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-white/20 animate-float" style={{ animationDelay: '1.5s' }}>
-                  <div className="flex items-center gap-2">
-                    <div className="flex -space-x-2">
-                      <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center text-xs font-bold text-slate-950">GH</div>
-                      <div className="w-7 h-7 rounded-full bg-sky-400 flex items-center justify-center text-xs font-bold text-slate-950">NG</div>
-                      <div className="w-7 h-7 rounded-full bg-emerald-400 flex items-center justify-center text-xs font-bold text-slate-950">KE</div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold">African Commerce Hub</p>
-                      <p className="text-[10px] text-sky-200">Across All Major Cities</p>
-                    </div>
-                  </div>
-                </div>
               </div>
+              <Button type="submit" className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-lg transition-all hover:scale-105 shrink-0">
+                Search
+              </Button>
             </div>
+          </form>
 
+          {/* Quick Action Pills */}
+          <div className="flex flex-wrap gap-2 justify-center text-xs pt-1">
+            <span className="text-sky-200 self-center font-medium">Popular:</span>
+            {['Phones', 'Supermarket', 'Electronics', 'Fashion', 'Cars', 'Services'].map((tag) => (
+              <Link
+                key={tag}
+                href={`/search?q=${encodeURIComponent(tag)}`}
+                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-sky-100 font-medium transition-colors border border-white/10"
+              >
+                {tag}
+              </Link>
+            ))}
           </div>
         </div>
 
         {/* Bottom wave */}
         <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none">
-          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-12 sm:h-16">
+          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-8 sm:h-12">
             <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f8fafc" />
           </svg>
         </div>

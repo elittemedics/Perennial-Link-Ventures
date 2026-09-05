@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { X, MessageCircle, Phone, Building2, MapPin, Tag, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, MessageCircle, Phone, Building2, MapPin, Tag, ShieldCheck, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatGHS } from '@/lib/utils';
 
@@ -224,7 +224,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           </div>
 
           {/* Action Buttons: Direct WhatsApp & Call Seller */}
-          <div className="space-y-2.5 pt-4 border-t border-slate-100">
+          <div className="space-y-3 pt-4 border-t border-slate-100">
             {formattedPhone ? (
               <>
                 <a
@@ -249,6 +249,20 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                 Contact information available on business profile.
               </p>
             )}
+
+            {/* Safety & Security Tips */}
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-[11px] text-amber-900 space-y-1.5 mt-3">
+              <p className="font-extrabold flex items-center gap-1.5 text-amber-950 text-xs">
+                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+                Safety & Security Tips
+              </p>
+              <ul className="space-y-1 text-[10.5px] leading-snug list-disc pl-4 text-amber-900/90 font-medium">
+                <li>When meeting in person, choose a safe and public location.</li>
+                <li>If an item is being delivered, confirm the delivery details and recipient before making payment.</li>
+                <li>Carefully inspect the item upon delivery or collection to ensure it matches the description and your expectations.</li>
+                <li>Before accepting a package, make sure it contains the same item you agreed to purchase.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
