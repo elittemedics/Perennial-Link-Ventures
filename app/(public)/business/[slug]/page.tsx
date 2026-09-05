@@ -98,7 +98,9 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
       include: {
         category: true,
         openingHours: true,
-        products: true,
+        products: {
+          include: { images: { orderBy: { sortOrder: 'asc' } } },
+        },
         services: true,
         socialLinks: true,
         gallery: true,

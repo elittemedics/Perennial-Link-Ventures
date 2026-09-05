@@ -1,11 +1,11 @@
 import React from 'react';
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import db from '@/lib/db';
+import { Search, ShoppingBag, Package, Phone, Sparkles } from 'lucide-react';
 import ProductCard from '@/components/products/ProductCard';
-import { Search, Filter, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Browse Products from Ghana Businesses',
@@ -16,11 +16,9 @@ export const metadata: Metadata = {
     title: 'Browse Products from Ghana Businesses | Perennial Link Ventures',
     description:
       'Find products from verified businesses across Ghana. Search by category, view prices, and contact sellers directly by WhatsApp or phone.',
-    type: 'website',
+    url: '/products',
   },
 };
-
-export const dynamic = 'force-dynamic';
 
 export interface ProductsPageProps {
   searchParams: Promise<{
@@ -86,16 +84,15 @@ export default async function ProductsPage(props: ProductsPageProps) {
     products = await db.businessProduct.findMany({
       where,
       include: {
+        images: { orderBy: { sortOrder: 'asc' } },
         business: {
-          select: { name: true, slug: true, phone: true, isVerified: true, cityName: true },
+          select: { name: true, slug: true, phone: true, whatsapp: true, isVerified: true, cityName: true },
         },
       },
       orderBy,
       take: query ? 100 : 40,
     });
 
-    // Put the closest product-title matches first, like a marketplace search,
-    // then use recency as the tie-breaker. Every matching seller remains visible.
     if (query && sort === 'newest') {
       const term = query.trim().toLocaleLowerCase();
       const relevance = (product: { title: string; description?: string | null }) => {
@@ -178,40 +175,37 @@ export default async function ProductsPage(props: ProductsPageProps) {
                 defaultValue={sort}
                 className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
               >
-                <option value="newest">Newest Arrivals</option>
+                <option value="newest">Newest First</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
               </select>
             </div>
 
-            <Button type="submit" variant="primary" className="w-full gap-2 font-bold py-2.5">
+            <Button type="submit" variant="primary" className="w-full font-bold gap-2">
               <Search className="w-4 h-4" /> Filter Products
             </Button>
           </form>
         </div>
 
-        <main className="space-y-6">
-          {products.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
-                <ShoppingBag className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">No Products Found</h3>
-              <p className="text-slate-500 text-sm max-w-md mx-auto">
-                No items match your filter selection right now. Try searching with a different term.
-              </p>
-              <Link href="/products">
-                <Button variant="outline">Reset Filters</Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
-              {products.map((prod) => (
-                <ProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          )}
-        </main>
+        {/* Product Grid */}
+        {products.length === 0 ? (
+          <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-4 shadow-sm">
+            <Package className="w-12 h-12 text-slate-300 mx-auto" />
+            <h3 className="text-xl font-bold text-slate-900">No Products Found</h3>
+            <p className="text-slate-500 text-sm max-w-md mx-auto">
+              We couldn&apos;t find any products matching your search criteria. Try clearing filters or searching for something else.
+            </p>
+            <Link href="/products">
+              <Button variant="ghost" className="font-bold text-sea">Clear Filters</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {products.map((prod) => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
+          </div>
+        )}
 
       </div>
     </div>

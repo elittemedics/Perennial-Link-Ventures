@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import AnimatedCounter from '@/components/common/AnimatedCounter';
 import TypewriterText from '@/components/common/TypewriterText';
 import ProductCard from '@/components/products/ProductCard';
 import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
@@ -39,16 +38,15 @@ const JUMIA_CATS = [
 export default async function HomePage() {
   let trendingProducts: any[] = [];
   let recentBusinesses: any[] = [];
-  let totalBusinesses = 0;
-  let totalReviews = 0;
 
   try {
     const res = await Promise.all([
-      db.business.count({ where: { status: 'APPROVED' } }),
-      db.review.count({ where: { isApproved: true } }),
       db.businessProduct.findMany({
         where: { isAvailable: true },
-        include: { business: { select: { name: true, slug: true, phone: true, isVerified: true, cityName: true } } },
+        include: {
+          images: { orderBy: { sortOrder: 'asc' } },
+          business: { select: { name: true, slug: true, phone: true, whatsapp: true, isVerified: true, cityName: true } },
+        },
         orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
         take: 18,
       }),
@@ -67,10 +65,8 @@ export default async function HomePage() {
         take: 6,
       }),
     ]);
-    totalBusinesses   = res[0];
-    totalReviews      = res[1];
-    trendingProducts  = res[2];
-    recentBusinesses = res[3];
+    trendingProducts = res[0];
+    recentBusinesses = res[1];
   } catch {
     // DB offline fallback for build/preview
   }
@@ -98,112 +94,94 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
             {/* Left — Text Content */}
-            <div className="space-y-6 sm:space-y-8 animate-fade-in-up">
-              <Badge className="bg-white/15 hover:bg-white/20 text-white border-white/30 px-5 py-2 text-xs font-bold uppercase tracking-widest backdrop-blur-sm shadow-lg">
-                <Sparkles className="w-3.5 h-3.5 mr-2 text-amber-300 shrink-0" />
-                <TypewriterText
-                  texts={[
-                    "A Global Business Marketplace & Directory",
-                    "Connect Directly With Verified Vendors",
-                    "List Products & Grow Your Business"
-                  ]}
-                />
-              </Badge>
-
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
-                Showcase your business
-                <br />
-                <span className="gradient-text">to the world.</span>
-              </h1>
-
-              <p className="text-lg sm:text-xl text-sky-100 leading-relaxed max-w-xl">
-                List your business, upload your products, and let customers contact you directly on WhatsApp or phone — no middlemen, no commission fees.
-              </p>
-
-              {/* Hero Search Bar */}
-              <form action="/listings" method="GET"
-                className="glass-panel rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-3 p-2.5 border border-white/30 max-w-xl"
-              >
-                <div className="flex-1 flex items-center gap-3 px-4 py-2.5 bg-white/90 rounded-xl">
-                  <Search className="w-5 h-5 text-sea shrink-0" />
-                  <input
-                    type="text"
-                    name="q"
-                    placeholder="Search products, brands, companies…"
-                    className="w-full bg-transparent text-sm text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
-                  />
-                </div>
-                <Button type="submit" variant="primary" size="lg" className="px-6 rounded-xl font-bold shadow-lg shrink-0 gap-2">
-                  <Search className="w-4 h-4" /> Search
-                </Button>
-              </form>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-4">
-                <Link href="/register">
-                  <Button variant="primary" size="lg"
-                    className="bg-white text-sea hover:bg-sky-50 font-extrabold px-8 py-3.5 rounded-2xl shadow-xl gap-2 text-base"
-                  >
-                    List Your Business Free
-                    <ArrowRight className="w-5 h-5" />
-                  </Button>
-                </Link>
-                <Link href="/products">
-                  <Button variant="ghost" size="lg"
-                    className="border border-white/40 text-white hover:bg-white/10 font-bold px-7 py-3.5 rounded-2xl backdrop-blur-sm"
-                  >
-                    Browse Products
-                  </Button>
-                </Link>
+            <div className="space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sky-200 text-xs sm:text-sm font-semibold shadow-lg">
+                <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
+                Ghana&apos;s #1 Verified Business & Product Directory
               </div>
 
-              {/* Trust badges */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                {['100% Free Listings', 'Verified Vendors', 'WhatsApp Direct'].map((t) => (
-                  <span key={t} className="flex items-center gap-1.5 text-xs text-sky-200 font-semibold bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> {t}
-                  </span>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
+                Connect with <br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-sky-200 to-white">
+                  <TypewriterText texts={['Verified Businesses', 'Direct Product Deals', 'Trusted Local Services', 'Wholesale Suppliers']} />
+                </span>
+              </h1>
+
+              <p className="text-sm sm:text-base lg:text-lg text-sky-100 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                Discover top rated African businesses, explore direct product listings, and contact sellers directly with zero middleman fees.
+              </p>
+
+              {/* Search Bar */}
+              <form action="/search" method="GET" className="max-w-xl mx-auto lg:mx-0">
+                <div className="flex flex-col sm:flex-row gap-2 bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-sky-200" />
+                    <input
+                      type="text"
+                      name="q"
+                      placeholder="Search businesses, products, services, or cities..."
+                      className="w-full pl-10 pr-4 py-3 bg-white/15 text-white placeholder-sky-200/70 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+                    />
+                  </div>
+                  <Button type="submit" className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-lg transition-all hover:scale-105 shrink-0">
+                    Search
+                  </Button>
+                </div>
+              </form>
+
+              {/* Quick Action Pills */}
+              <div className="flex flex-wrap gap-2 justify-center lg:justify-start text-xs pt-2">
+                <span className="text-sky-200 self-center font-medium">Popular:</span>
+                {['Phones', 'Supermarket', 'Electronics', 'Fashion', 'Cars', 'Services'].map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/search?q=${encodeURIComponent(tag)}`}
+                    className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-sky-100 font-medium transition-colors border border-white/10"
+                  >
+                    {tag}
+                  </Link>
                 ))}
               </div>
             </div>
 
-            {/* Right — 3D Handshake Image */}
-            <div className="order-last lg:order-none flex w-full flex-col items-center justify-center relative animate-slide-right mt-8 lg:mt-0">
-              {/* Decorative rings */}
-              <div className="absolute w-[260px] sm:w-[380px] lg:w-[420px] h-[220px] sm:h-[280px] lg:h-[420px] rounded-full border border-white/10 animate-pulse-glow" />
-              <div className="absolute w-[210px] sm:w-[310px] lg:w-[340px] h-[180px] sm:h-[240px] lg:h-[340px] rounded-full border border-white/15 animate-float-slow" style={{ animationDelay: '1s' }} />
-              <div className="absolute w-[180px] sm:w-[240px] lg:w-[260px] h-[160px] sm:h-[210px] lg:h-[260px] rounded-full bg-gradient-to-br from-sky-500/20 to-blue-600/20 blur-xl" />
-
-              {/* Hero Person Image */}
-              <div className="hero-image-3d relative z-10 w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[340px] h-[210px] sm:h-[280px] lg:h-[420px] rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl">
+            {/* Right — 3D Hero Graphic */}
+            <div className="relative hidden lg:flex justify-center items-center">
+              <div className="relative w-[480px] h-[480px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 group transform rotate-1 hover:rotate-0 transition-transform duration-500">
                 <Image
-                  src="/images/hero-handshake.jpg"
-                  alt="Professional business handshake on Perennial Link"
+                  src="/african-business-male-people-shaking-hands_1303-18516.jpg"
+                  alt="Verified Business Partners Shaking Hands"
                   fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
                   priority
-                  className="object-cover"
-                  sizes="(max-width: 640px) 280px, (max-width: 1023px) 420px, 340px"
                 />
-                {/* Overlay gradient at bottom for text */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="inline-flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                    Selling via WhatsApp Daily
-                  </span>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+
+                {/* Floating 3D Badge 1 */}
+                <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md text-slate-900 px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-3 border border-white animate-float">
+                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                  <div>
+                    <p className="text-xs font-black">Verified & Trusted</p>
+                    <p className="text-[10px] text-slate-500">Direct WhatsApp Sellers</p>
+                  </div>
+                </div>
+
+                {/* Floating 3D Badge 2 */}
+                <div className="absolute bottom-6 left-6 bg-slate-900/90 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-white/20 animate-float" style={{ animationDelay: '1.5s' }}>
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center text-xs font-bold text-slate-950">GH</div>
+                      <div className="w-7 h-7 rounded-full bg-sky-400 flex items-center justify-center text-xs font-bold text-slate-950">NG</div>
+                      <div className="w-7 h-7 rounded-full bg-emerald-400 flex items-center justify-center text-xs font-bold text-slate-950">KE</div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold">African Commerce Hub</p>
+                      <p className="text-[10px] text-sky-200">Across All Major Cities</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Floating stat cards */}
-              <div className="hidden lg:block absolute top-2 left-0 sm:-left-6 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
-                <p className="text-xl sm:text-2xl font-black text-white">500+</p>
-                <p className="text-[9px] sm:text-[10px] text-sky-300 font-semibold uppercase tracking-wider">Verified Vendors</p>
-              </div>
-              <div className="hidden lg:block absolute bottom-2 right-0 sm:bottom-6 sm:-right-8 glass-dark rounded-2xl p-2.5 sm:p-3.5 shadow-xl border border-white/10 card-3d">
-                <p className="text-xl sm:text-2xl font-black text-white">4.9 ★</p>
-                <p className="text-[9px] sm:text-[10px] text-sky-300 font-semibold uppercase tracking-wider">Avg. Rating</p>
-              </div>
             </div>
+
           </div>
         </div>
 
@@ -212,33 +190,6 @@ export default async function HomePage() {
           <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-12 sm:h-16">
             <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f8fafc" />
           </svg>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          2. ANIMATED STATS ROW
-         ═══════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-14 border-b border-slate-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { end: totalBusinesses > 0 ? totalBusinesses : 500, suffix: '+', label: 'Verified Listings' },
-              { end: totalReviews > 0 ? totalReviews : 1200, suffix: '+', label: 'Client Reviews' },
-              { end: 190, suffix: '+', label: 'Countries Available' },
-              { end: 99.9, suffix: '%', decimals: 1, label: 'Uptime Verified' },
-            ].map((stat) => (
-              <div key={stat.label}
-                className="card-3d group text-center p-6 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-100 hover:border-sea/30 shadow-sm"
-              >
-                <span className="block text-3xl sm:text-4xl font-black text-sea">
-                  <AnimatedCounter end={stat.end} suffix={stat.suffix} decimals={(stat as any).decimals} />
-                </span>
-                <span className="mt-1 block text-xs sm:text-sm text-sky-700 font-bold uppercase tracking-wider">
-                  {stat.label}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 

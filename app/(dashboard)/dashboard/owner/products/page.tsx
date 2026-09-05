@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import ImageUpload from '@/components/common/ImageUpload';
+import MultiImageUpload from '@/components/common/MultiImageUpload';
 import { Package, PlusCircle, Trash2, ArrowLeft, Store, Pencil } from 'lucide-react';
 import { readApiResponse } from '@/lib/api-client';
 import { formatGHS } from '@/lib/utils';
@@ -27,6 +27,7 @@ interface Product {
   quantity?: number | null;
   location?: string | null;
   image?: string | null;
+  images?: { id?: string; url: string; sortOrder?: number }[];
   productCategory: string;
   viewCount?: number;
   createdAt: string;
@@ -59,7 +60,17 @@ export default function OwnerProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [editDraft, setEditDraft] = useState({ title: '', description: '', price: '', quantity: '', location: '', whatsappPhone: '', productCategory: 'Other categories', image: null as string | null });
+  const [editDraft, setEditDraft] = useState({
+    title: '',
+    description: '',
+    price: '',
+    quantity: '',
+    location: '',
+    whatsappPhone: '',
+    productCategory: 'Other categories',
+    image: null as string | null,
+    images: [] as string[],
+  });
 
   const [formData, setFormData] = useState({
     businessId: '',
@@ -72,6 +83,7 @@ export default function OwnerProductsPage() {
     whatsappPhone: '',
     productCategory: 'Other categories',
     image: null as string | null,
+    images: [] as string[],
   });
 
   const fetchData = async () => {
@@ -89,7 +101,6 @@ export default function OwnerProductsPage() {
           businessId: prev.businessId || selectedBusiness.id,
           location: prev.location || selectedBusiness.cityName,
         }));
-        
       }
       // The inventory always shows every product posted by this account,
       // including standalone products without a business profile.
@@ -129,8 +140,8 @@ export default function OwnerProductsPage() {
         location: formData.location || undefined,
         whatsappPhone: formData.whatsappPhone || undefined,
         productCategory: formData.productCategory,
-        image: formData.image || undefined,
-        images: formData.image ? [formData.image] : [],
+        image: formData.images.length > 0 ? formData.images[0] : formData.image || undefined,
+        images: formData.images,
       };
 
       const res = await fetch('/api/v1/products', {
@@ -156,9 +167,10 @@ export default function OwnerProductsPage() {
         location: '',
         whatsappPhone: '',
         image: null,
+        images: [],
       }));
 
-      // Refresh the complete inventory, including products from every business.
+      // Refresh complete inventory
       fetchData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add product');
@@ -179,29 +191,14 @@ export default function OwnerProductsPage() {
     }
   };
 
-  const [editingImageId, setEditingImageId] = useState<string | null>(null);
-
-  const handleUpdateImage = async (id: string, newImageUrl: string | null) => {
-    try {
-      const res = await fetch(`/api/v1/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: newImageUrl }),
-      });
-      const data = await readApiResponse<{ success?: boolean; product?: Product }>(res);
-      if (res.ok && data.success) {
-        setProducts(prev => prev.map(p => p.id === id ? { ...p, image: newImageUrl } : p));
-        setEditingImageId(null);
-      } else {
-        alert('Failed to update image');
-      }
-    } catch {
-      alert('Error updating image');
-    }
-  };
-
   const openProductEditor = (product: Product) => {
     setEditingProduct(product);
+    const existingImages = product.images && product.images.length > 0
+      ? product.images.map((i) => i.url)
+      : product.image
+      ? [product.image]
+      : [];
+
     setEditDraft({
       title: product.title,
       description: product.description || '',
@@ -211,6 +208,7 @@ export default function OwnerProductsPage() {
       whatsappPhone: product.whatsappPhone || '',
       productCategory: product.productCategory,
       image: product.image || null,
+      images: existingImages,
     });
   };
 
@@ -230,7 +228,8 @@ export default function OwnerProductsPage() {
           location: editDraft.location || null,
           whatsappPhone: editDraft.whatsappPhone || null,
           productCategory: editDraft.productCategory,
-          image: editDraft.image,
+          image: editDraft.images.length > 0 ? editDraft.images[0] : null,
+          images: editDraft.images,
         }),
       });
       const data = await readApiResponse<{ success?: boolean; error?: string; product?: Product }>(response);
@@ -352,7 +351,7 @@ export default function OwnerProductsPage() {
                 />
               </div>
 
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                   Product Category
                 </label>
@@ -380,10 +379,11 @@ export default function OwnerProductsPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <ImageUpload
-                  label="Product Image (Sharp Auto-WebP)"
-                  value={formData.image}
-                  onChange={(url) => setFormData({ ...formData, image: url })}
+                <MultiImageUpload
+                  label="Product Images (Up to 4 - via Camera or Device Upload)"
+                  value={formData.images}
+                  onChange={(urls) => setFormData({ ...formData, images: urls, image: urls[0] || null })}
+                  maxImages={4}
                   prefix="product"
                 />
               </div>
@@ -416,7 +416,13 @@ export default function OwnerProductsPage() {
                 <Input label="Location (optional)" value={editDraft.location} onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })} />
                 <Input label="WhatsApp or phone number" type="tel" value={editDraft.whatsappPhone} onChange={(e) => setEditDraft({ ...editDraft, whatsappPhone: e.target.value })} />
                 <Textarea label="Description (optional)" rows={3} value={editDraft.description} onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })} />
-                <ImageUpload label="Replace product image (optional)" value={editDraft.image} onChange={(url) => setEditDraft({ ...editDraft, image: url })} prefix="product" />
+                <MultiImageUpload
+                  label="Product Images (Up to 4)"
+                  value={editDraft.images}
+                  onChange={(urls) => setEditDraft({ ...editDraft, images: urls, image: urls[0] || null })}
+                  maxImages={4}
+                  prefix="product"
+                />
                 <Button type="submit" variant="primary" className="gap-2"><Pencil className="w-4 h-4" /> Save changes</Button>
               </form>
             </Card>
@@ -432,44 +438,27 @@ export default function OwnerProductsPage() {
               {products.map((p) => (
                 <Card key={p.id} className="p-4 space-y-3 relative group">
                   <div className="flex gap-3">
-                    {editingImageId === p.id ? (
-                      <div className="flex-1">
-                        <ImageUpload
-                          label=""
-                          value={p.image}
-                          onChange={(url) => handleUpdateImage(p.id, url)}
-                          prefix="product"
-                        />
-                        <Button variant="ghost" size="sm" onClick={() => setEditingImageId(null)} className="mt-2 text-xs h-7">Cancel</Button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="relative group/img cursor-pointer" onClick={() => setEditingImageId(p.id)}>
-                          {p.image ? (
-                            <img src={p.image} alt={p.title} className="w-20 h-20 rounded-xl object-cover shrink-0 border border-slate-200" />
-                          ) : (
-                            <div className="w-20 h-20 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold shrink-0">
-                              No Image
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-slate-900/50 hidden group-hover/img:flex items-center justify-center rounded-xl">
-                            <span className="text-white text-[10px] font-bold text-center leading-tight">Edit<br/>Image</span>
-                          </div>
+                    <div className="relative group/img flex-shrink-0">
+                      {p.image ? (
+                        <img src={p.image} alt={p.title} className="w-20 h-20 rounded-xl object-cover shrink-0 border border-slate-200" />
+                      ) : (
+                        <div className="w-20 h-20 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold shrink-0">
+                          No Image
                         </div>
-                        <div className="space-y-1 flex-1">
-                          <span className="text-[10px] font-bold uppercase text-sea bg-brand-50 px-2 py-0.5 rounded-md">
-                            {p.productCategory}
-                          </span>
-                          <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{p.title}</h4>
-                          <p className="font-extrabold text-slate-900 text-sm">{p.price > 0 ? formatGHS(p.price) : 'Contact for price'}</p>
-                          {p.quantity !== undefined && p.quantity !== null && (
-                            <p className="text-xs text-emerald-700 font-medium">📦 Qty: {p.quantity}</p>
-                          )}
-                          <p className="text-xs font-medium text-sky-700">Views: {p.viewCount || 0}</p>
-                          {p.location && <p className="text-xs text-slate-500">📍 {p.location}</p>}
-                        </div>
-                      </>
-                    )}
+                      )}
+                    </div>
+                    <div className="space-y-1 flex-1">
+                      <span className="text-[10px] font-bold uppercase text-sea bg-brand-50 px-2 py-0.5 rounded-md">
+                        {p.productCategory}
+                      </span>
+                      <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{p.title}</h4>
+                      <p className="font-extrabold text-slate-900 text-sm">{p.price > 0 ? formatGHS(p.price) : 'Contact for price'}</p>
+                      {p.quantity !== undefined && p.quantity !== null && (
+                        <p className="text-xs text-emerald-700 font-medium">📦 Qty: {p.quantity}</p>
+                      )}
+                      <p className="text-xs font-medium text-sky-700">Views: {p.viewCount || 0}</p>
+                      {p.location && <p className="text-xs text-slate-500">📍 {p.location}</p>}
+                    </div>
                   </div>
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
