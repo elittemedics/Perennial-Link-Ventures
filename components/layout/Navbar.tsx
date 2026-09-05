@@ -3,7 +3,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package, House } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<{ name: string | null; role: string } | null>(null);
+  const router = useRouter();
 
   const loadUser = useCallback(() => {
     fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
@@ -53,6 +55,15 @@ export default function Navbar() {
     window.location.assign('/');
   };
 
+  const handleSellClick = () => {
+    setIsMobileMenuOpen(false);
+    if (user) {
+      router.push('/dashboard/owner/products#new-product');
+    } else {
+      router.push('/login?next=/dashboard/owner/products');
+    }
+  };
+
   const isAuthenticated = Boolean(user);
   const role = user?.role;
   const userInitials = user?.name
@@ -63,9 +74,9 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 w-full bg-white/98 backdrop-blur border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
+
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
             <div className="relative w-11 h-11 group-hover:scale-105 transition-transform shrink-0">
               <Image
                 src="/images/plv-logo.png"
@@ -76,7 +87,7 @@ export default function Navbar() {
                 priority
               />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col hidden sm:flex">
               <span className="font-extrabold text-navy text-base tracking-tight leading-tight group-hover:text-gold transition-colors">
                 Perennial Link
               </span>
@@ -100,23 +111,26 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          {/* Right Action Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated && (
-              <Link href="/dashboard/owner/products#new-product">
-                <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-sea text-sea font-bold hover:bg-brand-50">
-                  <Package className="w-4 h-4" /> Add product
-                </Button>
-              </Link>
-            )}
+          {/* Desktop Right Action Buttons */}
+          <div className="hidden md:flex items-center gap-2">
+            {/* Sell button — always visible on desktop */}
+            <button
+              type="button"
+              onClick={handleSellClick}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-sm font-bold shadow-sm transition-colors"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Sell
+            </button>
+
             <Link href={role === 'BUSINESS_OWNER' ? '/dashboard/owner/listings/new' : '/register'}>
-              <Button variant="primary" size="sm" className="gap-1.5 whitespace-nowrap">
+              <Button variant="outline" size="sm" className="gap-1.5 border-navy text-navy font-bold hover:bg-navy hover:text-white whitespace-nowrap">
                 <PlusCircle className="w-4 h-4" /> Add Business
               </Button>
             </Link>
+
             {isAuthenticated ? (
               <div ref={profileMenuRef} className="relative">
-                {/* Profile Icon / Avatar Button */}
                 <button
                   type="button"
                   onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
@@ -138,7 +152,6 @@ export default function Navbar() {
                   <User className="w-4 h-4 text-slate-500 lg:hidden" />
                 </button>
 
-                {/* Profile Dropdown Menu */}
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                     <div className="px-4 py-2 border-b border-slate-100">
@@ -184,31 +197,45 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login">
-                  <Button variant="outline" size="sm" className="gap-2 rounded-lg border-slate-200 bg-white font-bold text-slate-700 hover:border-gold-300 hover:bg-gold-50 hover:text-navy">
+                  <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-slate-200 bg-white font-bold text-slate-700 hover:border-gold-300 hover:bg-gold-50 hover:text-navy">
                     <User className="w-4 h-4 text-gold-600" />
-                    Sign in
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="primary" size="sm" className="gap-1.5 rounded-lg font-bold">
+                    Register
                   </Button>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile View: Home button always visible at top right next to menu */}
-          <div className="md:hidden flex items-center gap-2">
-            <Link
-              href="/"
-              aria-label="Home page"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-sea text-white px-3 py-1.5 text-xs font-bold shadow-md hover:bg-sea-600 transition-colors"
+          {/* Mobile top-right: Sign In (if unauth) + Sell + Hamburger */}
+          <div className="md:hidden flex items-center gap-1.5">
+            {!isAuthenticated && (
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white text-slate-700 px-2.5 py-1.5 text-xs font-bold hover:border-gold-400 hover:text-navy transition-colors"
+              >
+                <User className="w-3.5 h-3.5" />
+                Sign In
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={handleSellClick}
+              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 text-xs font-bold shadow-sm transition-colors"
             >
-              <House className="w-4 h-4" />
-              <span>Home</span>
-            </Link>
+              <ShoppingBag className="w-3.5 h-3.5" />
+              Sell
+            </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 focus:outline-none transition-colors"
               aria-label="Open menu"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -217,14 +244,14 @@ export default function Navbar() {
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-3 animate-in slide-in-from-top duration-200">
-          <nav className="flex flex-col space-y-2 text-sm font-medium text-slate-700">
-            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
+          <nav className="flex flex-col space-y-1 text-sm font-medium text-slate-700">
+            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2.5 rounded-xl hover:bg-slate-50">
               Home
             </Link>
-            <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-gold-50 font-bold text-gold-700">
-              🛍️ Marketplace Products
+            <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2.5 rounded-xl hover:bg-gold-50 font-bold text-gold-700 flex items-center gap-2">
+              🛍️ Marketplace
             </Link>
-            <Link href="/listings" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-md hover:bg-slate-50">
+            <Link href="/listings" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2.5 rounded-xl hover:bg-slate-50">
               Browse Businesses
             </Link>
           </nav>
@@ -244,16 +271,12 @@ export default function Navbar() {
                 <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <LayoutDashboard className="w-4 h-4" />
-                    Dashboard ({role})
+                    Dashboard
                   </Button>
                 </Link>
-                {isAuthenticated && (
-                  <Link href="/dashboard/owner/products#new-product" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="primary" className="w-full justify-start gap-2">
-                      <Package className="w-4 h-4" /> Add product
-                    </Button>
-                  </Link>
-                )}
+                <button type="button" onClick={handleSellClick} className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 text-sm transition-colors w-full">
+                  <ShoppingBag className="w-4 h-4" /> Sell a Product
+                </button>
                 <Link href={role === 'BUSINESS_OWNER' ? '/dashboard/owner/listings/new' : '/register'} onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <PlusCircle className="w-4 h-4" /> Add Business
@@ -269,16 +292,23 @@ export default function Navbar() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full gap-2 rounded-lg border-slate-200 font-bold">
-                    <User className="w-4 h-4 text-gold-600" />
-                    Sign in
-                  </Button>
-                </Link>
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full gap-2 rounded-lg border-slate-200 font-bold">
+                      <User className="w-4 h-4 text-gold-600" />
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="primary" className="w-full gap-1.5">
+                      <PlusCircle className="w-4 h-4" /> Register
+                    </Button>
+                  </Link>
+                </div>
                 <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" className="w-full gap-1.5">
-                    <PlusCircle className="w-4 h-4" /> Add Business
+                  <Button variant="outline" className="w-full gap-2 border-navy text-navy font-bold hover:bg-navy hover:text-white">
+                    <Package className="w-4 h-4" /> Add Business
                   </Button>
                 </Link>
               </div>

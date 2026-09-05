@@ -84,6 +84,8 @@ export default function OwnerProductsPage() {
     productCategory: 'Other categories',
     image: null as string | null,
     images: [] as string[],
+    hasDelivery: false,
+    deliveryRange: '',
   });
 
   const fetchData = async () => {
@@ -142,6 +144,8 @@ export default function OwnerProductsPage() {
         productCategory: formData.productCategory,
         image: formData.images.length > 0 ? formData.images[0] : formData.image || undefined,
         images: formData.images,
+        hasDelivery: formData.hasDelivery,
+        deliveryRange: formData.deliveryRange || undefined,
       };
 
       const res = await fetch('/api/v1/products', {
@@ -168,6 +172,8 @@ export default function OwnerProductsPage() {
         whatsappPhone: '',
         image: null,
         images: [],
+        hasDelivery: false,
+        deliveryRange: '',
       }));
 
       // Refresh complete inventory
@@ -376,6 +382,30 @@ export default function OwnerProductsPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe your product details, specifications..."
                 />
+              </div>
+
+              <div className="sm:col-span-2 space-y-2">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                  Delivery Options
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasDelivery}
+                    onChange={(e) => setFormData({ ...formData, hasDelivery: e.target.checked })}
+                    className="w-4 h-4 accent-emerald-600 rounded"
+                  />
+                  <span className="text-xs font-medium text-slate-700">I offer delivery for this product</span>
+                </label>
+                {formData.hasDelivery && (
+                  <Input
+                    label="Delivery range / area"
+                    value={formData.deliveryRange}
+                    onChange={(e) => setFormData({ ...formData, deliveryRange: e.target.value })}
+                    placeholder="e.g. Nationwide, Accra only, Within 20km"
+                    helperText="Let buyers know how far you can deliver."
+                  />
+                )}
               </div>
 
               <div className="sm:col-span-2">

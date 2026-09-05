@@ -83,6 +83,10 @@ export async function PUT(
       }
     }
 
+    // Delivery fields (not part of ProductSchema, passed directly)
+    if (body.hasDelivery !== undefined) updateData.hasDelivery = Boolean(body.hasDelivery);
+    if (body.deliveryRange !== undefined) updateData.deliveryRange = body.deliveryRange || null;
+
     const updated = await db.businessProduct.update({
       where: { id },
       data: updateData,

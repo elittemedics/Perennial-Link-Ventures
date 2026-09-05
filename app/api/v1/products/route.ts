@@ -74,7 +74,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'You can only select one of your own businesses.' }, { status: 403 });
     }
 
-    // Create product
     const product = await db.businessProduct.create({
       data: {
         businessId: validated.businessId || null,
@@ -87,12 +86,12 @@ export async function POST(req: NextRequest) {
         image: validated.image || (validated.images && validated.images.length > 0 ? validated.images[0] : null),
         quantity: validated.quantity !== undefined ? validated.quantity : null,
         location: validated.location || null,
-        // A standalone product keeps its own contact details; linked products
-        // can still default to the selected business contact.
         whatsappPhone: validated.whatsappPhone || business?.whatsapp || business?.phone || null,
         productCategory: validated.productCategory || 'Other categories',
+        hasDelivery: (body.hasDelivery === true) || false,
+        deliveryRange: body.deliveryRange || null,
         images: validated.images && validated.images.length > 0 ? {
-          create: validated.images.map((url, idx) => ({
+          create: validated.images.map((url: string, idx: number) => ({
             url,
             sortOrder: idx,
           })),

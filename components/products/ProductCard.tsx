@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatGHS } from '@/lib/utils';
-import { Phone, MessageCircle, Building2, Eye, Images } from 'lucide-react';
+import { Building2, Eye, Images, Bookmark, BookmarkCheck, Truck, StoreIcon } from 'lucide-react';
 import ProductModal from '@/components/products/ProductModal';
 
 export interface ProductItemProps {
@@ -21,6 +21,8 @@ export interface ProductItemProps {
     whatsappPhone?: string | null;
     location?: string | null;
     productCategory?: string;
+    hasDelivery?: boolean;
+    deliveryRange?: string | null;
     business: {
       name: string;
       slug: string;
@@ -34,12 +36,21 @@ export interface ProductItemProps {
 
 export default function ProductCard({ product }: ProductItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [savingLoading, setSavingLoading] = useState(false);
 
   const discount =
     product.discountPercentage ||
     (product.originalPrice && product.originalPrice > product.price
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
       : null);
+
+  useEffect(() => {
+    fetch(`/api/v1/products/${product.id}/save`)
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setSaved(d.saved); })
+      .catch(() => null);
+  }, [product.id]);
 
   const trackView = () => {
     fetch(`/api/v1/products/${product.id}/view`, { method: 'POST', keepalive: true }).catch(() => null);
@@ -50,11 +61,17 @@ export default function ProductCard({ product }: ProductItemProps) {
     setIsModalOpen(true);
   };
 
-  const sellerPhone = product.whatsappPhone || product.business?.whatsapp || product.business?.phone;
-  const formattedPhone = sellerPhone?.replace(/[^0-9+]/g, '');
-
-  const whatsappMessage = encodeURIComponent(`Hi, I am interested in buying "${product.title}" listed on Perennial Link Ventures.`);
-  const whatsappUrl = formattedPhone ? `https://wa.me/${formattedPhone.replace(/^\+/, '')}?text=${whatsappMessage}` : null;
+  const handleSave = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSavingLoading(true);
+    try {
+      const res = await fetch(`/api/v1/products/${product.id}/save`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) setSaved(data.saved);
+      else if (res.status === 401) window.location.href = '/login?next=' + window.location.pathname;
+    } catch { /* silent */ }
+    setSavingLoading(false);
+  };
 
   const imageCount = product.images && product.images.length > 0 ? product.images.length : (product.image ? 1 : 0);
 
@@ -62,8 +79,20 @@ export default function ProductCard({ product }: ProductItemProps) {
     <>
       <article
         onClick={handleCardClick}
-        className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-200 flex flex-col h-full group cursor-pointer"
+        className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-200 flex flex-col h-full group cursor-pointer relative"
       >
+        {/* Save/Bookmark Button */}
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={savingLoading}
+          className={`absolute top-2 right-2 z-20 p-1.5 rounded-full shadow-md transition-all ${saved ? 'bg-amber-400 text-white' : 'bg-white/90 text-slate-500 hover:bg-amber-50 hover:text-amber-500'}`}
+          aria-label={saved ? 'Unsave product' : 'Save product'}
+          title={saved ? 'Saved!' : 'Save this product'}
+        >
+          {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+        </button>
+
         {/* Product Image */}
         <div className="relative aspect-square bg-slate-50 overflow-hidden">
           <Image
@@ -79,19 +108,19 @@ export default function ProductCard({ product }: ProductItemProps) {
           />
 
           {discount && (
-            <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-md leading-tight shadow-sm z-10">
+            <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-md leading-tight shadow-sm z-10">
               -{discount}%
             </span>
           )}
 
           {imageCount > 1 && (
-            <span className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1 z-10 shadow-sm">
+            <span className="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1 z-10 shadow-sm">
               <Images className="w-3 h-3 text-amber-300" /> {imageCount} photos
             </span>
           )}
 
           {product.location && (
-            <span className="absolute bottom-2 left-2 bg-slate-900/70 backdrop-blur-xs text-white text-[10px] font-medium px-2 py-0.5 rounded-full z-10">
+            <span className="absolute bottom-2 right-2 bg-slate-900/70 backdrop-blur-xs text-white text-[10px] font-medium px-2 py-0.5 rounded-full z-10">
               📍 {product.location}
             </span>
           )}
@@ -99,7 +128,7 @@ export default function ProductCard({ product }: ProductItemProps) {
           {/* Quick Hover Overlay */}
           <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
             <span className="bg-slate-900/85 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-amber-300" /> Click to view larger
+              <Eye className="w-3.5 h-3.5 text-amber-300" /> Click to view
             </span>
           </div>
         </div>
@@ -119,6 +148,18 @@ export default function ProductCard({ product }: ProductItemProps) {
             <p className="text-[11px] text-slate-400 font-medium">Individual Seller</p>
           )}
 
+          {/* Delivery Badge */}
+          {product.hasDelivery ? (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5 w-fit">
+              <Truck className="w-3 h-3" />
+              {product.deliveryRange || 'Delivery available'}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-400 w-fit">
+              <StoreIcon className="w-3 h-3" /> Pickup only
+            </span>
+          )}
+
           <div className="mt-auto pt-1 flex items-baseline justify-between">
             <div>
               <p className="text-sm font-black text-slate-900">
@@ -130,21 +171,19 @@ export default function ProductCard({ product }: ProductItemProps) {
             </div>
           </div>
 
-          {/* Direct WhatsApp Contact Seller Button */}
-          {whatsappUrl ? (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+          {/* Contact Seller → goes to business profile, NOT WhatsApp */}
+          {product.business ? (
+            <Link
+              href={`/business/${product.business.slug}`}
               onClick={(e) => {
                 e.stopPropagation();
                 trackView();
               }}
-              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 rounded-xl py-2 px-2 hover:bg-emerald-600 hover:text-white transition-colors shadow-2xs"
+              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-bold text-sea bg-sky-50 rounded-xl py-2 px-2 hover:bg-sea hover:text-white transition-colors shadow-2xs"
             >
-              <MessageCircle className="w-3.5 h-3.5 fill-emerald-700 hover:fill-white text-emerald-800" />
+              <Building2 className="w-3.5 h-3.5" />
               <span>Contact Seller</span>
-            </a>
+            </Link>
           ) : (
             <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1 text-[11px] font-bold text-sky-800 bg-sky-50 rounded-xl py-2 px-2">
               <Eye className="w-3.5 h-3.5" />
