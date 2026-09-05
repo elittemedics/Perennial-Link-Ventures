@@ -28,6 +28,9 @@ import { formatDate } from '@/lib/utils';
 import ClientInquiryForm from './ClientInquiryForm';
 import ClientReviewForm from './ClientReviewForm';
 import ProductCard from '@/components/products/ProductCard';
+import FollowBusinessButton from '@/components/business/FollowBusinessButton';
+import SafetyTipsCard from '@/components/business/SafetyTipsCard';
+import OwnerMessagesSection from '@/components/business/OwnerMessagesSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,6 +107,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
         services: true,
         socialLinks: true,
         gallery: true,
+        followers: true,
         reviews: {
           where: { isApproved: true },
           include: { user: { select: { name: true, image: true } } },
@@ -206,6 +210,11 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                     </Badge>
                   )}
                   {business.isFeatured && <Badge variant="warning">Featured</Badge>}
+                  <FollowBusinessButton
+                    businessId={business.id}
+                    businessName={business.name}
+                    initialFollowerCount={business.followers?.length || 0}
+                  />
                 </div>
 
                 <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -221,9 +230,11 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                     {business.address}, {business.city}
                   </span>
                   <div className="flex items-center gap-1 text-amber-500 font-bold">
-                    <Star className="w-4 h-4 fill-amber-400" />
-                    <span>{business.avgRating?.toFixed(1) || '5.0'}</span>
-                    <span className="text-slate-400 font-normal">({business.totalReviews || 0} reviews)</span>
+                    <Star className={`w-4 h-4 ${(business.totalReviews || 0) > 0 ? 'fill-amber-400' : 'text-slate-300'}`} />
+                    <span>{(business.totalReviews || 0) > 0 ? business.avgRating?.toFixed(1) : 'No reviews yet'}</span>
+                    {(business.totalReviews || 0) > 0 && (
+                      <span className="text-slate-400 font-normal">({business.totalReviews} reviews)</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -306,16 +317,19 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                   <Package className="w-6 h-6 text-sea" /> Product Catalog &amp; Deals ({business.products.length})
                 </h3>
 
-                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                   {business.products.map((ps: any) => (
                     <ProductCard
                       key={ps.id}
+                      directContact={true}
+                      hideBusinessInfo={true}
                       product={{
                         ...ps,
                         business: {
                           name: business.name,
                           slug: business.slug,
                           phone: business.phone,
+                          whatsapp: business.whatsapp || business.phone,
                           isVerified: business.isVerified,
                           cityName: business.cityName,
                         },
@@ -325,6 +339,9 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                 </div>
               </div>
             )}
+
+            {/* Owner Direct Inquiries & Messages Panel (Visible to Business Owner) */}
+            <OwnerMessagesSection businessId={business.id} businessName={business.name} />
 
             {/* Photo Gallery Lightbox Grid */}
             {business.gallery?.length > 0 && (
@@ -353,13 +370,19 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">Customer Reviews</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <div className="flex text-amber-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-5 h-5 ${i < Math.round(business.avgRating || 5) ? 'fill-amber-400' : 'text-slate-300'}`} />
-                      ))}
-                    </div>
-                    <span className="font-bold text-slate-900 text-lg">{business.avgRating?.toFixed(1) || '5.0'}</span>
-                    <span className="text-slate-500 text-sm">out of 5 ({business.reviews.length} reviews)</span>
+                    {business.reviews.length > 0 ? (
+                      <>
+                        <div className="flex text-amber-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`w-5 h-5 ${i < Math.round(business.avgRating || 5) ? 'fill-amber-400' : 'text-slate-300'}`} />
+                          ))}
+                        </div>
+                        <span className="font-bold text-slate-900 text-lg">{business.avgRating?.toFixed(1) || '5.0'}</span>
+                        <span className="text-slate-500 text-sm">out of 5 ({business.reviews.length} reviews)</span>
+                      </>
+                    ) : (
+                      <span className="text-slate-500 text-sm font-medium">No customer reviews yet (0 reviews)</span>
+                    )}
                   </div>
                 </div>
 
@@ -393,8 +416,11 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
 
           </div>
 
-          {/* Right Sidebar - Hours & Contact Form */}
+          {/* Right Sidebar - Safety, Hours & Contact Form */}
           <div className="space-y-6">
+
+            {/* Buyer Safety Tips & Report / Mark Unavailable Actions */}
+            <SafetyTipsCard businessId={business.id} businessName={business.name} />
             
             {/* Opening Hours Widget */}
             <Card className="p-6 space-y-4">

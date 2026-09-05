@@ -256,9 +256,13 @@ export default async function ListingsPage(props: ListingsPageProps) {
 
                   <div className="p-3 pt-0 border-t border-slate-100 flex items-center justify-between mt-2">
                     <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      <span className="font-bold text-xs text-slate-800">{b.avgRating?.toFixed(1) || '5.0'}</span>
-                      <span className="text-[11px] text-slate-400">({b.totalReviews || 0})</span>
+                      <Star className={`w-3.5 h-3.5 ${(b.totalReviews || 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                      <span className="font-bold text-xs text-slate-800">
+                        {(b.totalReviews || 0) > 0 ? b.avgRating?.toFixed(1) : 'New'}
+                      </span>
+                      {(b.totalReviews || 0) > 0 && (
+                        <span className="text-[11px] text-slate-400">({b.totalReviews})</span>
+                      )}
                     </div>
 
                     <Link href={`/business/${b.slug}`}>

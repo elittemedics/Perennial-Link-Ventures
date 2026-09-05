@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package, ShoppingBag } from 'lucide-react';
+import { PlusCircle, User, LogOut, LayoutDashboard, Menu, X, Package, ShoppingBag, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
@@ -117,9 +117,9 @@ export default function Navbar() {
             <button
               type="button"
               onClick={handleSellClick}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-sm font-bold shadow-sm transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-slate-950 hover:bg-navy text-gold-300 hover:text-gold-200 border border-gold/40 px-4 py-2 text-sm font-black shadow-sm transition-all"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4 text-gold-400" />
               Sell
             </button>
 
@@ -168,6 +168,15 @@ export default function Navbar() {
                     >
                       <LayoutDashboard className="w-4 h-4 text-sea" />
                       Dashboard
+                    </Link>
+
+                    <Link
+                      href="/account/messages"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <MessageSquare className="w-4 h-4 text-sea" />
+                      Messages &amp; Inquiries
                     </Link>
 
                     {role === 'BUSINESS_OWNER' && (
@@ -225,9 +234,9 @@ export default function Navbar() {
             <button
               type="button"
               onClick={handleSellClick}
-              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 text-xs font-bold shadow-sm transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg bg-slate-950 hover:bg-navy text-gold-300 border border-gold/40 px-2.5 py-1.5 text-xs font-black shadow-sm transition-all"
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
+              <ShoppingBag className="w-3.5 h-3.5 text-gold-400" />
               Sell
             </button>
             <button

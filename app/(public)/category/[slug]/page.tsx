@@ -120,8 +120,8 @@ export default async function CategoryDetailPage(props: CategoryPageProps) {
                 <p className="text-slate-600 text-xs line-clamp-2">{b.description}</p>
                 <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                   <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
-                    <Star className="w-4 h-4 fill-amber-400" />
-                    <span>{b.avgRating.toFixed(1)}</span>
+                    <Star className={`w-4 h-4 ${(b.totalReviews || 0) > 0 ? 'fill-amber-400' : 'text-slate-300'}`} />
+                    <span>{(b.totalReviews || 0) > 0 ? b.avgRating.toFixed(1) : 'New'}</span>
                   </div>
                   <Link href={`/business/${b.slug}`}>
                     <Button variant="primary" size="sm">

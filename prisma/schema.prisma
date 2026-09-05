@@ -146,9 +146,12 @@ model User {
   adminLogs          AdminLog[]          @relation("AdminUser")
   auditLogs          AuditLog[]
   products           BusinessProduct[]   @relation("ProductOwner")
-  productMessages    ProductMessage[]
-  savedProducts      SavedProduct[]
-  productReports     ProductReport[]     @relation("ProductReporter")
+  sentProductMessages     ProductMessage[]    @relation("SentProductMessages")
+  receivedProductMessages ProductMessage[]    @relation("ReceivedProductMessages")
+  savedProducts           SavedProduct[]
+  productReports          ProductReport[]     @relation("ProductReporter")
+  followingBusinesses     BusinessFollow[]    @relation("UserFollowedBusinesses")
+  businessReports         BusinessReport[]    @relation("UserBusinessReports")
 
   @@index([email])
   @@index([role])
@@ -411,6 +414,8 @@ model Business {
   favorites        Favorite[]
   bookmarks        Bookmark[]
   inquiries        InquiryMessage[]
+  followers        BusinessFollow[]
+  reports          BusinessReport[]
   businessViews    BusinessView[]
   businessClicks   BusinessClick[]
 
@@ -635,16 +640,51 @@ model ProductMessage {
   productId  String   @db.Uuid
   businessId String?  @db.Uuid
   senderId   String   @db.Uuid
+  receiverId String?  @db.Uuid
+  replyToId  String?  @db.Uuid
   message    String   @db.Text
   isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
 
   product  BusinessProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sender   User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  sender   User            @relation("SentProductMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User?           @relation("ReceivedProductMessages", fields: [receiverId], references: [id], onDelete: SetNull)
 
   @@index([productId])
   @@index([senderId])
+  @@index([receiverId])
   @@index([businessId])
+}
+
+model BusinessFollow {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @db.Uuid
+  businessId String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  user     User     @relation("UserFollowedBusinesses", fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
+}
+
+model BusinessReport {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId    String   @db.Uuid
+  reporterId    String?  @db.Uuid
+  reportType    String   @default("ABUSE") // "ABUSE" | "UNAVAILABLE" | "FRAUD" | "OTHER"
+  reason        String?  @db.Text
+  reporterName  String?
+  reporterEmail String?
+  createdAt     DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  reporter User?    @relation("UserBusinessReports", fields: [reporterId], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([reporterId])
 }
 
 model SavedProduct {

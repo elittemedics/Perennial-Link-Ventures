@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatGHS } from '@/lib/utils';
-import { Building2, Eye, Images, Bookmark, BookmarkCheck, Truck, StoreIcon } from 'lucide-react';
+import { Building2, Eye, Images, Bookmark, BookmarkCheck, Truck, StoreIcon, MessageCircle } from 'lucide-react';
 import ProductModal from '@/components/products/ProductModal';
 
 export interface ProductItemProps {
@@ -32,9 +32,11 @@ export interface ProductItemProps {
       cityName?: string;
     } | null;
   };
+  directContact?: boolean;
+  hideBusinessInfo?: boolean;
 }
 
-export default function ProductCard({ product }: ProductItemProps) {
+export default function ProductCard({ product, directContact = false, hideBusinessInfo = false }: ProductItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saved, setSaved] = useState(false);
   const [savingLoading, setSavingLoading] = useState(false);
@@ -75,6 +77,15 @@ export default function ProductCard({ product }: ProductItemProps) {
 
   const imageCount = product.images && product.images.length > 0 ? product.images.length : (product.image ? 1 : 0);
 
+  const sellerPhone = product.whatsappPhone || product.business?.whatsapp || product.business?.phone;
+  const formattedPhone = sellerPhone?.replace(/[^0-9+]/g, '');
+  const whatsappMessage = encodeURIComponent(
+    `Hi, I am interested in buying "${product.title}" listed on Perennial Link Ventures.`
+  );
+  const whatsappUrl = formattedPhone
+    ? `https://wa.me/${formattedPhone.replace(/^\+/, '')}?text=${whatsappMessage}`
+    : '#';
+
   return (
     <>
       <article
@@ -103,8 +114,8 @@ export default function ProductCard({ product }: ProductItemProps) {
             }
             alt={product.title}
             fill
-            sizes="(max-width: 640px) 48vw, (max-width: 1024px) 25vw, 17vw"
-            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 640px) 48vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
 
           {discount && (
@@ -139,13 +150,15 @@ export default function ProductCard({ product }: ProductItemProps) {
             {product.title}
           </h3>
 
-          {product.business ? (
-            <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1 line-clamp-1">
-              <Building2 className="w-3 h-3 text-sea shrink-0" />
-              <span>{product.business.name}</span>
-            </p>
-          ) : (
-            <p className="text-[11px] text-slate-400 font-medium">Individual Seller</p>
+          {!hideBusinessInfo && (
+            product.business ? (
+              <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1 line-clamp-1">
+                <Building2 className="w-3 h-3 text-sea shrink-0" />
+                <span>{product.business.name}</span>
+              </p>
+            ) : (
+              <p className="text-[11px] text-slate-400 font-medium">Individual Seller</p>
+            )
           )}
 
           {/* Delivery Badge */}
@@ -171,8 +184,22 @@ export default function ProductCard({ product }: ProductItemProps) {
             </div>
           </div>
 
-          {/* Contact Seller → goes to business profile, NOT WhatsApp */}
-          {product.business ? (
+          {/* Contact Seller button: WhatsApp directly if on business profile (directContact), else profile link */}
+          {directContact && whatsappUrl !== '#' ? (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                trackView();
+              }}
+              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-bold text-white bg-emerald-600 rounded-xl py-2 px-2 hover:bg-emerald-500 transition-colors shadow-2xs"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>Contact Seller</span>
+            </a>
+          ) : product.business ? (
             <Link
               href={`/business/${product.business.slug}`}
               onClick={(e) => {
@@ -197,6 +224,7 @@ export default function ProductCard({ product }: ProductItemProps) {
       {isModalOpen && (
         <ProductModal
           product={product}
+          directContact={directContact}
           onClose={() => setIsModalOpen(false)}
         />
       )}

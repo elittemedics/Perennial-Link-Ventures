@@ -425,17 +425,6 @@ async function main() {
       });
     }
 
-    // Sample Reviews
-    await db.review.create({
-      data: {
-        businessId: business.id,
-        userId: visitorUser.id,
-        rating: 5,
-        title: 'Outstanding Global Service',
-        comment: 'Working with this business enabled our cross-border international team to expand exponentially.',
-        isApproved: true,
-      },
-    });
   }
 
   // 7. Seed Site Settings

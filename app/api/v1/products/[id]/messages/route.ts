@@ -22,9 +22,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const messages = await db.productMessage.findMany({
       where: isOwner
         ? { productId: id }
-        : { productId: id, senderId: user.id },
+        : {
+            productId: id,
+            OR: [
+              { senderId: user.id },
+              { receiverId: user.id },
+            ],
+          },
       include: {
         sender: { select: { id: true, name: true, image: true } },
+        receiver: { select: { id: true, name: true, image: true } },
       },
       orderBy: { createdAt: 'asc' },
     });
@@ -51,19 +58,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const product = await db.businessProduct.findUnique({
       where: { id },
-      select: { businessId: true },
+      select: { businessId: true, ownerId: true, business: { select: { ownerId: true } } },
     });
     if (!product) return NextResponse.json({ success: false, error: 'Product not found.' }, { status: 404 });
+
+    const isOwner =
+      product.ownerId === user.id ||
+      (product.business?.ownerId === user.id);
+
+    const receiverId = isOwner
+      ? body.receiverId || null
+      : product.ownerId || product.business?.ownerId || null;
 
     const created = await db.productMessage.create({
       data: {
         productId: id,
         businessId: product.businessId ?? null,
         senderId: user.id,
+        receiverId,
+        replyToId: body.replyToId || null,
         message,
       },
       include: {
         sender: { select: { id: true, name: true, image: true } },
+        receiver: { select: { id: true, name: true, image: true } },
       },
     });
 

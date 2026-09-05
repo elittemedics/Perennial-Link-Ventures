@@ -37,6 +37,7 @@ export interface ProductModalProps {
     } | null;
   } | null;
   onClose: () => void;
+  directContact?: boolean;
 }
 
 type MessageItem = {
@@ -46,7 +47,7 @@ type MessageItem = {
   sender: { id: string; name: string | null; image: string | null };
 };
 
-export default function ProductModal({ product, onClose }: ProductModalProps) {
+export default function ProductModal({ product, onClose, directContact = false }: ProductModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [saved, setSaved] = useState(false);
   const [savingLoading, setSavingLoading] = useState(false);
@@ -367,10 +368,28 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             </div>
           )}
 
-          {/* ─── Contact Actions (on business profile) ─── */}
+          {/* ─── Contact Actions ─── */}
           <div className="space-y-2 pt-2 border-t border-slate-100">
-            {/* Goes to WhatsApp only from the business profile page; here we link to profile */}
-            {product.business ? (
+            {directContact && formattedPhone ? (
+              <>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-all text-sm"
+                >
+                  <MessageCircle className="w-5 h-5 fill-white text-emerald-600" />
+                  Chat on WhatsApp with Seller
+                </a>
+                <a
+                  href={`tel:${formattedPhone}`}
+                  className="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 px-4 rounded-xl transition-colors text-xs"
+                >
+                  <Phone className="w-4 h-4 text-slate-600" />
+                  Call Seller ({sellerPhone})
+                </a>
+              </>
+            ) : product.business ? (
               <Link
                 href={`/business/${product.business.slug}`}
                 onClick={onClose}
