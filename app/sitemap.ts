@@ -20,11 +20,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const products = await db.businessProduct.findMany({
-      where: { isAvailable: true },
-      select: { id: true, createdAt: true },
-      take: 1000,
-    });
+    const [products, businesses, categories] = await Promise.all([
+      db.businessProduct.findMany({
+        where: { isAvailable: true },
+        select: { id: true, createdAt: true },
+        take: 5000,
+      }),
+      db.business.findMany({
+        where: { status: 'APPROVED', deletedAt: null },
+        select: { slug: true, updatedAt: true, isFeatured: true },
+        take: 5000,
+      }),
+      db.category.findMany({
+        select: { slug: true, updatedAt: true },
+        take: 1000,
+      }),
+    ]);
 
     const productEntries: MetadataRoute.Sitemap = products.map((p) => ({
       url: `${baseUrl}/product/${p.id}`,
@@ -33,7 +44,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    return [...staticEntries, ...productEntries];
+    const businessEntries: MetadataRoute.Sitemap = businesses.map((b) => ({
+      url: `${baseUrl}/business/${b.slug}`,
+      lastModified: b.updatedAt,
+      changeFrequency: 'weekly',
+      priority: b.isFeatured ? 0.9 : 0.8,
+    }));
+
+    const categoryEntries: MetadataRoute.Sitemap = categories.map((c) => ({
+      url: `${baseUrl}/category/${c.slug}`,
+      lastModified: c.updatedAt || now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
+
+    return [...staticEntries, ...businessEntries, ...categoryEntries, ...productEntries];
   } catch {
     return staticEntries;
   }
