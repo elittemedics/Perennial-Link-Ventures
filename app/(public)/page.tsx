@@ -168,52 +168,6 @@ export default async function HomePage() {
 
 
       {/* ═══════════════════════════════════════════════════════════
-          5. TRENDING PRODUCTS — Jumia-style responsive grid
-         ═══════════════════════════════════════════════════════════ */}
-      <section className="hidden" aria-hidden="true">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <Badge variant="info" className="mb-2 px-3 py-1 text-xs">Fresh listings</Badge>
-              <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Latest products</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Browse products quickly, then open the business profile to view and contact the seller.
-              </p>
-            </div>
-            <Link href="/products">
-              <Button variant="outline" className="gap-2 rounded-xl shrink-0">
-                View All Products <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-
-          {trendingProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              {trendingProducts.map((prod) => (
-                <ProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {JUMIA_CATS.slice(0, 6).map(({ name, slug, Icon, color }) => (
-                <Link key={slug} href={`/products?category=${encodeURIComponent(name)}`}>
-                  <div className="card-3d group flex items-center gap-4 p-5 bg-gradient-to-br from-slate-50 to-sky-50/30 rounded-2xl border border-slate-200 hover:border-sea/30 shadow-sm cursor-pointer">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform`}>
-                      <Icon className="w-7 h-7 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 group-hover:text-sea transition-colors">{name}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Tap to browse products →</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
           6. BUSINESS REGISTRATION CTA — Dark 3D panel
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative bg-slate-950 py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
