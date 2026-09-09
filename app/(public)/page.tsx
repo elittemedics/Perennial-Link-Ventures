@@ -4,9 +4,6 @@ import Image from 'next/image';
 import db from '@/lib/db';
 import {
   Search, Phone, ArrowRight, Star, ShieldCheck, Sparkles,
-  Smartphone, Tv, Laptop, Armchair, Refrigerator, Shirt,
-  ShoppingCart, Gamepad2, Baby, Dumbbell, MoreHorizontal, HeartPulse, Car, BriefcaseBusiness,
-  UtensilsCrossed,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,23 +15,7 @@ import CategoryTabDropdown from '@/components/home/CategoryTabDropdown';
 export const dynamic = 'force-dynamic';
 
 
-const JUMIA_CATS = [
-  { name: 'Supermarket',       slug: 'supermarket',       Icon: ShoppingCart,    color: 'from-amber-500 to-orange-500' },
-  { name: 'Food & Beverages',  slug: 'food-beverages',    Icon: UtensilsCrossed, color: 'from-green-500 to-emerald-600' },
-  { name: 'Phones & Tablets',  slug: 'phones-tablets',    Icon: Smartphone,      color: 'from-blue-500 to-sky-600' },
-  { name: 'Health & Beauty',   slug: 'health-beauty',     Icon: HeartPulse,      color: 'from-pink-500 to-rose-500' },
-  { name: 'Home & Office',     slug: 'home-office',       Icon: Armchair,        color: 'from-emerald-500 to-teal-600' },
-  { name: 'Cars & Vehicles',   slug: 'cars-vehicles',     Icon: Car,             color: 'from-slate-500 to-slate-700' },
-  { name: 'Services',          slug: 'services',          Icon: BriefcaseBusiness, color: 'from-rose-500 to-pink-600' },
-  { name: 'Appliances',        slug: 'appliances',        Icon: Refrigerator,    color: 'from-cyan-500 to-blue-600' },
-  { name: 'Electronics',       slug: 'electronics',       Icon: Tv,              color: 'from-violet-500 to-purple-600' },
-  { name: 'Computing',         slug: 'computing',         Icon: Laptop,          color: 'from-indigo-500 to-blue-600' },
-  { name: 'Fashion',           slug: 'fashion',           Icon: Shirt,           color: 'from-fuchsia-500 to-pink-600' },
-  { name: 'Sporting Goods',    slug: 'sporting-goods',    Icon: Dumbbell,        color: 'from-orange-500 to-red-500' },
-  { name: 'Baby Products',     slug: 'baby-products',     Icon: Baby,            color: 'from-sky-400 to-cyan-500' },
-  { name: 'Gaming',            slug: 'gaming',            Icon: Gamepad2,        color: 'from-purple-600 to-indigo-600' },
-  { name: 'Other categories',  slug: 'other-categories',  Icon: MoreHorizontal,  color: 'from-slate-500 to-slate-600' },
-];
+
 
 export default async function HomePage() {
   let trendingProducts: any[] = [];
@@ -184,44 +165,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-f8fafc py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-10">
-          <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
-            <div className="space-y-3">
-              <Badge variant="info" className="px-4">Shop By Category</Badge>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Explore Marketplace Categories
-              </h2>
-              <p className="text-slate-500 text-sm sm:text-base max-w-2xl">
-                Find products from verified Ghanaian companies by category, then contact the seller directly.
-              </p>
-            </div>
-            <Link href="/products">
-              <Button variant="outline" className="shrink-0 gap-2 rounded-xl font-bold">
-                View All Products <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
 
-          <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/50 sm:p-4">
-            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-            {JUMIA_CATS.map(({ name, slug, Icon, color }) => (
-              <Link key={slug} href={`/products?category=${encodeURIComponent(name)}`}>
-                <div className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-all hover:bg-gold-50 hover:shadow-sm sm:px-4">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105`}>
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="flex-1 text-left text-sm font-bold text-slate-700 group-hover:text-navy transition-colors">
-                    {name}
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-gold-600" />
-                </div>
-              </Link>
-            ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════════════════════════════════════════════════════
           5. TRENDING PRODUCTS — Jumia-style responsive grid
