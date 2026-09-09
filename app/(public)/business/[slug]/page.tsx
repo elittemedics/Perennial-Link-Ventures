@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
 import { Card } from '@/components/ui/card';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatWhatsAppNumber } from '@/lib/utils';
 import ClientInquiryForm from './ClientInquiryForm';
 import ClientReviewForm from './ClientReviewForm';
 import ProductCard from '@/components/products/ProductCard';
@@ -166,7 +166,8 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
       })),
     }),
   };
-  const whatsappNumber = business.whatsapp?.replace(/\D/g, '');
+  const whatsappNumber = formatWhatsAppNumber(business.whatsapp || business.phone);
+
   const hasPhone = business.phone && business.phone !== 'Not provided';
   const hasEmail = business.email && business.email !== 'Not provided';
 

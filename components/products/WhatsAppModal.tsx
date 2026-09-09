@@ -5,7 +5,7 @@ import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageSquare, PhoneCall, ExternalLink } from 'lucide-react';
-import { formatGHS } from '@/lib/utils';
+import { formatGHS, formatWhatsAppNumber } from '@/lib/utils';
 
 export interface WhatsAppModalProps {
   isOpen: boolean;
@@ -23,13 +23,8 @@ export interface WhatsAppModalProps {
 
 export default function WhatsAppModal({ isOpen, onClose, product }: WhatsAppModalProps) {
   const defaultPhone = product.whatsappPhone || product.phone || '0594772823';
-  const cleanPhone = defaultPhone.replace(/[^0-9]/g, '');
-  // Format international number for Ghana (233)
-  const formattedWhatsApp = cleanPhone.startsWith('0')
-    ? `233${cleanPhone.slice(1)}`
-    : cleanPhone.startsWith('233')
-    ? cleanPhone
-    : `233${cleanPhone}`;
+  const formattedWhatsApp = formatWhatsAppNumber(defaultPhone);
+
 
   const [note, setNote] = useState('');
 

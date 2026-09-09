@@ -8,9 +8,16 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
 
 export const metadata: Metadata = {
   icons: {
-    icon: [{ url: '/icon.png', type: 'image/png' }],
-    apple: [{ url: '/apple-icon.png', type: 'image/png' }],
+    icon: [
+      { url: '/icon.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
+
   title: {
     default: 'Perennial Link Ventures | Ghana Business Directory',
     template: '%s | Perennial Link Ventures',

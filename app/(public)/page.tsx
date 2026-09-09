@@ -13,8 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import ProductCard from '@/components/products/ProductCard';
 import { BusinessBrandFallback } from '@/components/common/BusinessBrandFallback';
+import CategoryTabDropdown from '@/components/home/CategoryTabDropdown';
 
 export const dynamic = 'force-dynamic';
+
 
 const JUMIA_CATS = [
   { name: 'Supermarket',       slug: 'supermarket',       Icon: ShoppingCart,    color: 'from-amber-500 to-orange-500' },
@@ -116,12 +118,16 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col gap-5">
             <div>
-              <Badge variant="info" className="mb-2 px-3 py-1 text-xs">Fresh listings</Badge>
+              <CategoryTabDropdown />
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant="info" className="px-3 py-1 text-xs">Fresh listings</Badge>
+              </div>
               <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Latest products</h2>
               <p className="mt-1 text-sm text-slate-500 max-w-2xl">
                 Browse products quickly, then open the business profile to view and contact the seller to buy products.
               </p>
             </div>
+
 
             {/* Search Bar */}
             <form action="/search" method="GET" className="max-w-2xl w-full">

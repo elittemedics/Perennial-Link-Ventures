@@ -12,16 +12,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/dashboard/',
           '/api/',
-          // Block noisy search/filter params that create duplicate content
-          '/*?q=',
-          '/*?page=',
-          '/*?category=',
-          '/*?city=',
-          '/*?rating=',
         ],
       },
       {
-        // Block GPTBot / AI scrapers from training on content
         userAgent: 'GPTBot',
         disallow: ['/'],
       },
@@ -38,7 +31,9 @@ export default function robots(): MetadataRoute.Robots {
       `${baseUrl}/sitemap.xml`,
       `${baseUrl}/sitemap-businesses.xml`,
       `${baseUrl}/sitemap-categories.xml`,
+      `${baseUrl}/sitemap-products.xml`,
     ],
     host: baseUrl,
   };
 }
+

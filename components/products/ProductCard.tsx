@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { formatGHS } from '@/lib/utils';
+import { formatGHS, formatWhatsAppNumber } from '@/lib/utils';
 import { Building2, Eye, Images, Bookmark, BookmarkCheck, Truck, StoreIcon, MessageCircle } from 'lucide-react';
 import ProductModal from '@/components/products/ProductModal';
 
@@ -78,13 +78,14 @@ export default function ProductCard({ product, directContact = false, hideBusine
   const imageCount = product.images && product.images.length > 0 ? product.images.length : (product.image ? 1 : 0);
 
   const sellerPhone = product.whatsappPhone || product.business?.whatsapp || product.business?.phone;
-  const formattedPhone = sellerPhone?.replace(/[^0-9+]/g, '');
+  const formattedPhone = formatWhatsAppNumber(sellerPhone);
   const whatsappMessage = encodeURIComponent(
     `Hi, I am interested in buying "${product.title}" listed on Perennial Link Ventures.`
   );
   const whatsappUrl = formattedPhone
-    ? `https://wa.me/${formattedPhone.replace(/^\+/, '')}?text=${whatsappMessage}`
+    ? `https://wa.me/${formattedPhone}?text=${whatsappMessage}`
     : '#';
+
 
   return (
     <>

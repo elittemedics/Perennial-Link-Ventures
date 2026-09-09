@@ -56,3 +56,23 @@ export function truncate(text: string, length: number): string {
   if (text.length <= length) return text;
   return text.slice(0, length) + '...';
 }
+
+export function formatWhatsAppNumber(phone: string | null | undefined): string {
+  if (!phone) return '';
+  const cleaned = phone.trim();
+  if (!cleaned) return '';
+  
+  // Remove non-digits except leading +
+  let digits = cleaned.replace(/[^0-9+]/g, '');
+  if (digits.startsWith('+')) {
+    digits = digits.slice(1);
+  }
+  
+  // If starts with 0 (e.g. Ghana local number 0594772823 -> 233594772823)
+  if (digits.startsWith('0')) {
+    return `233${digits.slice(1)}`;
+  }
+  
+  return digits;
+}
+

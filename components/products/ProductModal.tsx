@@ -9,7 +9,7 @@ import {
   Truck, StoreIcon, Send, AlertTriangle, EyeOff, Flag, CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatGHS } from '@/lib/utils';
+import { formatGHS, formatWhatsAppNumber } from '@/lib/utils';
 
 export interface ProductModalProps {
   product: {
@@ -72,6 +72,21 @@ export default function ProductModal({ product, onClose, directContact = false }
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+      } else if (e.key === 'ArrowRight') {
+        setActiveImageIndex((prev) => (prev + 1) % allImages.length);
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [product]);
+
   if (!product) return null;
 
   // Build image list
@@ -85,7 +100,7 @@ export default function ProductModal({ product, onClose, directContact = false }
   const activeImageUrl = allImages[activeImageIndex] || allImages[0];
 
   const sellerPhone = product.whatsappPhone || product.business?.whatsapp || product.business?.phone;
-  const formattedPhone = sellerPhone?.replace(/[^0-9+]/g, '');
+  const formattedPhone = formatWhatsAppNumber(sellerPhone);
 
   const discount =
     product.discountPercentage ||
@@ -97,11 +112,17 @@ export default function ProductModal({ product, onClose, directContact = false }
     `Hi, I am interested in buying "${product.title}" listed on Perennial Link Ventures.`
   );
   const whatsappUrl = formattedPhone
-    ? `https://wa.me/${formattedPhone.replace(/^\+/, '')}?text=${whatsappMessage}`
+    ? `https://wa.me/${formattedPhone}?text=${whatsappMessage}`
     : '#';
 
-  const nextImage = () => setActiveImageIndex((prev) => (prev + 1) % allImages.length);
-  const prevImage = () => setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  const nextImage = (e?: React.MouseEvent | React.TouchEvent) => {
+    if (e) e.stopPropagation();
+    setActiveImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+  const prevImage = (e?: React.MouseEvent | React.TouchEvent) => {
+    if (e) e.stopPropagation();
+    setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -112,12 +133,13 @@ export default function ProductModal({ product, onClose, directContact = false }
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     const dy = Math.abs(e.changedTouches[0].clientY - (touchStartY.current ?? 0));
     if (Math.abs(dx) > 40 && dy < 60) {
-      if (dx < 0) nextImage();
-      else prevImage();
+      if (dx < 0) setActiveImageIndex((prev) => (prev + 1) % allImages.length);
+      else setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
     }
     touchStartX.current = null;
     touchStartY.current = null;
   };
+
 
   // Load save status
   useEffect(() => {
@@ -241,20 +263,27 @@ export default function ProductModal({ product, onClose, directContact = false }
               <>
                 <button
                   type="button"
-                  onClick={prevImage}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white shadow-md transition-colors"
+                  onClick={(e) => { e.stopPropagation(); prevImage(e); }}
+                  onTouchEnd={(e) => { e.stopPropagation(); prevImage(e); }}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-slate-900/80 hover:bg-amber-400 hover:text-slate-950 text-white shadow-xl transition-all border border-white/20 active:scale-90 focus:outline-none"
+                  aria-label="Previous product image"
+                  title="Previous image"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
                 </button>
                 <button
                   type="button"
-                  onClick={nextImage}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white shadow-md transition-colors"
+                  onClick={(e) => { e.stopPropagation(); nextImage(e); }}
+                  onTouchEnd={(e) => { e.stopPropagation(); nextImage(e); }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-slate-900/80 hover:bg-amber-400 hover:text-slate-950 text-white shadow-xl transition-all border border-white/20 active:scale-90 focus:outline-none"
+                  aria-label="Next product image"
+                  title="Next image"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-6 h-6 stroke-[2.5]" />
                 </button>
               </>
             )}
+
           </div>
 
           {/* Thumbnails */}
