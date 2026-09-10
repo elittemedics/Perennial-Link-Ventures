@@ -93,7 +93,7 @@ export default async function HomePage() {
 
 
       {/* ═══════════════════════════════════════════════════════════
-          4. 12 JUMIA CATEGORIES — Clickable, with gradient icons
+          4. MARKETPLACE CATEGORIES — Clickable, with gradient icons
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
         <div className="max-w-7xl mx-auto space-y-8">

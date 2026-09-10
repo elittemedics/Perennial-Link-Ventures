@@ -6,32 +6,44 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        // Allow all well-behaved crawlers to index public content
+        // Allow all standard search engine and shopping crawlers
         userAgent: '*',
-        allow: '/',
+        allow: [
+          '/',
+          '/product/',
+          '/products',
+          '/business/',
+          '/category/',
+          '/categories',
+          '/api/products/feed',
+        ],
         disallow: [
           '/dashboard/',
           '/api/',
         ],
       },
       {
-        userAgent: 'GPTBot',
-        disallow: ['/'],
-      },
-      {
-        userAgent: 'Google-Extended',
-        disallow: ['/'],
-      },
-      {
-        userAgent: 'CCBot',
-        disallow: ['/'],
+        // Explicitly welcome Googlebot and Google Shopping crawlers
+        userAgent: ['Googlebot', 'StoreBot-Google', 'Googlebot-Image', 'Google-InspectionTool', 'Google-Extended'],
+        allow: [
+          '/',
+          '/product/',
+          '/products',
+          '/business/',
+          '/category/',
+          '/categories',
+          '/api/products/feed',
+        ],
+        disallow: [
+          '/dashboard/',
+        ],
       },
     ],
     sitemap: [
       `${baseUrl}/sitemap.xml`,
+      `${baseUrl}/sitemap-products.xml`,
       `${baseUrl}/sitemap-businesses.xml`,
       `${baseUrl}/sitemap-categories.xml`,
-      `${baseUrl}/sitemap-products.xml`,
     ],
     host: baseUrl,
   };

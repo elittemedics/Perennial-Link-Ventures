@@ -23,12 +23,12 @@ export async function generateMetadata(props: CategoryPageProps): Promise<Metada
     select: { name: true, slug: true, description: true },
   });
 
-  if (!category) return { title: 'Category Not Found' };
+  if (!category) return { title: 'Category Not Found | Market PLV' };
 
-  const title = `${category.name} Businesses in Ghana`;
+  const title = `Buy ${category.name} Online — Verified Sellers & Deals | Market PLV`;
   const description =
     category.description ||
-    `Browse verified ${category.name} businesses in Ghana. Find contact details, WhatsApp numbers, and reviews for top ${category.name} providers.`;
+    `Browse and buy ${category.name} online from verified sellers on Market PLV. Check prices, contact sellers directly on WhatsApp or phone, and get fast delivery.`;
   const canonicalUrl = `${baseUrl}/category/${category.slug}`;
 
   return {
@@ -36,14 +36,15 @@ export async function generateMetadata(props: CategoryPageProps): Promise<Metada
     description,
     alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: `${title} | Perennial Link Ventures`,
+      title,
       description,
       url: canonicalUrl,
       type: 'website',
+      siteName: 'Market PLV',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} | Perennial Link Ventures`,
+      title,
       description,
     },
   };

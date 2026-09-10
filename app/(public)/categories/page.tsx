@@ -11,7 +11,7 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-// Hardcoded Jumia categories as guaranteed fallback
+// Top marketplace categories as guaranteed fallback
 const STATIC_CATEGORIES = [
   { name: 'Supermarket',      slug: 'Supermarket',      icon: 'ShoppingCart',    description: 'Groceries, Beverages, Snacks, Food Staples, Household Cleaning Supplies.',       color: 'from-amber-500 to-orange-500', count: 0 },
   { name: 'Food & Beverages', slug: 'Food & Beverages', icon: 'UtensilsCrossed', description: 'Restaurants, Fast Food, Catering, Drinks, Juices, Wines & Spirits, Bakeries.',     color: 'from-green-500 to-emerald-600', count: 0 },

@@ -7,19 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Browse Products from Ghana Businesses',
-  description:
-    'Discover products sold by verified businesses across Ghana on Perennial Link Ventures. Browse by category or search for specific items and contact the seller directly.',
-  alternates: { canonical: '/products' },
-  openGraph: {
-    title: 'Browse Products from Ghana Businesses | Perennial Link Ventures',
-    description:
-      'Find products from verified businesses across Ghana. Search by category, view prices, and contact sellers directly by WhatsApp or phone.',
-    url: '/products',
-  },
-};
-
 export interface ProductsPageProps {
   searchParams: Promise<{
     q?: string;
@@ -29,7 +16,52 @@ export interface ProductsPageProps {
   }>;
 }
 
-const JUMIA_CATEGORIES = [
+export async function generateMetadata(props: ProductsPageProps): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+  const query = searchParams.q?.trim() || '';
+  const category = searchParams.category?.trim() || '';
+
+  let title = 'Online Shopping & Marketplace — Buy Electronics, Phones, Laptops & Deals | Market PLV';
+  let description =
+    'Shop verified products directly from sellers on Market PLV. Browse laptops, phones, electronics, fashion, home appliances, and more with buyer protection and fast delivery.';
+
+  if (query && category) {
+    title = `Buy ${query} in ${category} Online — Best Prices | Market PLV`;
+    description = `Find and buy ${query} in ${category} from verified sellers on Market PLV. Compare prices, chat on WhatsApp, and enjoy secure delivery.`;
+  } else if (query) {
+    title = `Buy ${query} Online — Best Deals & Verified Sellers | Market PLV`;
+    description = `Looking for ${query}? Browse authentic listings with real photos and verified seller contacts on Market PLV.`;
+  } else if (category) {
+    title = `Buy ${category} Online — Best Deals & Verified Sellers | Market PLV`;
+    description = `Explore top deals on ${category} on Market PLV. Connect with trusted sellers directly for quick orders and nationwide delivery.`;
+  }
+
+  const canonicalUrl = category
+    ? `${baseUrl}/products?category=${encodeURIComponent(category)}`
+    : `${baseUrl}/products`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+      siteName: 'Market PLV',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    robots: { index: true, follow: true },
+  };
+}
+
+const POPULAR_CATEGORIES = [
   'Supermarket',
   'Phones & Tablets',
   'Health & Beauty',
@@ -110,61 +142,84 @@ export default async function ProductsPage(props: ProductsPageProps) {
     // Fallback for offline DB
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: selectedCategory
+      ? `Buy ${selectedCategory} Online | Market PLV`
+      : 'Browse Products & Deals | Market PLV',
+    description: 'Verified products available for direct purchase from trusted sellers on Market PLV.',
+    numberOfItems: products.length,
+    itemListElement: products.map((prod, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: prod.title,
+      url: `${baseUrl}/product/${prod.id}`,
+      image: prod.images?.[0]?.url || prod.image || undefined,
+    })),
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* Header Banner */}
-      <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="space-y-2">
-          <Badge className="bg-emerald-600 text-white border-none px-3 py-1">Perennial Link Marketplace</Badge>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Browse Products & Direct Deals</h1>
-          <p className="text-slate-300 text-xs sm:text-sm">
-            Contact business owners directly via WhatsApp or Phone without middleman fees.
-          </p>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        
+        {/* Header Banner */}
+        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <Badge className="bg-emerald-600 text-white border-none px-3 py-1">Market PLV Verified Marketplace</Badge>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Browse Products & Direct Deals</h1>
+            <p className="text-slate-300 text-xs sm:text-sm">
+              Connect directly with verified sellers via WhatsApp or phone. Secure deals and fast delivery.
+            </p>
+          </div>
+
+          <Link href="/register">
+            <Button variant="primary" size="lg" className="rounded-2xl gap-2 font-bold shadow-lg">
+              <ShoppingBag className="w-5 h-5" /> Post Product for Free
+            </Button>
+          </Link>
         </div>
 
-        <Link href="/register">
-          <Button variant="primary" size="lg" className="rounded-2xl gap-2 font-bold shadow-lg">
-            <ShoppingBag className="w-5 h-5" /> Post Product for Free
-          </Button>
-        </Link>
-      </div>
+        <div className="space-y-8">
+          
+          {/* Filter Bar */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <form action="/products" method="GET" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Keyword Search
+                </label>
+                <input
+                  type="text"
+                  name="q"
+                  defaultValue={query}
+                  placeholder="Product, company, phone, email..."
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
+                />
+              </div>
 
-      <div className="space-y-8">
-        
-        {/* Filter Bar */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <form action="/products" method="GET" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                Keyword Search
-              </label>
-              <input
-                type="text"
-                name="q"
-                defaultValue={query}
-                placeholder="Product, company, phone, email..."
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                Select Category
-              </label>
-              <select
-                name="category"
-                defaultValue={selectedCategory}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
-              >
-                <option value="">All Categories</option>
-                {JUMIA_CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Select Category
+                </label>
+                <select
+                  name="category"
+                  defaultValue={selectedCategory}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:border-sea focus:outline-none"
+                >
+                  <option value="">All Categories</option>
+                  {POPULAR_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -209,5 +264,6 @@ export default async function ProductsPage(props: ProductsPageProps) {
 
       </div>
     </div>
+    </>
   );
 }

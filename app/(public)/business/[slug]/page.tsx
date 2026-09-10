@@ -311,7 +311,7 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
               </p>
             </Card>
 
-            {/* Jumia-Style Products Catalog Section */}
+            {/* Products Catalog Section */}
             {business.products?.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">

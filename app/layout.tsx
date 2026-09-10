@@ -19,81 +19,80 @@ export const metadata: Metadata = {
   },
 
   title: {
-    default: 'Perennial Link Ventures | Ghana Business Directory',
-    template: '%s | Perennial Link Ventures',
+    default: 'Market PLV — Global & Regional Online Marketplace | Buy & Sell',
+    template: '%s | Market PLV',
   },
   description:
-    "Ghana's premier verified business directory. Discover, compare, and contact trusted businesses in Accra, Tema, Kumasi & beyond — by WhatsApp, phone, email, or website. Free to list.",
+    'Discover, buy, and sell laptops, phones, electronics, fashion, home appliances, vehicles, and services globally and across Ghana. Contact verified sellers directly via WhatsApp or phone on Market PLV. Best prices, fast delivery, and buyer protection.',
   keywords: [
     // Brand
-    'Perennial Link Ventures',
+    'Market PLV',
     'market-plv.com',
-    // Directory — Ghana
-    'Business Directory Ghana',
-    'Ghana Yellow Pages',
-    'Ghana Business Registry',
-    'Verified Companies Ghana',
-    'Accra Business Listings',
-    'Tuba Weija Businesses',
-    'Greater Accra Business Directory',
-    'Ghana Local Business Search',
-    // Long-tail intent
-    'find businesses in Ghana',
-    'contact businesses on WhatsApp Ghana',
-    'free business listing Ghana',
-    'list my business in Ghana',
-    'Ghana company directory',
+    'Perennial Link Ventures',
+    // High-Intent Buying Queries
+    'buy online',
+    'online shopping',
+    'global online marketplace',
+    'buy laptops online',
+    'buy macbook pro',
+    'buy hp elitebook',
+    'buy microphones online',
+    'buy phones online',
+    'electronics online store',
+    'fashion online store',
+    'verified sellers marketplace',
+    'wholesale and retail suppliers',
+    'direct contact sellers',
+    // Regional & Local High-Ranking Keywords
+    'online shopping Ghana',
     'buy products Ghana online',
-    'Ghana services directory',
-    'verified suppliers Ghana',
-    'local services Accra',
-    'small business Ghana',
-    // Global
-    'global business directory',
-    'free business advertising',
-    'WhatsApp business contact',
+    'Accra marketplace',
+    'Ghana business directory and marketplace',
+    'WhatsApp shopping contact',
+    'verified companies Ghana',
+    'best price in Ghana',
   ],
-  authors: [{ name: 'Perennial Link Ventures' }],
-  creator: 'Perennial Link Ventures',
-  publisher: 'Perennial Link Ventures',
-  category: 'Business Directory',
-  classification: 'Business',
+  authors: [{ name: 'Market PLV (Perennial Link Ventures)' }],
+  creator: 'Market PLV',
+  publisher: 'Market PLV',
+  category: 'Online Marketplace',
+  classification: 'Shopping & E-Commerce',
   metadataBase: new URL(appUrl),
   alternates: {
     canonical: '/',
   },
-  // ── Geo / Local SEO meta tags ─────────────────────────────────────────────
+  // ── Geo / Global & Regional SEO meta tags ─────────────────────────────────
   other: {
     'geo.region': 'GH-AA',
     'geo.placename': 'Accra, Greater Accra, Ghana',
     'geo.position': '5.5502;-0.2174',
     'ICBM': '5.5502, -0.2174',
-    'DC.title': 'Perennial Link Ventures — Ghana Business Directory',
-    'DC.subject': 'Business Directory; Ghana; Accra',
+    'DC.title': 'Market PLV — Global Online Marketplace & Shopping',
+    'DC.subject': 'Online Marketplace; Shopping; E-Commerce; Electronics; Ghana; Worldwide',
     'DC.language': 'en',
   },
   openGraph: {
-    title: 'Perennial Link Ventures | Ghana Business Directory',
+    title: 'Market PLV — Global Online Marketplace & Verified Shopping',
     description:
-      'Find verified businesses in Ghana and contact them directly by WhatsApp, phone, email, or website. Free to list.',
+      'Buy and sell electronics, laptops, phones, fashion, and goods worldwide and in Ghana. Contact verified sellers directly on Market PLV.',
     url: appUrl,
-    siteName: 'Perennial Link Ventures',
-    locale: 'en_GH',
+    siteName: 'Market PLV',
+    locale: 'en_US',
     type: 'website',
     images: [
       {
         url: `${appUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'Perennial Link Ventures — Ghana Business Directory',
+        alt: 'Market PLV — Global Online Marketplace & Shopping Platform',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Perennial Link Ventures | Ghana Business Directory',
+    title: 'Market PLV — Global Online Marketplace & Verified Shopping',
     description:
-      'Find verified businesses in Ghana and contact them by WhatsApp, phone, email, or website.',
+      'Buy and sell electronics, laptops, phones, fashion, and goods worldwide and in Ghana. Contact verified sellers directly on Market PLV.',
     images: [`${appUrl}/og-image.png`],
   },
   robots: {
@@ -120,27 +119,57 @@ export default function RootLayout({
 }>) {
   // ── JSON-LD Structured Data ───────────────────────────────────────────────
 
-  // 1. WebSite — enables Google Sitelinks Search Box
+  // 1. WebSite — enables Google Sitelinks Search Box for product queries
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Perennial Link Ventures Directory',
+    name: 'Market PLV',
+    alternateName: ['Market-PLV', 'Perennial Link Ventures Marketplace', 'Market PLV Online Store'],
     url: appUrl,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${appUrl}/listings?q={search_term_string}`,
+      target: `${appUrl}/products?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   };
 
-  // 2. Organization — brand knowledge panel signals
+  // 2. OnlineMarketplace / Store — establishes e-commerce entity authority with Google AI & Shopping
+  const marketplaceSchema = {
+    '@context': 'https://schema.org',
+    '@type': ['OnlineMarketplace', 'Store'],
+    name: 'Market PLV',
+    url: appUrl,
+    description:
+      'Premier global and regional online marketplace connecting buyers directly with verified sellers for electronics, laptops, phones, fashion, home goods, and services.',
+    logo: `${appUrl}/icon.png`,
+    image: `${appUrl}/og-image.png`,
+    telephone: '+233594772823',
+    email: 'info@market-plv.com',
+    currenciesAccepted: 'GHS, USD, EUR, GBP',
+    paymentAccepted: 'Cash on Delivery, Mobile Money, Bank Transfer, Card',
+    priceRange: '$$',
+    areaServed: [
+      { '@type': 'Country', name: 'Ghana' },
+      { '@type': 'AdministrativeArea', name: 'Worldwide' },
+    ],
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'GH',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: 7,
+      returnMethod: 'https://schema.org/ReturnInStore',
+      returnFees: 'https://schema.org/FreeReturn',
+    },
+  };
+
+  // 3. Organization — Brand trust & customer contact
   const orgSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Perennial Link Ventures',
+    name: 'Market PLV (Perennial Link Ventures)',
+    alternateName: 'Market PLV',
     url: appUrl,
     logo: `${appUrl}/icon.png`,
-    sameAs: [],
     telephone: '+233594772823',
     email: 'info@market-plv.com',
     address: {
@@ -151,44 +180,13 @@ export default function RootLayout({
       postalCode: 'GA',
       addressCountry: 'GH',
     },
-  };
-
-  // 3. LocalBusiness — local SEO signals (maps, local pack)
-  const localBusinessSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: 'Perennial Link Ventures',
-    description:
-      "Ghana's premier verified business directory connecting customers with local businesses via WhatsApp, phone, email, and website.",
-    url: appUrl,
-    telephone: '+233594772823',
-    email: 'info@market-plv.com',
-    image: `${appUrl}/og-image.png`,
-    priceRange: 'Free',
-    currenciesAccepted: 'GHS',
-    paymentAccepted: 'Free listing',
-    areaServed: {
-      '@type': 'Country',
-      name: 'Ghana',
-    },
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Tuba / Weija',
-      addressLocality: 'Accra',
-      addressRegion: 'Greater Accra',
-      addressCountry: 'GH',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 5.5502,
-      longitude: -0.2174,
-    },
-    openingHoursSpecification: [
+    contactPoint: [
       {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        opens: '08:00',
-        closes: '18:00',
+        '@type': 'ContactPoint',
+        telephone: '+233594772823',
+        contactType: 'customer service',
+        availableLanguage: ['en', 'Akan', 'Ga'],
+        areaServed: ['GH', 'Worldwide'],
       },
     ],
   };
@@ -214,11 +212,11 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(marketplaceSchema) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
       <body className="flex flex-col min-h-screen bg-slate-50 antialiased text-slate-900 overflow-x-hidden">

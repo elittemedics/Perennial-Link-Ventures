@@ -61,7 +61,7 @@ export default function CategoryTabDropdown() {
         />
       </button>
 
-      {/* Sub-dropdown Panel (Compact Jumia-style Megamenu) */}
+      {/* Sub-dropdown Panel (Compact Megamenu) */}
       {isOpen && (
         <div className="absolute top-full left-0 mt-2 w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 sm:p-5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">

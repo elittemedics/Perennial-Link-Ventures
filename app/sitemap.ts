@@ -41,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/product/${p.id}`,
       lastModified: p.createdAt,
       changeFrequency: 'daily',
-      priority: 0.8,
+      priority: 0.9,
     }));
 
     const businessEntries: MetadataRoute.Sitemap = businesses.map((b) => ({

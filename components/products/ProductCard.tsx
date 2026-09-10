@@ -105,8 +105,13 @@ export default function ProductCard({ product, directContact = false, hideBusine
           {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
         </button>
 
-        {/* Product Image */}
-        <div className="relative aspect-square bg-slate-50 overflow-hidden">
+        {/* Product Image Link */}
+        <Link
+          href={`/product/${product.id}`}
+          onClick={trackView}
+          className="block relative aspect-square bg-slate-50 overflow-hidden"
+          title={`View details for ${product.title}`}
+        >
           <Image
             src={
               product.image ||
@@ -140,25 +145,33 @@ export default function ProductCard({ product, directContact = false, hideBusine
           {/* Quick Hover Overlay */}
           <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
             <span className="bg-slate-900/85 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-amber-300" /> Click to view
+              <Eye className="w-3.5 h-3.5 text-amber-300" /> View & Buy
             </span>
           </div>
-        </div>
+        </Link>
 
         {/* Product Info */}
         <div className="p-3 flex flex-col gap-1 flex-1">
-          <h3 className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug min-h-[2.2rem] group-hover:text-sea transition-colors">
-            {product.title}
-          </h3>
+          <Link
+            href={`/product/${product.id}`}
+            onClick={trackView}
+            className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug min-h-[2.2rem] hover:text-sea transition-colors"
+          >
+            <h3>{product.title}</h3>
+          </Link>
 
           {!hideBusinessInfo && (
             product.business ? (
-              <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1 line-clamp-1">
+              <Link
+                href={`/business/${product.business.slug}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-[11px] text-slate-500 font-semibold flex items-center gap-1 line-clamp-1 hover:text-sea transition-colors"
+              >
                 <Building2 className="w-3 h-3 text-sea shrink-0" />
                 <span>{product.business.name}</span>
-              </p>
+              </Link>
             ) : (
-              <p className="text-[11px] text-slate-400 font-medium">Individual Seller</p>
+              <p className="text-[11px] text-slate-400 font-medium">Verified Seller</p>
             )
           )}
 
@@ -185,39 +198,33 @@ export default function ProductCard({ product, directContact = false, hideBusine
             </div>
           </div>
 
-          {/* Contact Seller button: WhatsApp directly if on business profile (directContact), else profile link */}
-          {directContact && whatsappUrl !== '#' ? (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-                trackView();
-              }}
-              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-bold text-white bg-emerald-600 rounded-xl py-2 px-2 hover:bg-emerald-500 transition-colors shadow-2xs"
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>Contact Seller</span>
-            </a>
-          ) : product.business ? (
+          {/* Action CTAs: Quick WhatsApp + Direct View & Buy link */}
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1.5">
+            {whatsappUrl !== '#' && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  trackView();
+                }}
+                className="flex-1 flex items-center justify-center gap-1 text-[11px] font-bold text-white bg-emerald-600 rounded-xl py-2 px-2 hover:bg-emerald-500 transition-colors shadow-2xs"
+                title="Chat directly on WhatsApp with seller"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+              </a>
+            )}
             <Link
-              href={`/business/${product.business.slug}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                trackView();
-              }}
-              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-bold text-sea bg-sky-50 rounded-xl py-2 px-2 hover:bg-sea hover:text-white transition-colors shadow-2xs"
+              href={`/product/${product.id}`}
+              onClick={trackView}
+              className="flex-1 flex items-center justify-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-sea hover:text-white rounded-xl py-2 px-2 transition-colors shadow-2xs"
             >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Contact Seller</span>
-            </Link>
-          ) : (
-            <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-center gap-1 text-[11px] font-bold text-sky-800 bg-sky-50 rounded-xl py-2 px-2">
               <Eye className="w-3.5 h-3.5" />
-              <span>View Product Details</span>
-            </div>
-          )}
+              <span>Details</span>
+            </Link>
+          </div>
         </div>
       </article>
 
