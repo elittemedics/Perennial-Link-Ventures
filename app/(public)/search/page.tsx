@@ -10,7 +10,10 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Search Products & Businesses',
-  description: 'Search for products, verified businesses, suppliers, and local services on Perennial Link Ventures.',
+  description: 'Search for products, verified businesses, suppliers, and local services on Market PLV.',
+  // Dynamic search result URLs are user-generated query pages; they index
+  // poorly and waste crawl budget, so we keep them out of the index.
+  robots: { index: false, follow: true },
 };
 
 export interface SearchPageProps {

@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
         location: validated.location || null,
         whatsappPhone: validated.whatsappPhone || business?.whatsapp || business?.phone || null,
         productCategory: validated.productCategory || 'Other categories',
+        itemCondition: validated.itemCondition || 'NewCondition',
         hasDelivery: (body.hasDelivery === true) || false,
         deliveryRange: body.deliveryRange || null,
         images: validated.images && validated.images.length > 0 ? {

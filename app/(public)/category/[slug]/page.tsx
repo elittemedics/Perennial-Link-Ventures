@@ -67,8 +67,54 @@ export default async function CategoryDetailPage(props: CategoryPageProps) {
     notFound();
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+
+  // ── BreadcrumbList — Home > Categories > This category ──
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Categories', item: `${baseUrl}/categories` },
+      { '@type': 'ListItem', position: 3, name: category.name, item: `${baseUrl}/category/${category.slug}` },
+    ],
+  };
+
+  // ── ItemList — businesses listed under this category ──
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${category.name} businesses on Market PLV`,
+    numberOfItems: category.businesses.length,
+    itemListElement: category.businesses.map((b, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `${baseUrl}/business/${b.slug}`,
+      name: b.name,
+      image: b.coverImage || undefined,
+      ...(b.totalReviews > 0
+        ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: b.avgRating.toFixed(1),
+              reviewCount: b.totalReviews,
+              bestRating: 5,
+            },
+          }
+        : {}),
+    })),
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
       
       <Link href="/categories">
         <Button variant="ghost" size="sm" className="gap-2">

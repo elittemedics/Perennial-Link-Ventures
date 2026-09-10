@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { readApiResponse } from '@/lib/api-client';
-import { UserPlus, Building2, User, Eye, EyeOff, Mail } from 'lucide-react';
+import { UserPlus, Building2, User, Eye, EyeOff, Mail, Loader2 } from 'lucide-react';
 import { DEFAULT_COUNTRY } from '@/lib/countries-data';
 import { CountrySelect } from '@/components/common/CountrySelect';
+import GoogleIcon from '@/components/common/GoogleIcon';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,7 +22,15 @@ export default function RegisterPage() {
   const [role, setRole] = useState<'VISITOR' | 'BUSINESS_OWNER'>('BUSINESS_OWNER');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // ── Google OAuth ─────────────────────────────────────────────────────────
+  const handleGoogleSignIn = () => {
+    setOauthLoading(true);
+    setError(null);
+    window.location.href = '/api/v1/auth/google';
+  };
 
   const isValidEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
 
@@ -69,7 +78,7 @@ export default function RegisterPage() {
           </div>
           <CardTitle className="text-2xl font-bold text-slate-900">Create Your Account</CardTitle>
           <CardDescription className="text-slate-500 text-xs">
-            Join Ghana&apos;s leading business directory network.
+            Buy and sell on Ghana&apos;s trusted online marketplace.
           </CardDescription>
         </CardHeader>
 
@@ -79,6 +88,26 @@ export default function RegisterPage() {
               {error}
             </div>
           )}
+
+          {/* Google Sign-Up */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={oauthLoading || isLoading}
+            className="w-full flex items-center justify-center gap-2.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow focus:outline-none focus:ring-2 focus:ring-sea/30 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {oauthLoading ? (
+              <><Loader2 className="w-5 h-5 animate-spin text-slate-400" /> Connecting to Google…</>
+            ) : (
+              <><GoogleIcon className="w-5 h-5" /> Sign up with Google</>
+            )}
+          </button>
+
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-slate-200" />
+            <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">or</span>
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             

@@ -53,8 +53,41 @@ export default async function HomePage() {
     // DB offline fallback for build/preview
   }
 
+  // ItemList schema for the "Latest products" grid — tells Google these are
+  // real marketplace listings, each linking to its own product page.
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://market-plv.com';
+  const itemListSchema =
+    trendingProducts.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Latest products on Market PLV',
+          itemListOrder: 'https://schema.org/ItemListOrderDescending',
+          numberOfItems: trendingProducts.length,
+          itemListElement: trendingProducts.map((prod, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            url: `${baseUrl}/product/${prod.id}`,
+            name: prod.title,
+            image: prod.images?.[0]?.url || prod.image || undefined,
+            offers: {
+              '@type': 'Offer',
+              price: prod.price > 0 ? prod.price : undefined,
+              priceCurrency: prod.currency || 'GHS',
+              availability: prod.isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            },
+          })),
+        }
+      : null;
+
   return (
     <div className="space-y-0 overflow-hidden">
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+        />
+      )}
 
       {/* ═══════════════════════════════════════════════════════════
           1. HERO SECTION — Compact, centered, static text
@@ -73,11 +106,11 @@ export default async function HomePage() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 w-full">
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-snug">
-            Showcase Your Products to <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-sky-200 to-white">Thousands of Buyers</span>
+            Buy &amp; Sell Online in Ghana — <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-sky-200 to-white">Verified Sellers, Best Prices</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-sky-100 max-w-2xl mx-auto font-normal leading-relaxed">
-            List your business, upload your products, and let customers contact you directly on whatsapp or phone - no middlemen, no commission fees.
+          <p className="text-sm sm:text-base text-sky-100 max-w-3xl mx-auto font-normal leading-relaxed">
+            Discover laptops, phones, electronics, fashion, and more from thousands of verified sellers. Contact sellers directly on WhatsApp or phone — inspect before you pay, with no middlemen or commission.
           </p>
 
         </div>

@@ -26,10 +26,6 @@ const nextConfig = {
         destination: '/api/v1/auth/reset-password',
       },
       {
-        source: '/api/v1/auth/send-otp',
-        destination: '/api/auth/send-otp',
-      },
-      {
         source: '/api/categories',
         destination: '/api/v1/categories',
       },

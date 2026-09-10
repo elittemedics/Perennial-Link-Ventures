@@ -12,7 +12,6 @@ export const RegisterSchema = z.object({
 export const LoginSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
   password: z.string().min(1, 'Password is required.'),
-  otp: z.string().optional(),
 });
 
 export const ForgotPasswordSchema = z.object({
@@ -118,6 +117,7 @@ export const ProductSchema = z.object({
   location: z.string().optional().nullable(),
   whatsappPhone: z.string().min(6, 'Please add a WhatsApp or phone number customers can use.').optional().nullable(),
   productCategory: z.string().default('Other categories'),
+  itemCondition: z.enum(['NewCondition', 'UsedCondition', 'RefurbishedCondition', 'DamagedCondition']).default('NewCondition'),
 });
 
 export const ServiceSchema = z.object({

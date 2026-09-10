@@ -43,7 +43,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              A global business directory and marketplace connecting customers directly with trusted businesses and service providers.
+              A global online marketplace connecting buyers directly with verified sellers and trusted businesses — no middlemen, no commission.
             </p>
           </div>
 
@@ -56,6 +56,7 @@ export default function Footer() {
               <li><Link href="/listings" className="hover:text-gold-400 transition-colors">Browse Business Directory</Link></li>
               <li><Link href="/register" className="hover:text-gold-400 transition-colors">Register Your Business</Link></li>
               <li><Link href="/about" className="hover:text-gold-400 transition-colors">About Us</Link></li>
+              <li><Link href="/faq" className="hover:text-gold-400 transition-colors">FAQ — Buying &amp; Selling</Link></li>
             </ul>
           </div>
 

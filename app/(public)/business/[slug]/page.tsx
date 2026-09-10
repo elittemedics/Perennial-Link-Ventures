@@ -75,7 +75,7 @@ export async function generateMetadata(props: BusinessPageProps): Promise<Metada
     ].filter(Boolean),
     alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: `${business.name} | Perennial Link Ventures`,
+      title: `${business.name} | Market PLV`,
       description,
       url: canonicalUrl,
       type: 'website',
@@ -83,7 +83,7 @@ export async function generateMetadata(props: BusinessPageProps): Promise<Metada
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${business.name} | Perennial Link Ventures`,
+      title: `${business.name} | Market PLV`,
       description,
       images: [ogImage],
     },
@@ -171,11 +171,26 @@ export default async function BusinessDetailPage(props: BusinessPageProps) {
   const hasPhone = business.phone && business.phone !== 'Not provided';
   const hasEmail = business.email && business.email !== 'Not provided';
 
+  // ── BreadcrumbList — Home > Businesses > This business ──
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Businesses', item: `${baseUrl}/listings` },
+      { '@type': 'ListItem', position: 3, name: business.name, item: `${baseUrl}/business/${business.slug}` },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <div className="bg-slate-50 pb-16">

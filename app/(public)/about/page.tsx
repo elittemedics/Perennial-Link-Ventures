@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { ShieldCheck, Phone, MapPin, Mail, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'About Us — Ghana\'s Premier Business Directory',
+  title: 'About Us — Ghana\'s Online Marketplace for Buying & Selling',
   description:
-    'Learn about Perennial Link Ventures — headquartered in Tuba/Weija, Accra. We bridge the gap between high-intent clients and verified local businesses across Ghana.',
+    'Market PLV (Perennial Link Ventures) is a global and regional online marketplace headquartered in Tuba/Weija, Accra. Buy and sell products and services by contacting verified sellers directly via WhatsApp or phone.',
   alternates: { canonical: '/about' },
   openGraph: {
-    title: 'About Perennial Link Ventures | Ghana Business Directory',
+    title: 'About Market PLV | Online Marketplace for Buying & Selling',
     description:
-      'Learn how Perennial Link Ventures connects customers with verified local businesses across Ghana via WhatsApp, phone, email, and web.',
+      'Learn how Market PLV connects buyers with verified sellers across Ghana and worldwide via WhatsApp, phone, email, and web — no middlemen, no commission.',
     type: 'website',
   },
 };
@@ -27,10 +27,10 @@ export default function AboutPage() {
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <Badge variant="info">Company Overview</Badge>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-          About Perennial Link Ventures
+          About Market PLV
         </h1>
         <p className="text-slate-600 text-lg leading-relaxed">
-          Ghana’s premier verified business directory and enterprise solutions hub. Headquartered in Tuba/Weija, Greater Accra, we bridge the gap between high-intent clients and verified local businesses.
+          Ghana&apos;s trusted online marketplace for buying and selling. Headquartered in Tuba/Weija, Greater Accra, we connect buyers directly with verified sellers and local businesses — no middlemen, no hidden commission.
         </p>
       </div>
 

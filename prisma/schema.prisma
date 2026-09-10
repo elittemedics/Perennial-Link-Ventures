@@ -122,6 +122,8 @@ model User {
   image              String?
   phone              String?
   status             UserStatus @default(ACTIVE)
+  provider           String     @default("credentials") // "credentials" | "google"
+  providerId         String?    // Google sub, only for Google sign-ins
   twoFactorToken     String?
   twoFactorExpires   DateTime?
   onboardingSeenAt   DateTime?
@@ -155,6 +157,7 @@ model User {
 
   @@index([email])
   @@index([role])
+  @@index([provider, providerId])
   @@index([status])
 }
 
@@ -518,6 +521,7 @@ model BusinessProduct {
   viewCount          Int      @default(0)
   hasDelivery        Boolean  @default(false)
   deliveryRange      String?  // e.g. "Nationwide", "Accra & Tema", "Within 20km"
+  itemCondition      String   @default("NewCondition") // "NewCondition" | "UsedCondition" | "RefurbishedCondition" | "DamagedCondition"
   createdAt          DateTime @default(now())
 
   business Business?              @relation(fields: [businessId], references: [id], onDelete: SetNull)

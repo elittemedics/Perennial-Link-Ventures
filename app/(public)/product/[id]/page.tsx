@@ -118,6 +118,19 @@ export async function generateMetadata(props: ProductPageProps): Promise<Metadat
       images: [imageUrl],
     },
     robots: { index: true, follow: true },
+    other: {
+      // Product OG tags so WhatsApp/Facebook previews show price & stock.
+      ...(product.price > 0
+        ? {
+            'product:price:amount': String(product.price),
+            'product:price:currency': 'GHS',
+            'og:price:amount': String(product.price),
+            'og:price:currency': 'GHS',
+          }
+        : {}),
+      'product:availability': product.isAvailable ? 'in stock' : 'out of stock',
+      'og:availability': product.isAvailable ? 'in stock' : 'out of stock',
+    },
   };
 }
 
@@ -197,6 +210,77 @@ export default async function ProductPage(props: ProductPageProps) {
   }
 
   // ── JSON-LD: Google Merchant & Rich Snippets Product Schema ──────────────
+  // NOTE: Reviews/ratings are intentionally omitted from this schema.
+  // Hardcoding aggregate ratings violates Google's structured-data spam
+  // policy and is why Google penalized the site. Only real, user-submitted
+  // ratings belong here (see business pages for real review markup).
+  const itemCondition = `https://schema.org/${product.itemCondition || 'NewCondition'}`;
+  const isFreePrice = product.price <= 0;
+  const hasSellerBusiness = Boolean(product.business);
+
+  const offer: Record<string, unknown> = {
+    '@type': 'Offer',
+    priceCurrency: 'GHS',
+    priceValidUntil: '2027-12-31',
+    itemCondition,
+    availability: product.isAvailable
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock',
+    url: `${baseUrl}/product/${id}`,
+  };
+
+  // Honest pricing: when the price is 0 (contact-for-price), do NOT emit a
+  // numeric `price` — a fake GHS 1 price is misleading structured data.
+  if (!isFreePrice) {
+    offer.price = product.price;
+  }
+
+  // Seller: prefer the registered business (Organization). Product posted by
+  // an individual with no business is a Person.
+  if (hasSellerBusiness) {
+    offer.seller = {
+      '@type': 'Organization',
+      name: product.business!.name,
+      url: `${baseUrl}/business/${product.business!.slug}`,
+    };
+  } else {
+    offer.seller = {
+      '@type': 'Person',
+      name: 'Verified Seller on Market PLV',
+      url: `${baseUrl}/product/${id}`,
+    };
+  }
+
+  // Return & shipping claims are only made when the seller actually offers
+  // delivery. Pickup-only listings get no delivery promises.
+  offer.hasMerchantReturnPolicy = {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: 'GH',
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: 7,
+    returnMethod: 'https://schema.org/ReturnInStore',
+    returnFees: 'https://schema.org/FreeReturn',
+  };
+  if (product.hasDelivery) {
+    offer.shippingDetails = {
+      '@type': 'OfferShippingDetails',
+      shippingRate: {
+        '@type': 'MonetaryAmount',
+        value: '0',
+        currency: 'GHS',
+      },
+      shippingDestination: [{
+        '@type': 'DefinedRegion',
+        addressCountry: 'GH',
+      }],
+      deliveryTime: {
+        '@type': 'ShippingDeliveryTime',
+        handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+        transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
+      },
+    };
+  }
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -211,69 +295,7 @@ export default async function ProductPage(props: ProductPageProps) {
     },
     category: product.productCategory,
     url: `${baseUrl}/product/${id}`,
-    offers: {
-      '@type': 'Offer',
-      price: product.price > 0 ? product.price : 1,
-      priceCurrency: 'GHS',
-      priceValidUntil: '2027-12-31',
-      itemCondition: 'https://schema.org/NewCondition',
-      availability: product.isAvailable
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      url: `${baseUrl}/product/${id}`,
-      seller: {
-        '@type': 'Organization',
-        name: product.business?.name || 'Verified Vendor',
-        url: product.business ? `${baseUrl}/business/${product.business.slug}` : baseUrl,
-      },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'GH',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 7,
-        returnMethod: 'https://schema.org/ReturnInStore',
-        returnFees: 'https://schema.org/FreeReturn',
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: '0',
-          currency: 'GHS',
-        },
-        shippingDestination: [{
-          '@type': 'DefinedRegion',
-          addressCountry: 'GH',
-        }],
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
-        },
-      },
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '19',
-      bestRating: '5',
-      worstRating: '1',
-    },
-    review: [
-      {
-        '@type': 'Review',
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: '5',
-          bestRating: '5',
-        },
-        author: {
-          '@type': 'Person',
-          name: 'Verified Customer',
-        },
-        reviewBody: 'High quality item, exactly as described. Seller responded fast on WhatsApp.',
-      },
-    ],
+    offers: offer,
   };
 
   const breadcrumbSchema = {

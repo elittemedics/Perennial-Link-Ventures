@@ -172,6 +172,14 @@ export default function RootLayout({
     logo: `${appUrl}/icon.png`,
     telephone: '+233594772823',
     email: 'info@market-plv.com',
+    // sameAs helps Google link your Knowledge Panel. Only include URLs that
+    // actually exist and link back to market-plv.com. Replace the placeholders
+    // below with the company's real social profiles, or Google will drop them.
+    sameAs: [
+      'https://www.facebook.com/marketplv',
+      'https://www.instagram.com/marketplv',
+      'https://www.linkedin.com/company/market-plv',
+    ],
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Tuba / Weija',

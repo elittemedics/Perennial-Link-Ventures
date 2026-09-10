@@ -92,7 +92,7 @@ export default function Navbar() {
                 Perennial Link
               </span>
               <span className="text-[10px] tracking-widest text-gold-600 font-bold uppercase leading-none">
-                Ventures Directory
+                Online Marketplace
               </span>
             </div>
           </Link>
@@ -108,6 +108,9 @@ export default function Navbar() {
             </Link>
             <Link href="/listings" className="hover:text-gold transition-colors">
               Businesses
+            </Link>
+            <Link href="/faq" className="hover:text-gold transition-colors">
+              FAQ
             </Link>
           </nav>
 

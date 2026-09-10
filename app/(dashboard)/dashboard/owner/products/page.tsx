@@ -29,6 +29,7 @@ interface Product {
   image?: string | null;
   images?: { id?: string; url: string; sortOrder?: number }[];
   productCategory: string;
+  itemCondition?: string;
   viewCount?: number;
   createdAt: string;
   whatsappPhone?: string | null;
@@ -52,6 +53,13 @@ const CATEGORIES = [
   'Other categories',
 ];
 
+const CONDITIONS = [
+  { value: 'NewCondition', label: 'New' },
+  { value: 'UsedCondition', label: 'Used' },
+  { value: 'RefurbishedCondition', label: 'Refurbished' },
+  { value: 'DamagedCondition', label: 'Damaged' },
+] as const;
+
 export default function OwnerProductsPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -68,6 +76,7 @@ export default function OwnerProductsPage() {
     location: '',
     whatsappPhone: '',
     productCategory: 'Other categories',
+    itemCondition: 'NewCondition',
     image: null as string | null,
     images: [] as string[],
   });
@@ -82,6 +91,7 @@ export default function OwnerProductsPage() {
     location: '',
     whatsappPhone: '',
     productCategory: 'Other categories',
+    itemCondition: 'NewCondition',
     image: null as string | null,
     images: [] as string[],
     hasDelivery: false,
@@ -142,6 +152,7 @@ export default function OwnerProductsPage() {
         location: formData.location || undefined,
         whatsappPhone: formData.whatsappPhone || undefined,
         productCategory: formData.productCategory,
+        itemCondition: formData.itemCondition,
         image: formData.images.length > 0 ? formData.images[0] : formData.image || undefined,
         images: formData.images,
         hasDelivery: formData.hasDelivery,
@@ -174,6 +185,7 @@ export default function OwnerProductsPage() {
         images: [],
         hasDelivery: false,
         deliveryRange: '',
+        itemCondition: 'NewCondition',
       }));
 
       // Refresh complete inventory
@@ -213,6 +225,7 @@ export default function OwnerProductsPage() {
       location: product.location || '',
       whatsappPhone: product.whatsappPhone || '',
       productCategory: product.productCategory,
+      itemCondition: product.itemCondition || 'NewCondition',
       image: product.image || null,
       images: existingImages,
     });
@@ -234,6 +247,7 @@ export default function OwnerProductsPage() {
           location: editDraft.location || null,
           whatsappPhone: editDraft.whatsappPhone || null,
           productCategory: editDraft.productCategory,
+          itemCondition: editDraft.itemCondition,
           image: editDraft.images.length > 0 ? editDraft.images[0] : null,
           images: editDraft.images,
         }),
@@ -375,6 +389,23 @@ export default function OwnerProductsPage() {
               </div>
 
               <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Item Condition
+                </label>
+                <select
+                  value={formData.itemCondition}
+                  onChange={(e) => setFormData({ ...formData, itemCondition: e.target.value })}
+                  className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-medium focus:border-sea focus:outline-none"
+                >
+                  {CONDITIONS.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="sm:col-span-2">
                 <Textarea
                   label="Description (optional)"
                   rows={2}
@@ -439,6 +470,22 @@ export default function OwnerProductsPage() {
                   <Button type="button" variant="ghost" size="sm" onClick={() => setEditingProduct(null)}>Cancel</Button>
                 </div>
                 <Input label="Product title" required value={editDraft.title} onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })} />
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Item Condition
+                  </label>
+                  <select
+                    value={editDraft.itemCondition}
+                    onChange={(e) => setEditDraft({ ...editDraft, itemCondition: e.target.value })}
+                    className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-medium focus:border-sea focus:outline-none"
+                  >
+                    {CONDITIONS.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <Input label="Price (optional)" type="number" step="0.01" value={editDraft.price} onChange={(e) => setEditDraft({ ...editDraft, price: e.target.value })} />
                   <Input label="Quantity (optional)" type="number" value={editDraft.quantity} onChange={(e) => setEditDraft({ ...editDraft, quantity: e.target.value })} />
@@ -481,6 +528,11 @@ export default function OwnerProductsPage() {
                       <span className="text-[10px] font-bold uppercase text-sea bg-brand-50 px-2 py-0.5 rounded-md">
                         {p.productCategory}
                       </span>
+                      {p.itemCondition && p.itemCondition !== 'NewCondition' && (
+                        <span className="text-[10px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md ml-1">
+                          {p.itemCondition === 'UsedCondition' ? 'Used' : p.itemCondition === 'RefurbishedCondition' ? 'Refurbished' : 'Damaged'}
+                        </span>
+                      )}
                       <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{p.title}</h4>
                       <p className="font-extrabold text-slate-900 text-sm">{p.price > 0 ? formatGHS(p.price) : 'Contact for price'}</p>
                       {p.quantity !== undefined && p.quantity !== null && (
